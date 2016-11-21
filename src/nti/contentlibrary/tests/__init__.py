@@ -19,20 +19,16 @@ import zope.testing.cleanup
 
 from nti.contentlibrary.interfaces import IContentUnitAnnotationUtility
 
-from nti.dataserver.tests.mock_dataserver import DSInjectorMixin
-
 from nti.testing.layers import ZopeComponentLayer
 from nti.testing.layers import ConfiguringLayerMixin
 
 class ContentlibraryTestLayer(ZopeComponentLayer,
-							  ConfiguringLayerMixin,
-							  DSInjectorMixin):
+							  ConfiguringLayerMixin):
 
-
-	set_up_packages = (	'nti.contentlibrary', 
+	set_up_packages = (	'nti.containers', 
+						'nti.contentlibrary', 
 						'nti.externalization', 
-						'nti.contenttypes.presentation', 
-						'nti.dataserver')
+						'nti.contenttypes.presentation')
 
 	@classmethod
 	def setUp(cls):

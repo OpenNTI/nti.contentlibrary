@@ -16,13 +16,10 @@ does_not = is_not
 
 import fudge
 
-
 from zope import component
 from zope import interface
 
-from zope.component.hooks import site
-
-from nti.appserver.policies.sites import BASECOPPA  #TODO: Remove this
+from zope.configuration import xmlconfig, config
 
 from nti.contentlibrary.interfaces import IS3Key
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -35,7 +32,7 @@ from nti.contentlibrary.filesystem import EnumerateOnceFilesystemLibrary
 
 from nti.externalization.externalization import to_external_object
 
-from nti.site.transient import TrivialSite
+from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 from nti.testing.matchers import verifiably_provides
 
@@ -50,12 +47,6 @@ HEAD_ZCML_STRING = """
 		<include package="z3c.baseregistry" file="meta.zcml" />
 		<include package="." file="meta.zcml" />
 
-		<utility
-			component="nti.appserver.policies.sites.BASECOPPA"
-			provides="zope.component.interfaces.IComponents"
-			name="mathcounts.nextthought.com" />
-
-		<registerIn registry="nti.appserver.policies.sites.BASECOPPA">
 """
 
 ZCML_STRING = HEAD_ZCML_STRING + """
@@ -63,7 +54,6 @@ ZCML_STRING = HEAD_ZCML_STRING + """
 				directory="tests/"
 				prefix="SomePrefix"
 				/>
-		</registerIn>
 		</configure>
 		"""
 
@@ -72,20 +62,13 @@ BOTO_ZCML_STRING = HEAD_ZCML_STRING + """
 				bucket="foobar"
 				cdn_name="cdnname"
 				/>
-		</registerIn>
 		</configure>
 		"""
-
-from zope.configuration import xmlconfig, config
-
-from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 class TestZcml(ContentlibraryLayerTest):
 
 	def setUp(self):
 		super(TestZcml,self).setUp()
-		xsite = BASECOPPA
-		xsite.__init__( xsite.__parent__, name=xsite.__name__, bases=xsite.__bases__ )
 
 	def test_filesystem_site_registrations(self):
 		#"Can we add new registrations in a sub-site?"
@@ -96,19 +79,14 @@ class TestZcml(ContentlibraryLayerTest):
 
 		xmlconfig.string( ZCML_STRING, context )
 
-		assert_that( BASECOPPA.__bases__, is_( (component.globalSiteManager,) ) )
-
-		# assert_that( component.queryUtility( IContentPackageLibrary ), is_( none() ) )
-
-		with site( TrivialSite( BASECOPPA ) ):
-			lib = component.getUtility( IContentPackageLibrary )
-			assert_that( lib, verifiably_provides( IFilesystemContentPackageLibrary ) )
-			assert_that( lib, is_( EnumerateOnceFilesystemLibrary ) )
-			# Did the right prefix come in?
-			assert_that( lib, has_property( 'url_prefix', '/SomePrefix/' ) )
-			pack_ext = to_external_object( lib[0] )
-			assert_that( pack_ext, has_entry( 'href', '/SomePrefix/TestFilesystem/index.html' ) )
-			assert_that( pack_ext, has_entry( 'root', '/SomePrefix/TestFilesystem/' ) )
+		lib = component.getUtility( IContentPackageLibrary )
+		assert_that( lib, verifiably_provides( IFilesystemContentPackageLibrary ) )
+		assert_that( lib, is_( EnumerateOnceFilesystemLibrary ) )
+		# Did the right prefix come in?
+		assert_that( lib, has_property( 'url_prefix', '/SomePrefix/' ) )
+		pack_ext = to_external_object( lib[0] )
+		assert_that( pack_ext, has_entry( 'href', '/SomePrefix/TestFilesystem/index.html' ) )
+		assert_that( pack_ext, has_entry( 'root', '/SomePrefix/TestFilesystem/' ) )
 
 
 	@fudge.patch('boto.connect_s3')
@@ -125,15 +103,14 @@ class TestZcml(ContentlibraryLayerTest):
 		xmlconfig.string( BOTO_ZCML_STRING, context )
 		# assert_that( component.queryUtility( IContentPackageLibrary ), is_( none() ) )
 
-		with site( TrivialSite( BASECOPPA ) ):
-			lib = component.getUtility( IContentPackageLibrary )
-			assert_that( lib, verifiably_provides( IContentPackageLibrary ) )
-			assert_that( lib, is_( BotoS3BucketContentLibrary ) )
+		lib = component.getUtility( IContentPackageLibrary )
+		assert_that( lib, verifiably_provides( IContentPackageLibrary ) )
+		assert_that( lib, is_( BotoS3BucketContentLibrary ) )
 
-			@interface.implementer(IS3Key)
-			class Key(object):
-				bucket = None
-				key = 'my.key'
+		@interface.implementer(IS3Key)
+		class Key(object):
+			bucket = None
+			key = 'my.key'
 
-			mapper = component.getAdapter( Key(), IAbsoluteContentUnitHrefMapper )
-			assert_that( mapper, has_property( 'href', '//cdnname/my.key' ) )
+		mapper = component.getAdapter( Key(), IAbsoluteContentUnitHrefMapper )
+		assert_that( mapper, has_property( 'href', '//cdnname/my.key' ) )
