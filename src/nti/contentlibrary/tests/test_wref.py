@@ -31,16 +31,16 @@ from nti.contentlibrary.tests import ContentlibraryLayerTest
 class TestWref(ContentlibraryLayerTest):
 
 	def setUp(self):
-		global_library = self.global_library = filesystem.GlobalFilesystemContentPackageLibrary( os.path.dirname(__file__) )
-	
+		global_library = self.global_library = filesystem.GlobalFilesystemContentPackageLibrary(os.path.dirname(__file__))
+
 		global_library.syncContentPackages()
 
-		component.getGlobalSiteManager().registerUtility( global_library,
-														  provided=IContentPackageLibrary )
+		component.getGlobalSiteManager().registerUtility(global_library,
+														 provided=IContentPackageLibrary)
 
 	def tearDown(self):
-		component.getGlobalSiteManager().unregisterUtility( self.global_library,
-															provided=IContentPackageLibrary )
+		component.getGlobalSiteManager().unregisterUtility(self.global_library,
+														   provided=IContentPackageLibrary)
 
 
 	def test_wref(self):
@@ -49,22 +49,19 @@ class TestWref(ContentlibraryLayerTest):
 		unit = lib['tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.']
 
 		wref = IWeakRef(unit)
+		assert_that(wref(), is_(unit))
 
-		assert_that( wref(), is_( unit ))
+		wref2 = pickle.loads(pickle.dumps(wref))
 
-		wref2 = pickle.loads( pickle.dumps(wref) )
-
-		assert_that( wref2, is_( wref ))
-
-		assert_that( wref2(), is_( unit ))
+		assert_that(wref2, is_(wref))
+		assert_that(wref2(), is_(unit))
 
 	def test_wref_to_persistent(self):
 		unit = filesystem.PersistentFilesystemContentUnit()
 		unit.ntiid = 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
 
 		wref = IWeakRef(unit)
-
-		assert_that( wref, is_(ContentUnitWeakRef))
+		assert_that(wref, is_(ContentUnitWeakRef))
 
 		# It resolves to what's in the library
 		lib = component.getUtility(interfaces.IContentPackageLibrary)
@@ -72,5 +69,4 @@ class TestWref(ContentlibraryLayerTest):
 		lib_unit = lib['tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.']
 
 		wref = IWeakRef(unit)
-
-		assert_that( wref(), is_( lib_unit ))
+		assert_that(wref(), is_(lib_unit))

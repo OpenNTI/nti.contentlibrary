@@ -19,7 +19,9 @@ import unittest
 
 from nti.contentlibrary import filesystem
 from nti.contentlibrary import presentationresource
+
 from nti.contentlibrary.bucket import _AbstractDelimitedHierarchyObject
+
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
 
 from nti.testing.matchers import validly_provides

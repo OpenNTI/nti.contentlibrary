@@ -22,7 +22,6 @@ from hamcrest import is_not as does_not
 from hamcrest import contains_inanyorder
 from hamcrest import greater_than_or_equal_to
 
-import time
 import os.path
 import anyjson as json
 
@@ -32,9 +31,11 @@ except ImportError:
 	import pickle
 
 from zope import component
+
 from zope.dublincore.interfaces import IWriteZopeDublinCore
 
-from nti.contentlibrary import interfaces, filesystem
+from nti.contentlibrary import filesystem
+from nti.contentlibrary import interfaces 
 
 from nti.externalization.externalization import to_external_object
 

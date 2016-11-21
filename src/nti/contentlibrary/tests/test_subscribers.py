@@ -23,6 +23,8 @@ from hamcrest import empty as is_empty
 from hamcrest import contains_inanyorder
 does_not = is_not
 
+from nti.testing.matchers import validly_provides
+
 from nti.externalization.tests import externalizes
 
 import os
@@ -30,6 +32,7 @@ import os
 from zope import component
 
 from zope.component import eventtesting
+
 from zope.component.hooks import site as current_site
 
 from zope.annotation.interfaces import IAnnotations
@@ -47,14 +50,14 @@ from zope.schema.interfaces import IFieldUpdatedEvent
 from nti.contentlibrary import filesystem
 from nti.contentlibrary import interfaces
 from nti.contentlibrary import subscribers
+
 from nti.contentlibrary.bundle import ContentPackageBundle
+
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 from nti.zodb.minmax import NumericMaximum
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
-
-from nti.testing.matchers import validly_provides
 
 class TestSubscribers(ContentlibraryLayerTest):
 

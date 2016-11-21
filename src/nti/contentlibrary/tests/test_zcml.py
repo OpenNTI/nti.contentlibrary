@@ -16,8 +16,10 @@ does_not = is_not
 
 import fudge
 
-from zope import interface
+
 from zope import component
+from zope import interface
+
 from zope.component.hooks import site
 
 from nti.appserver.policies.sites import BASECOPPA  #TODO: Remove this
