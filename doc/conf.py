@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# nti.solr documentation build configuration file, created by
+# nti.contentlibrary documentation build configuration file, created by
 # sphinx-quickstart on Tue Aug  2 08:43:18 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -64,7 +64,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'nti.solr'
+project = u'nti.contentlibrary'
 copyright = u'2016, NextThought'
 author = u'Jason Madden'
 
@@ -153,7 +153,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'nti.solr v1.0'
+# html_title = u'nti.contentlibrary v1.0'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -253,7 +253,7 @@ html_static_path = ['_static']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ntisolrdoc'
+htmlhelp_basename = 'nticontentlibrarydoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -279,7 +279,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'ntisolr.tex', u'nti.solr Documentation',
+    (master_doc, 'nticontentlibrary.tex', u'nti.contentlibrary Documentation',
      u'Jason madden', 'manual'),
 ]
 
@@ -321,7 +321,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ntisolr', u'nti.solr Documentation',
+    (master_doc, 'nticontentlibrary', u'nti.contentlibrary Documentation',
      [author], 1)
 ]
 
@@ -336,8 +336,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'ntisolr', u'nti.solr Documentation',
-     author, 'ntisolr', 'One line description of project.',
+    (master_doc, 'nticontentlibrary', u'nti.contentlibrary Documentation',
+     author, 'nticontentlibrary', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -367,9 +367,9 @@ intersphinx_mapping = {
     #'https://docs.zope.org/zope.site/': None,
 }
 
-extlinks = {'issue': ('https://github.com/NextThought/nti.solr/issues/%s',
+extlinks = {'issue': ('https://github.com/NextThought/nti.contentlibrary/issues/%s',
                       'issue #'),
-            'pr': ('https://github.com/NextThought/nti.solr/pull/%s',
+            'pr': ('https://github.com/NextThought/nti.contentlibrary/pull/%s',
                    'pull request #')}
 
 autodoc_default_flags = ['members', 'show-inheritance']

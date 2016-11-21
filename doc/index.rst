@@ -1,6 +1,6 @@
 
 ===========
- nti.solr:
+ nti.contentlibrary:
 ===========
 
 Contents:
@@ -8,10 +8,10 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-   nti.solr
+   nti.contentlibrary
    changelog
 
-.. automodule:: nti.solr
+.. automodule:: nti.contentlibrary
     :members:
     :undoc-members:
     :show-inheritance:
