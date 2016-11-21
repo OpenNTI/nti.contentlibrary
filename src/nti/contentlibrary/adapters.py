@@ -17,8 +17,8 @@ from zope import interface
 from .interfaces import IContentPackageLibrary
 from .interfaces import IDelimitedHierarchyContentPackageEnumeration
 
-@interface.implementer(IDelimitedHierarchyContentPackageEnumeration)
 @component.adapter(IContentPackageLibrary)
+@interface.implementer(IDelimitedHierarchyContentPackageEnumeration)
 def enumeration_from_library(library):
 	"""
 	Provide the library's enumeration.
@@ -28,7 +28,6 @@ def enumeration_from_library(library):
 		with this interface. This may break in the future,
 		in which case this adapter will raise an exception.
 	"""
-
 	e = library._enumeration # pylint: disable=I0011,W0212
 	assert IDelimitedHierarchyContentPackageEnumeration.providedBy(e)
 	return e
