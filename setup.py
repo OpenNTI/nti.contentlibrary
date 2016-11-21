@@ -53,6 +53,7 @@ setup(
         'BTrees',
         'boto',
         'lxml',
+        'nti.containers',
         'nti.contentfragments',
 		'nti.externalization',
         'nti.ntiids',
