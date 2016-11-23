@@ -49,7 +49,6 @@ class ContentlibraryTestLayer(ZopeComponentLayer,
 		# they are tracked by NTIID and would otherwise persist
 		annotations = component.getUtility(IContentUnitAnnotationUtility)
 		annotations.annotations.clear()
-		cls.setUpTestDS(test)
 		shutil.rmtree(cls.new_data_dir, True)
 		os.environ['DATASERVER_DATA_DIR'] = cls.old_data_dir or '/tmp'
 
