@@ -41,19 +41,16 @@ ARCHIVE_FILENAME = 'archive.zip'
 #: for sub-glossaries specific to just portions of the content
 MAIN_CSV_CONTENT_GLOSSARY_FILENAME = 'nti_content_glossary.csv'
 
-#: Assessment items for this entire content
-ASSESSMENT_INDEX_FILENAME = 'assessment_index.json'
-
-_toc_item_attrs = ('NTIRelativeScrollHeight','label', 'ntiid', 'href')
+_toc_item_attrs = ('NTIRelativeScrollHeight', 'label', 'ntiid', 'href')
 
 # Note that we preserve href as a string, and manually
 # set a 'key' property for BWC
-_toc_item_key_attrs = ('icon','thumbnail')
+_toc_item_key_attrs = ('icon', 'thumbnail')
 
-def _node_get( node, name, default=None ):
+def _node_get(node, name, default=None):
 	# LXML defaults to returning ASCII attributes as byte strings
 	# https://mailman-mail5.webfaction.com/pipermail/lxml/2011-December/006239.html
-	val = node.get( name, default )
+	val = node.get(name, default)
 	if isinstance(val, bytes):
 		val = val.decode('utf-8')
 	return val
@@ -83,16 +80,16 @@ def _href_for_sibling_key(href):
 	path = '/'.join(parts)
 	return path
 
-def _tocItem( node, toc_entry, factory=None, child_factory=None ):
+def _tocItem(node, toc_entry, factory=None, child_factory=None):
 	tocItem = factory()
-	tocItem._v_toc_node = node # for testing and secret stuff
+	tocItem._v_toc_node = node  # for testing and secret stuff
 	for i in _toc_item_attrs:
 		val = _node_get(node, i, i)
 		if val and val is not i:
-			setattr( tocItem, str(i), val )
+			setattr(tocItem, str(i), val)
 
-	if node.get( 'sharedWith', '' ):
-		tocItem.sharedWith = _node_get( node, 'sharedWith' ).split( ' ' )
+	if node.get('sharedWith', ''):
+		tocItem.sharedWith = _node_get(node, 'sharedWith').split(' ')
 
 	# Now the things that should be keys.
 	# NOTE: The href may have a fragment in it, but the key is supposed
@@ -100,23 +97,23 @@ def _tocItem( node, toc_entry, factory=None, child_factory=None ):
 	# off (if there is one). Also, the hrefs may be URL encoded
 	# if they contain spaces, and since we are in the domain of knowing
 	# about URLs, it is our job to decode them.
-	tocItem.key = toc_entry.make_sibling_key( _href_for_sibling_key(tocItem.href) )
+	tocItem.key = toc_entry.make_sibling_key(_href_for_sibling_key(tocItem.href))
 	for i in _toc_item_key_attrs:
-		val = _node_get( node, i )
+		val = _node_get(node, i)
 		if val:
 			# We leave it to the toc_entry to decide if/how
 			# it needs to deal with multi-level keys, either
 			# by creating a hierarchy of keys (filesystem)
 			# or by simply string appending (boto)
-			setattr( tocItem, str(i), toc_entry.make_sibling_key( _href_for_sibling_key(val) ) )
+			setattr(tocItem, str(i), toc_entry.make_sibling_key(_href_for_sibling_key(val)))
 
 	children = []
 	for ordinal, child in enumerate(node.iterchildren(tag='topic'), 1):
-		child = _tocItem( child, toc_entry, factory=child_factory, child_factory=child_factory )
+		child = _tocItem(child, toc_entry, factory=child_factory, child_factory=child_factory)
 		child.__parent__ = tocItem
 		child.ordinal = ordinal
-		child._v_toc_node = child # for testing and secret stuff
-		children.append( child )
+		child._v_toc_node = child  # for testing and secret stuff
+		children.append(child)
 	if children:
 		tocItem.children = children
 
@@ -127,9 +124,9 @@ def _tocItem( node, toc_entry, factory=None, child_factory=None ):
 			continue
 
 		if not is_valid_ntiid_string(ntiid):
-			#logger.log( TRACE,
-			#			"Ignoring ill-formed object NTIID (%s); please fix the rendering for %s",
-			#			ntiid, tocItem)
+			# logger.log( TRACE,
+			# 			"Ignoring ill-formed object NTIID (%s); please fix the rendering for %s",
+			# 			ntiid, tocItem)
 			continue
 
 		if ntiid not in embeddedContainerNTIIDs:
@@ -145,9 +142,9 @@ def _tocItem( node, toc_entry, factory=None, child_factory=None ):
 
 etree_Error = getattr(etree, 'Error')
 
-def EclipseContentPackage( toc_entry,
+def EclipseContentPackage(toc_entry,
 						   package_factory=None,
-						   unit_factory=None ):
+						   unit_factory=None):
 	"""
 	Given a :class:`nti.contentlibrary.interfaces.IDelimitedHierarchyEntry` pointing
 	to an Eclipse TOC XML file, parse it and return the :class:`IContentPackage`
@@ -172,11 +169,11 @@ def EclipseContentPackage( toc_entry,
 	try:
 		root = toc_entry.key.readContentsAsETree()
 	except (IOError, etree_Error):
-		logger.debug( "Failed to parse TOC at %s", toc_entry, exc_info=True )
+		logger.debug("Failed to parse TOC at %s", toc_entry, exc_info=True)
 		return None
 
 	toc_last_modified = toc_entry.lastModified
-	content_package = _tocItem( root, toc_entry, factory=package_factory, child_factory=unit_factory )
+	content_package = _tocItem(root, toc_entry, factory=package_factory, child_factory=unit_factory)
 	# NOTE: assuming only one level of hierarchy (or at least the accessibility given just the parent)
 	# TODO: root and index should probably be replaced with IDelimitedHierarchyEntry objects.
 	# NOTE: IDelimitedHierarchyEntry is specified as '/' delimited. This means that when we are working with
@@ -184,9 +181,9 @@ def EclipseContentPackage( toc_entry,
 	content_package.root = toc_entry.get_parent_key()
 	content_package.index = toc_entry.key
 	content_package.index_last_modified = toc_last_modified
-	content_package.index_jsonp = toc_entry.does_sibling_entry_exist( TOC_FILENAME + '.jsonp' )
+	content_package.index_jsonp = toc_entry.does_sibling_entry_exist(TOC_FILENAME + '.jsonp')
 
-	renderVersion = root.get( 'renderVersion' )
+	renderVersion = root.get('renderVersion')
 	if renderVersion:
 		content_package.renderVersion = int(renderVersion)
 
@@ -212,17 +209,17 @@ def EclipseContentPackage( toc_entry,
 		# practice is also always the value of info[@src].
 		# Take whatever we can get.
 		info = course.xpath('info')
-		if info: # sigh
+		if info:  # sigh
 			content_package.courseInfoSrc = _node_get(info[0], 'src')
-		elif content_package.does_sibling_entry_exist( 'course_info.json' ):
+		elif content_package.does_sibling_entry_exist('course_info.json'):
 			content_package.courseInfoSrc = 'course_info.json'
 
-	if content_package.does_sibling_entry_exist( ARCHIVE_FILENAME ):
+	if content_package.does_sibling_entry_exist(ARCHIVE_FILENAME):
 		content_package.archive = ARCHIVE_FILENAME
 		content_package.installable = True
-		content_package.archive_unit = unit_factory( key=content_package.make_sibling_key( ARCHIVE_FILENAME ),
+		content_package.archive_unit = unit_factory(key=content_package.make_sibling_key(ARCHIVE_FILENAME),
 													 href=ARCHIVE_FILENAME,
-													 title='Content Archive' )
+													 title='Content Archive')
 		content_package.archive_unit.__parent__ = content_package
 
 
