@@ -320,7 +320,12 @@ class _S3ContentUnitHrefMapper(object):
 @component.adapter(IS3Key)
 class _S3KeyHrefMapper(object):
 	"""
-	Produces HTTP URLs for keys in buckets.
+	Produces HTTP URLs for keys in buckets.	Takes steps to work with CORS
+	and other distribution strategies.
+
+	Use this mapper when the bucket name is a DNS name, and the bucket name
+	also has a DNS CNAME set up for it, and the application accessing the content
+	was served from the same CNAME origin (or doesn't care about cross-origin concerns).
 	"""
 	href = None
 
@@ -331,6 +336,11 @@ class _S3KeyHrefMapper(object):
 		request_sites = component.queryUtility(IRequestSiteNames)
 		sites = request_sites.sites() if request_sites is not None else None
 		if sites:
+			# In the CORS case, we may be coming from an origin, to the dataserver
+			# and serving content which ought to come back from the origin CDN. We cannot use
+			# the request.host (Host) header, because that would name the dataserver, which
+			# might not be the content origin. The preferred sites send back the
+			# origin first
 			self.href = 'http://' + sites[0] + '/' + key.key
 		else:
 			quoted_key =  _path_maybe_quote(key.key) if request_sites is None else key.key
