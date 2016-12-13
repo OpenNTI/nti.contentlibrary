@@ -1090,3 +1090,11 @@ class ISiteLibraryFactory(interface.Interface):
 
 	def library_for_site_named(name):
 		pass
+
+class IRequestSiteNames(interface.Interface):
+	"""
+	Return a utility to return the request site names
+	"""
+
+	def sites():
+		pass

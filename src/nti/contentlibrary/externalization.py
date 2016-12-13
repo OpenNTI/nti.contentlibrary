@@ -7,6 +7,7 @@ Support for externalizing portions of the library.
 """
 
 from __future__ import print_function, unicode_literals, absolute_import, division
+from nti.contentlibrary.interfaces import IRequestSiteNames
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -327,7 +328,13 @@ class _S3KeyHrefMapper(object):
 		# We have to force HTTP here, because using https (or protocol relative)
 		# falls down for the browser: the certs on the CNAME we redirect to, *.s3.aws.amazon.com
 		# don't match for bucket.name host
-		self.href = 'http://' + key.bucket.name + '/' + _path_maybe_quote(key.key)
+		request_sites = component.queryUtility(IRequestSiteNames)
+		sites = request_sites.sites() if request_sites is not None else None
+		if sites:
+			self.href = 'http://' + sites[0] + '/' + key.key
+		else:
+			quoted_key =  _path_maybe_quote(key.key) if request_sites is None else key.key
+			self.href = 'http://' + key.bucket.name + '/' + quoted_key
 
 @interface.implementer(IAbsoluteContentUnitHrefMapper)
 class CDNS3KeyHrefMapper(object):
