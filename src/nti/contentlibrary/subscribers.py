@@ -93,12 +93,12 @@ def install_site_content_library(local_site_manager, _=None):
 from zope.interface.interfaces import IRegistered
 from zope.interface.interfaces import IUnregistered
 
+from .bundle import ContentPackageBundleLibrary
+
 from .interfaces import IContentPackageBundleLibrary
 from .interfaces import IContentPackageLibraryDidSyncEvent
-from .interfaces import IDelimitedHierarchyContentPackageEnumeration
 from .interfaces import ISyncableContentPackageBundleLibrary
-
-from .bundle import ContentPackageBundleLibrary
+from .interfaces import IDelimitedHierarchyContentPackageEnumeration
 
 _BUNDLE_LIBRARY_NAME = 'ContentPackageBundles' # because it might be in traversal paths
 
