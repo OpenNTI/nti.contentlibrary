@@ -13,7 +13,7 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
-from nti.coremetadata.interfaces import ILastModified
+from nti.base.interfaces import ILastModified
 
 from nti.dublincore.time_mixins import DCTimesLastModifiedMixin
 

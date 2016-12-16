@@ -31,7 +31,7 @@ from zope.location.interfaces import IContained as IZContained
 
 from persistent.interfaces import IPersistent
 
-from nti.coremetadata.interfaces import ILastModified
+from nti.base.interfaces import ILastModified
 
 from nti.dataserver_core.interfaces import IShouldHaveTraversablePath
 

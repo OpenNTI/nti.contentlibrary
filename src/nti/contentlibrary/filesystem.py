@@ -130,7 +130,7 @@ from .bucket import AbstractBucket
 
 from zope.dublincore.interfaces import IDCTimes
 
-from nti.coremetadata.interfaces import ILastModified
+from nti.base.interfaces import ILastModified
 
 from nti.dublincore.time_mixins import TimeProperty
 
