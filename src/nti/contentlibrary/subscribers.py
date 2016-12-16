@@ -22,8 +22,8 @@ from .annotation import ContentUnitAnnotationUtility
 
 from .interfaces import ISiteLibraryFactory
 from .interfaces import IContentPackageLibrary
-from .interfaces import IPersistentContentPackageLibrary
 from .interfaces import IContentUnitAnnotationUtility
+from .interfaces import IPersistentContentPackageLibrary
 
 _LIBRARY_NAME = '++etc++library'
 
