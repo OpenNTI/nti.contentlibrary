@@ -7,7 +7,6 @@ Support for externalizing portions of the library.
 """
 
 from __future__ import print_function, unicode_literals, absolute_import, division
-from nti.contentlibrary.interfaces import IRequestSiteNames
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -35,6 +34,7 @@ from .interfaces import IFilesystemKey
 from .interfaces import IS3ContentUnit
 from .interfaces import IContentPackage
 from .interfaces import IFilesystemBucket
+from .interfaces import IRequestSiteNames
 from .interfaces import IContentPackageBundle
 from .interfaces import IContentPackageLibrary
 from .interfaces import IContentUnitHrefMapper
