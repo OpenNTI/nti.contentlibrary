@@ -33,7 +33,7 @@ from persistent.interfaces import IPersistent
 
 from nti.base.interfaces import ILastModified
 
-from nti.dataserver_core.interfaces import IShouldHaveTraversablePath
+from nti.coremetadata.interfaces import IShouldHaveTraversablePath
 
 from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
 
