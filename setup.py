@@ -54,6 +54,7 @@ setup(
         'nti.containers',
         'nti.contentfragments',
         'nti.contenttypes.presentation',
+        'nti.coremetadata',
 		'nti.externalization',
         'nti.ntiids',
         'nti.property',
