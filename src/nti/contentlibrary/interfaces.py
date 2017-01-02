@@ -722,7 +722,7 @@ class IContentPackage(IContentUnit,
 							   default=1,
 						min=1)
 
-class IEditableContentPackage(IEditableContentUnit):
+class IEditableContentPackage(IEditableContentUnit, IContentPackage):
 	"""
 	A :class:`IContentPackage` that can be edited.
 	"""
