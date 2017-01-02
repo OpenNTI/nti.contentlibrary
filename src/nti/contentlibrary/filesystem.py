@@ -56,7 +56,7 @@ def _isTOC(path):
 
 def _package_factory(bucket, _package_factory=None, _unit_factory=None):
 	"""
-	Given a FilesystemBucket, return a package if it is sutable.
+	Given a FilesystemBucket, return a package if it is suitable.
 	"""
 
 	directory = bucket.absolute_path
@@ -332,7 +332,7 @@ class AbstractFilesystemLibrary(library.AbstractContentPackageLibrary):
 	def __repr__(self):
 		try:
 			return "<%s(%s)>" % (self.__class__.__name__,
-						   		 getattr(self._enumeration, 
+						   		 getattr(self._enumeration,
 										 'absolute_path',
 										  self._enumeration.root))
 		except ConnectionStateError:
@@ -454,7 +454,7 @@ class PersistentFilesystemContentUnit(Persistent,
 	"""
 	A persistent version of a content unit.
 	"""
-	
+
 	def __repr__(self):
 		try:
 			return super(PersistentFilesystemContentUnit, self).__repr__()
@@ -473,7 +473,7 @@ class PersistentFilesystemContentPackage(Persistent,
 			return super(PersistentFilesystemContentPackage, self).__repr__()
 		except ConnectionStateError:
 			return object.__repr__(self)
-		
+
 class _PersistentFilesystemLibraryEnumeration(Persistent,
 											  _FilesystemLibraryEnumeration):
 
@@ -483,7 +483,7 @@ class _PersistentFilesystemLibraryEnumeration(Persistent,
 											   root,
 											   PersistentFilesystemContentPackage,
 											   PersistentFilesystemContentUnit)
-		
+
 	def __repr__(self):
 		try:
 			return super(_PersistentFilesystemLibraryEnumeration, self).__repr__()
@@ -573,7 +573,7 @@ class PersistentFilesystemLibrary(AbstractFilesystemLibrary,
 			return super(PersistentFilesystemLibrary, self).__repr__()
 		except ConnectionStateError:
 			return object.__repr__(self)
-		
+
 from nti.externalization.persistence import NoPickle
 
 from .interfaces import ISiteLibraryFactory
