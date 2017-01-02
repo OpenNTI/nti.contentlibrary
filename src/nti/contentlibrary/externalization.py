@@ -21,6 +21,20 @@ import anyjson as json
 from zope import component
 from zope import interface
 
+from nti.contentlibrary.interfaces import IS3Key
+from nti.contentlibrary.interfaces import IFilesystemKey
+from nti.contentlibrary.interfaces import IS3ContentUnit
+from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IFilesystemBucket
+from nti.contentlibrary.interfaces import IRequestSiteNames
+from nti.contentlibrary.interfaces import IContentPackageBundle
+from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IContentUnitHrefMapper
+from nti.contentlibrary.interfaces import IFilesystemContentUnit
+from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
+from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
+from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
+
 from nti.externalization.interfaces import IExternalObject
 from nti.externalization.interfaces import StandardExternalFields
 
@@ -28,20 +42,6 @@ from nti.externalization.datastructures import InterfaceObjectIO
 
 from nti.externalization.externalization import toExternalObject
 from nti.externalization.externalization import to_standard_external_dictionary
-
-from .interfaces import IS3Key
-from .interfaces import IFilesystemKey
-from .interfaces import IS3ContentUnit
-from .interfaces import IContentPackage
-from .interfaces import IFilesystemBucket
-from .interfaces import IRequestSiteNames
-from .interfaces import IContentPackageBundle
-from .interfaces import IContentPackageLibrary
-from .interfaces import IContentUnitHrefMapper
-from .interfaces import IFilesystemContentUnit
-from .interfaces import IAbsoluteContentUnitHrefMapper
-from .interfaces import ILegacyCourseConflatedContentPackage
-from .interfaces import IDisplayablePlatformPresentationResources
 
 
 @interface.implementer(IExternalObject)
