@@ -11,13 +11,11 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from persistent import Persistent
-
 from zope import interface
 
-from nti.base.interfaces import ILastModified
+from zope.container.ordered import OrderedContainer
 
-from nti.containers.containers import LastModifiedBTreeContainer
+from nti.base.interfaces import ILastModified
 
 from nti.contentlibrary.bucket import AbstractKey
 from nti.contentlibrary.bucket import AbstractBucket
@@ -27,15 +25,14 @@ from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 
 from nti.coremetadata.interfaces import ITitledContent
 
-from nti.dublincore.time_mixins import CreatedAndModifiedTimeMixin
+from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
 from nti.property.property import alias
 
 @interface.implementer(IDelimitedHierarchyKey,
 					   ILastModified)
 class PersistentHierarchyKey(AbstractKey,
-							 Persistent,
-							 CreatedAndModifiedTimeMixin,
+							 PersistentCreatedModDateTrackingObject,
 							 ITitledContent):
 
 	_contents = None
@@ -49,7 +46,9 @@ class PersistentHierarchyKey(AbstractKey,
 		return self._contents
 
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
-class PersistentHierarchyBucket(LastModifiedBTreeContainer, AbstractBucket):
+class PersistentHierarchyBucket(AbstractBucket,
+								PersistentCreatedModDateTrackingObject,  # order matters
+								OrderedContainer):
 
 	def enumerateChildren(self):
 		return self.values()
