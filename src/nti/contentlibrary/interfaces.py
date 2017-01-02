@@ -33,6 +33,8 @@ from persistent.interfaces import IPersistent
 
 from nti.base.interfaces import ILastModified
 
+from nti.coremetadata.interfaces import IPublishable
+from nti.coremetadata.interfaces import IRecordableContainer
 from nti.coremetadata.interfaces import IShouldHaveTraversablePath
 
 from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
@@ -668,6 +670,11 @@ class IContentUnit(IZContained,
 											  unique=True,
 											  default=())
 
+class IEditableContentUnit(IContentUnit, IPublishable, IRecordableContainer):
+	"""
+	A :class:`IContentUnit` that can be edited.
+	"""
+
 class IContentPackage(IContentUnit,
 					  IDisplayableContent,
 					  ILastModified):
@@ -714,6 +721,11 @@ class IContentPackage(IContentUnit,
 	renderVersion = Int(title="Version of the rendering process that produced this package.",
 							   default=1,
 						min=1)
+
+class IEditableContentPackage(IEditableContentUnit):
+	"""
+	A :class:`IContentPackage` that can be edited.
+	"""
 
 class IContentPackageUnmodifiedEvent(IObjectEvent):
 	"""

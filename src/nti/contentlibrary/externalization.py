@@ -83,7 +83,7 @@ root_url_of_unit = _root_url_of_unit
 # simply requiring the keys to be strings; however, we do
 # list some well-known keys and their corresponding values
 # (when a dot is used, it means the key nested inside the containing dictionary):
-# 
+#
 # ``numbering``
 # 		 A dictionary that controls the presentation of "chapter numbers" and "section numbers"
 # ``numbering.suppressed``
@@ -103,7 +103,7 @@ root_url_of_unit = _root_url_of_unit
 # 		 A dictionary that controls the presentation of various table of contents menus.
 # ``toc.max-level``
 # 		An integer giving the maximum level to show in toc menus; defaults to all levels.
-# 
+#
 DEFAULT_PRESENTATION_PROPERTIES_FILE = 'nti_default_presentation_properties.json'
 
 @interface.implementer(IExternalObject)
