@@ -40,125 +40,137 @@ from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.principalannotation.utility import Annotations
 from zope.principalannotation.utility import PrincipalAnnotationUtility
 
+from nti.contentlibrary.interfaces import IContentUnit
+from nti.contentlibrary.interfaces import IContentUnitAnnotationUtility
+
 from nti.externalization.persistence import NoPickle
 
-from .interfaces import IContentUnit
-from .interfaces import IContentUnitAnnotationUtility
 
 @NoPickle
 class _WithId(object):
-	"""A pseudo-principal like thing for ease of compatibility with
-	principalannotations."""
+    """A pseudo-principal like thing for ease of compatibility with
+    principalannotations."""
 
-	__slots__ = (b'id',)
+    __slots__ = (b'id',)
 
-	def __init__(self, unit):
-		# Because for various included items, the content units NTIID
-		# can actually wind up the same, we also have to include
-		# the ordinal...and even the path at which we reached the
-		# ntiid
-		self.id = unit.ntiid
-		if self.id is None:
-			raise ValueError("ContentUnit with no NTIID cannot be annotated", unit)
-		self.id = self.id + ':ordinal %s' % unit.ordinal
+    def __init__(self, unit):
+        # Because for various included items, the content units NTIID
+        # can actually wind up the same, we also have to include
+        # the ordinal...and even the path at which we reached the
+        # ntiid
+        self.id = unit.ntiid
+        if self.id is None:
+            raise ValueError(
+                "ContentUnit with no NTIID cannot be annotated", unit)
+        self.id = self.id + ':ordinal %s' % unit.ordinal
 
-		try:
-			self.id += _WithId(unit.__parent__).id
-		except (AttributeError, ValueError):
-			pass
+        try:
+            self.id += _WithId(unit.__parent__).id
+        except (AttributeError, ValueError):
+            pass
+
 
 def _to_id(func):
-	@functools.wraps(func)
-	def _with_id(self, content_unit):
-		return func(self, _WithId(content_unit))
-	return _with_id
+    @functools.wraps(func)
+    def _with_id(self, content_unit):
+        return func(self, _WithId(content_unit))
+    return _with_id
+
 
 def _im_func(obj):
-	return getattr(obj, 'im_func', None)
+    return getattr(obj, 'im_func', None)
+
 
 @interface.implementer(IContentUnitAnnotationUtility,
-					   IAttributeAnnotatable)
+                       IAttributeAnnotatable)
 class ContentUnitAnnotationUtility(PrincipalAnnotationUtility):
 
-	# These two methods are the only ones that depend on the id attribute
-	getAnnotations = _to_id(_im_func(PrincipalAnnotationUtility.getAnnotations))
-	hasAnnotations = _to_id(_im_func(PrincipalAnnotationUtility.hasAnnotations))
+    # These two methods are the only ones that depend on the id attribute
+    getAnnotations = _to_id(
+        _im_func(PrincipalAnnotationUtility.getAnnotations))
+    hasAnnotations = _to_id(
+        _im_func(PrincipalAnnotationUtility.hasAnnotations))
 
-	def getAnnotationsById(self, principalId):
-		"""
-		Return object implementing `IAnnotations` for the given principal.
+    def getAnnotationsById(self, principalId):
+        """
+        Return object implementing `IAnnotations` for the given principal.
 
-		If there is no `IAnnotations` it will be created and then returned.
-		"""
-		notes = self.annotations.get(principalId)
-		if notes is None:
-			notes = ContentUnitAnnotations(principalId, store=self.annotations)
-			notes.__parent__ = self
-			notes.__name__ = principalId
-		return notes
+        If there is no `IAnnotations` it will be created and then returned.
+        """
+        notes = self.annotations.get(principalId)
+        if notes is None:
+            notes = ContentUnitAnnotations(principalId, store=self.annotations)
+            notes.__parent__ = self
+            notes.__name__ = principalId
+        return notes
 
 from nti.site.localutility import queryNextUtility
 
+
 class ContentUnitAnnotations(Annotations):
 
-	def __next_annotes(self):
-		if isinstance(self.__parent__, GlobalContentUnitAnnotationUtility):
-			# prevent infinite recursion getting the next site manager
-			# (XXX: what's the loop?)
-			next_utility = None
-		else:
-			next_utility = queryNextUtility(self.__parent__, IContentUnitAnnotationUtility)
+    def __next_annotes(self):
+        if isinstance(self.__parent__, GlobalContentUnitAnnotationUtility):
+            # prevent infinite recursion getting the next site manager
+            # (XXX: what's the loop?)
+            next_utility = None
+        else:
+            next_utility = queryNextUtility(
+                self.__parent__, IContentUnitAnnotationUtility)
 
-		if next_utility is not None:
-			parent = next_utility.getAnnotationsById(self.principalId)
-			return parent
+        if next_utility is not None:
+            parent = next_utility.getAnnotationsById(self.principalId)
+            return parent
 
-	def items(self):
-		for i in self.data.items():
-			yield i
-		parent = self.__next_annotes()
-		if parent is not None:
-			for k, v in parent.items():
-				if k not in self.data:
-					yield k, v
+    def items(self):
+        for i in self.data.items():
+            yield i
+        parent = self.__next_annotes()
+        if parent is not None:
+            for k, v in parent.items():
+                if k not in self.data:
+                    yield k, v
 
-	def keys(self):
-		for k, _ in self.items():
-			yield k
+    def keys(self):
+        for k, _ in self.items():
+            yield k
 
-	def values(self):
-		for _, v in self.items():
-			yield v
+    def values(self):
+        for _, v in self.items():
+            yield v
 
-	def __bool__(self):
-		nz = bool(self.data)
-		if not nz:
-			# maybe higher-level utility's annotations will be non-zero
-			parent = self.__next_annotes()
-			return bool(parent)
-		return nz
+    def __bool__(self):
+        nz = bool(self.data)
+        if not nz:
+            # maybe higher-level utility's annotations will be non-zero
+            parent = self.__next_annotes()
+            return bool(parent)
+        return nz
 
-	__nonzero__ = __bool__
+    __nonzero__ = __bool__
 
-	def __getitem__(self, key):
-		try:
-			return self.data[key]
-		except KeyError:
-			# We failed locally: delegate to a higher-level utility.
-			parent = self.__next_annotes()
-			if parent is not None:
-				return parent[key]
-			raise
+    def __getitem__(self, key):
+        try:
+            return self.data[key]
+        except KeyError:
+            # We failed locally: delegate to a higher-level utility.
+            parent = self.__next_annotes()
+            if parent is not None:
+                return parent[key]
+            raise
+
 
 @NoPickle
 class GlobalContentUnitAnnotationUtility(ContentUnitAnnotationUtility):
-	"""
-	A global utility, registered by this package, that is always
-	available.
-	"""
+    """
+    A global utility, registered by this package, that is always
+    available.
+    """
+
 
 @component.adapter(IContentUnit)
 @interface.implementer(IAnnotations)
 def annotations(content_unit, context=None):
-	utility = component.getUtility(IContentUnitAnnotationUtility, context=context)
-	return utility.getAnnotations(content_unit)
+    utility = component.getUtility(
+        IContentUnitAnnotationUtility, context=context)
+    return utility.getAnnotations(content_unit)
