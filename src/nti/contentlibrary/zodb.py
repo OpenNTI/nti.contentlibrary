@@ -15,8 +15,6 @@ from zope import interface
 
 from zope.container.ordered import OrderedContainer
 
-from nti.base.interfaces import ILastModified
-
 from nti.contentlibrary.bucket import AbstractKey
 from nti.contentlibrary.bucket import AbstractBucket
 
@@ -29,27 +27,39 @@ from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
 from nti.property.property import alias
 
-@interface.implementer(IDelimitedHierarchyKey,
-					   ILastModified)
+
+@interface.implementer(IDelimitedHierarchyKey)
 class PersistentHierarchyKey(AbstractKey,
-							 PersistentCreatedModDateTrackingObject,
-							 ITitledContent):
+                             PersistentCreatedModDateTrackingObject,
+                             ITitledContent):
 
-	_contents = None
-	data = alias('_contents')
+    _contents = None
+    data = alias('_contents')
 
-	def __init__(self, contents, *args, **kwargs):
-		super( PersistentHierarchyKey, self ).__init__(*args, **kwargs)
-		self._contents = contents
+    def __init__(self, contents, *args, **kwargs):
+        super(PersistentHierarchyKey, self).__init__(*args, **kwargs)
+        self._contents = contents
 
-	def readContents(self):
-		return self._contents
+    def readContents(self):
+        return self._contents
+
 
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
 class PersistentHierarchyBucket(AbstractBucket,
-								PersistentCreatedModDateTrackingObject,  # order matters
-								OrderedContainer):
+                                # order matters
+                                PersistentCreatedModDateTrackingObject,
+                                OrderedContainer):
 
-	def enumerateChildren(self):
-		return self.values()
+    def enumerateChildren(self):
+        return self.values()
 
+    def getChildNamed(self, name):
+        return self.get(name)
+
+    def __setitem__(self, key, value):
+        self.updateLastMod()
+        return OrderedContainer.__setitem__(self, key, value)
+
+    def __delitem__(self, key):
+        OrderedContainer.__delitem__(self, key)
+        self.updateLastMod()
