@@ -42,7 +42,7 @@ class PersistentHierarchyKey(AbstractKey,
 
     def readContents(self):
         return self._contents
-
+    read_contents = readContents
 
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
 class PersistentHierarchyBucket(AbstractBucket,
@@ -52,10 +52,12 @@ class PersistentHierarchyBucket(AbstractBucket,
 
     def enumerateChildren(self):
         return self.values()
-
+    enumerate_children = enumerateChildren
+    
     def getChildNamed(self, name):
         return self.get(name)
-
+    get_child_named = getChildNamed
+    
     def __setitem__(self, key, value):
         self.updateLastMod()
         return OrderedContainer.__setitem__(self, key, value)
