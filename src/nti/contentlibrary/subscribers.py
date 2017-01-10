@@ -56,8 +56,8 @@ def install_site_content_library(local_site_manager, _=None):
                      local_site_manager, lib)
         return lib
 
-    global_library = component.getGlobalSiteManager().queryUtility(
-        IContentPackageLibrary)
+    gsm = component.getGlobalSiteManager()
+    global_library = gsm.queryUtility(IContentPackageLibrary)
     if global_library is None:
         logger.warning(
             "New site installed without global library; will not have local library")
@@ -155,8 +155,8 @@ def sync_bundles_when_library_synched(library, event):
     bundle_bucket = enumeration_root.getChildNamed(bundle_library.__name__)
     if bundle_bucket is None:
         logger.info("Not synchronizing: no directory named %s in %s for library %s",
-                    bundle_library.__name__, getattr(
-                        enumeration_root, 'absolute_path', enumeration_root),
+                    bundle_library.__name__, 
+                    getattr(enumeration_root, 'absolute_path', enumeration_root),
                     library)
         return
 
