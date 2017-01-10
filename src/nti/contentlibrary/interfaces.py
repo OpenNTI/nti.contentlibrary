@@ -1205,3 +1205,10 @@ class IRequestSiteNames(interface.Interface):
 
     def sites():
         pass
+
+
+class INoAutoIndex(interface.Interface):
+    """
+    Marker interface for objects that should not automatically
+    be index.
+    """
