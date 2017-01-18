@@ -167,6 +167,9 @@ class ContainedObjectCatalog(Persistent):
 	container_index = alias('_container_index')
 	namespace_index = alias('_namespace_index')
 
+	# In case a proper migration was not ran
+	_target_index = None 
+
 	def __init__(self):
 		self.reset()
 
@@ -265,7 +268,7 @@ class ContainedObjectCatalog(Persistent):
 									(self._target_index, target, 'any_of'),
 									(self._namespace_index, namespace, 'any_of'),
 							  		(self._container_index, container_ntiids, container_query)):
-			if value is not None:
+			if value is not None and index is not None:
 				value = to_iterable(value)
 				ids = index.apply({query: value}) or self.family.IF.LFSet()
 				if result is None:
@@ -307,7 +310,7 @@ class ContainedObjectCatalog(Persistent):
 							 (self._container_index, container_ntiids)):
 			# XXX: we want to make sure we don't index None in order to
 			# to keep the index data value(s)
-			if value is not None:
+			if value is not None and index is not None:
 				index.index_doc(doc_id, value)
 		return True
 	index_doc = index
@@ -330,9 +333,10 @@ class ContainedObjectCatalog(Persistent):
 		yield 'site', self._site_index
 		yield 'type', self._type_index
 		yield 'ntiid', self._ntiid_index
-		yield 'target', self._target_index
 		yield 'container', self._container_index
 		yield 'namespace', self._namespace_index
+		if self._target_index  is not None:
+			yield 'target', self._target_index
 
 def install_container_catalog(site_manager_container, intids=None):
 	lsm = site_manager_container.getSiteManager()
