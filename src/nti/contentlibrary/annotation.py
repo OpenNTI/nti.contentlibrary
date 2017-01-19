@@ -171,6 +171,6 @@ class GlobalContentUnitAnnotationUtility(ContentUnitAnnotationUtility):
 @component.adapter(IContentUnit)
 @interface.implementer(IAnnotations)
 def annotations(content_unit, context=None):
-    utility = component.getUtility(
-        IContentUnitAnnotationUtility, context=context)
+    utility = component.getUtility(IContentUnitAnnotationUtility,
+                                   context=context)
     return utility.getAnnotations(content_unit)
