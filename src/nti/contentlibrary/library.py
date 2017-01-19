@@ -35,7 +35,8 @@ from ZODB.POSException import ConnectionStateError
 
 from persistent import Persistent
 
-from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import INoAutoSync
+from nti.contentlibrary.interfaces import IContentPackage 
 from nti.contentlibrary.interfaces import IGlobalContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IPersistentContentUnit
@@ -217,14 +218,19 @@ class AbstractContentPackageLibrary(object):
 		if prefix:
 			self.url_prefix = prefix
 
+	def _filter_packages(self, contentPackages=()):
+		for package in contentPackages or ():
+			if not INoAutoSync.providedBy(package):
+				yield package
+
 	def _content_packages_tuple(self, contentPackages=(), packages=None):
 		if not packages:
-			by_list = list(contentPackages or ())
+			by_list = list(self._filter_packages(contentPackages))
 			by_ntiid = {x.ntiid: x for x in by_list}
 		else:
 			by_list = []
 			by_ntiid = {}
-			for content_package in contentPackages or ():
+			for content_package in self._filter_packages(contentPackages):
 				if content_package.ntiid in packages:
 					by_list.append(content_package)
 					by_ntiid[content_package.ntiid] = content_package
@@ -322,7 +328,7 @@ class AbstractContentPackageLibrary(object):
 
 		# filter packages if specified
 		never_synced = self._contentPackages is None
-		filtered_old_content_packages, filtered_old_content_packages_by_ntiid = \
+		old_content_packages, old_content_packages_by_ntiid = \
 						self._content_packages_tuple(self._contentPackages, packages)
 
 		# make sure we get ALL packages
@@ -342,7 +348,7 @@ class AbstractContentPackageLibrary(object):
 			unmodified = []
 			added = [package
 				 		for ntiid, package in new_content_packages_by_ntiid.items()
-				 		if ntiid not in filtered_old_content_packages_by_ntiid]
+				 		if ntiid not in old_content_packages_by_ntiid]
 		else:
 			# chosing this path WILL NOT add any new package
 			added = ()
@@ -352,9 +358,9 @@ class AbstractContentPackageLibrary(object):
 			# make sure we get old references
 			unmodified = [package
 				 			for package in unfiltered_content_packages
-				 			if package.ntiid not in filtered_old_content_packages_by_ntiid]
+				 			if package.ntiid not in old_content_packages_by_ntiid]
 
-		for old in filtered_old_content_packages:
+		for old in old_content_packages:
 			new = new_content_packages_by_ntiid.get(old.ntiid)
 			if new is None:
 				removed.append(old)
