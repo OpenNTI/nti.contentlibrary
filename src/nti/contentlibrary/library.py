@@ -123,7 +123,14 @@ class AbstractDelimitedHiercharchyContentPackageEnumeration(AbstractContentPacka
 			return ()
 		return root.enumerateChildren()
 
-def _register_content_units(context, content_unit):
+def add_to_connection(context, obj):
+	connection = IConnection(context, None)
+	if connection is not None and not IConnection(obj, None):
+		connection.add(obj)
+		return True
+	return False
+
+def register_content_units(context, content_unit):
 	"""
 	Recursively register content units.
 	"""
@@ -132,7 +139,7 @@ def _register_content_units(context, content_unit):
 		return
 
 	def _register(obj):
-		_add_2_connection(context, obj)
+		add_to_connection(context, obj)
 		try:
 			if 		IBroken.providedBy(obj) or \
 				not IPersistentContentUnit.providedBy(obj):
@@ -146,7 +153,7 @@ def _register_content_units(context, content_unit):
 			_register(child)
 	_register(content_unit)
 
-def _unregister_content_units(content_unit):
+def unregister_content_units(content_unit):
 	"""
 	Recursively unregister content units.
 	"""
@@ -168,13 +175,6 @@ def _unregister_content_units(content_unit):
 		for child in obj.children:
 			_unregister(child)
 	_unregister(content_unit)
-
-def _add_2_connection(context, obj):
-	connection = IConnection(context, None)
-	if connection is not None and not IConnection(obj, None):
-		connection.add(obj)
-		return True
-	return False
 
 @interface.implementer(ISyncableContentPackageLibrary)
 class AbstractContentPackageLibrary(object):
@@ -242,7 +242,7 @@ class AbstractContentPackageLibrary(object):
 	def _do_addContentPackages(self, added, lib_sync_results, params, results):
 		for new in added:
 			new.__parent__ = self
-			_register_content_units(self, new)  # get intids
+			register_content_units(self, new)  # get intids
 			lifecycleevent.created(new)
 			lib_sync_results.added(new.ntiid)   # register
 			notify(ContentPackageAddedEvent(new, params, results))
@@ -250,7 +250,7 @@ class AbstractContentPackageLibrary(object):
 	def _do_removeContentPackages(self, removed, lib_sync_results, params, results):
 		for old in removed or ():
 			notify(ContentPackageRemovedEvent(old, params, results))
-			_unregister_content_units(old)
+			unregister_content_units(old)
 			old.__parent__ = None
 			lib_sync_results.removed(old.ntiid)  # register
 
@@ -264,7 +264,7 @@ class AbstractContentPackageLibrary(object):
 			# XXX CS/JZ, 2-04-15 DO NEITHER call lifecycleevent.created nor
 			# lifecycleevent.added on 'new' objects as modified events subscribers
 			# are expected to handle any change
-			_register_content_units(self, new)
+			register_content_units(self, new)
 			lib_sync_results.modified(new.ntiid)  # register
 			# Note that this is the special event that shows both objects.
 			notify(ContentPackageReplacedEvent(new, old, params, results))
@@ -411,7 +411,7 @@ class AbstractContentPackageLibrary(object):
 				# CS/JZ, 2-04-15  DO NOT call lifecycleevent.removed on this
 				# objects b/c this may unregister things we don't want to leaving
 				# the database in a invalid state
-				_unregister_content_units(old)
+				unregister_content_units(old)
 				old.__parent__ = None
 
 			# Ok, new let people know that 'contentPackages' changed
@@ -501,7 +501,7 @@ class AbstractContentPackageLibrary(object):
 		# we do the delete?
 		for title in self._contentPackages:
 			lifecycleevent.removed(title)
-			_unregister_content_units(title)
+			unregister_content_units(title)
 			title.__parent__ = None # ground
 
 		# Must also take care to clear its dependents
