@@ -202,6 +202,10 @@ class IDelimitedHierarchyContentPackageEnumeration(IContentPackageEnumeration):
         the given named bucket.
         """
 
+class INoAutoSync(interface.Interface):
+    """
+    Marker for objects that should not be automatically sync
+    """
 
 class IContentPackageLibrary(ILastModified,
                              IZContained):
@@ -230,8 +234,10 @@ class IContentPackageLibrary(ILastModified,
         """
 
     def childrenOfNTIID(ntiid):
-        """ Returns a flattened list of all the children entries of ntiid
-        in no particular order. If there are no children, returns ``[]``"""
+        """ 
+        Returns a flattened list of all the children entries of ntiid
+        in no particular order. If there are no children, returns ``[]``
+        """
 
     def pathsToEmbeddedNTIID(ntiid):
         """
@@ -256,10 +262,14 @@ class IContentPackageLibrary(ILastModified,
         """
 
     def __contains__(key):
-        "Consistent with :meth:`__getitem__`"
+        """
+        Consistent with :meth:`__getitem__`
+        """
 
     def __len__():
-        "The number of content packages in this library"
+        """
+        The number of content packages in this library
+        """
 
     contentPackages = Iterable(
         title=u'Sequence of all known :class:`IContentPackage`')
@@ -303,8 +313,8 @@ class IContentPackageSyncResults(IGenericSynchronizationResults):
 
     Site = ValidTextLine(title="The site name", required=False)
 
-    ContentPackageNTIID = ValidTextLine(
-        title="The ContentPackage NTIID", required=False)
+    ContentPackageNTIID = ValidTextLine(title="The ContentPackage NTIID",
+                                        required=False)
 
     AssessmentsUpdated = UniqueIterable(value_type=ValidTextLine(title="An asset NTIID"),
                                         title="The updated assessment NTIIDs",
