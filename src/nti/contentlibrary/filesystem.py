@@ -280,8 +280,8 @@ class _FilesystemLibraryEnumeration(library.AbstractDelimitedHiercharchyContentP
             root_path = os.path.abspath(root_path)
             if root_path.endswith('/'):
                 root_path = root_path[:-1]
-            self._root = FilesystemBucket(
-                bucket=self, name=os.path.basename(root_path))
+            self._root = FilesystemBucket(bucket=self, 
+                                          name=os.path.basename(root_path))
             self._root.absolute_path = root_path
             # Keep this unnamed so it doesn't get in the traversal path
             self._root.__name__ = None
@@ -321,7 +321,9 @@ class _FilesystemLibraryEnumeration(library.AbstractDelimitedHiercharchyContentP
         return self.absolute_path
 
     def _package_factory(self, bucket):
-        return _package_factory(bucket, self.__package_factory, self._unit_factory)
+        return _package_factory(bucket,
+                                self.__package_factory,
+                                self._unit_factory)
 
 
 @interface.implementer(IFilesystemContentPackageLibrary)
@@ -415,8 +417,8 @@ class FilesystemContentUnit(_FilesystemTimesMixin,
 
         key = type(self.key)(bucket=parent, name=parts[-1])
 
-        assert key.absolute_path == os.path.join(
-            os.path.dirname(self.filename), *parts)
+        dirname = os.path.dirname(self.filename)
+        assert key.absolute_path == os.path.join(dirname, *parts)
 
         return key
 

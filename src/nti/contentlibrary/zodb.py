@@ -26,8 +26,10 @@ from nti.contentlibrary.contentunit import ContentUnit
 from nti.contentlibrary.contentunit import ContentPackage
 
 from nti.contentlibrary.interfaces import INoAutoSync
+from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IPersistentContentUnit
+from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IPersistentContentPackage
 from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 
@@ -39,23 +41,25 @@ from nti.property.property import alias
 
 
 @interface.implementer(IDCTimes)
-class _TimesMixin(PersistentCreatedModDateTrackingObject):
+class TimesMixin(PersistentCreatedModDateTrackingObject):
+
     created = alias('createdTime')
     modified = alias('lastModified')
 
     def __init__(self, *args, **kwargs):
-        super(_TimesMixin, self).__init__(*args, **kwargs)
-        
+        super(TimesMixin, self).__init__(*args, **kwargs)
+
 
 @interface.implementer(IDelimitedHierarchyKey)
-class PersistentHierarchyKey(AbstractKey,
-                             _TimesMixin,
+class PersistentHierarchyKey(TimesMixin,
+                             AbstractKey,
                              ITitledContent):
 
     _contents = None
     data = alias('_contents')
 
-    def __init__(self, contents, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        contents = kwargs.pop('contents', None)
         super(PersistentHierarchyKey, self).__init__(*args, **kwargs)
         self._contents = contents
 
@@ -65,13 +69,18 @@ class PersistentHierarchyKey(AbstractKey,
 
 
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
-class PersistentHierarchyBucket(AbstractBucket,
-                                # order matters
-                                _TimesMixin,
+class PersistentHierarchyBucket(TimesMixin,
+                                AbstractBucket,
                                 OrderedContainer):
 
+    _key_type = PersistentHierarchyKey
+
+    def __init__(self, *args, **kwargs):
+        OrderedContainer.__init__(self)
+        AbstractBucket.__init__(*args, **kwargs)
+
     def enumerateChildren(self):
-        return self.values()
+        return list(self.values())
     enumerate_children = enumerateChildren
 
     def getChildNamed(self, name):
@@ -88,10 +97,18 @@ class PersistentHierarchyBucket(AbstractBucket,
 
 
 @interface.implementer(IPersistentContentUnit)
-class PersistentContentUnit(_TimesMixin, ContentUnit):
+class PersistentContentUnit(TimesMixin, ContentUnit):
     """
     A persistent version of a content unit.
     """
+
+    def __init__(self, *args, **kwargs):
+        super(PersistentContentUnit, self).__init__(*args, **kwargs)
+        if self.key is None:
+            self.key = PersistentHierarchyKey()
+
+    def read_contents(self):
+        return self.key.readContents()
 
     def __repr__(self):
         try:
@@ -100,8 +117,13 @@ class PersistentContentUnit(_TimesMixin, ContentUnit):
             return object.__repr__(self)
 
 
+@interface.implementer(IEditableContentUnit)
+class PersistentEditableContentUnit(PersistentContentUnit):
+    pass
+
+
 @interface.implementer(IPersistentContentPackage, INoAutoSync)
-class PersistentContentPackage(_TimesMixin, ContentPackage):
+class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     """
     A persistent content package.
     """
@@ -111,3 +133,8 @@ class PersistentContentPackage(_TimesMixin, ContentPackage):
             return super(PersistentContentPackage, self).__repr__()
         except ConnectionStateError:
             return object.__repr__(self)
+
+
+@interface.implementer(IEditableContentPackage)
+class PersistentEditableContentPackage(PersistentContentPackage):
+    pass
