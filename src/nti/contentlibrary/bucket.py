@@ -92,6 +92,7 @@ class _AbstractDelimitedHierarchyObject(object):
         method that returns an empty list.
         """
         return ()
+    enumerate_children = enumerateChildren
 
     def getChildNamed(self, name):
         """
@@ -101,6 +102,7 @@ class _AbstractDelimitedHierarchyObject(object):
         for k in self.enumerateChildren():
             if k.__name__ == name:
                 return k
+    get_child_named = getChildNamed
 
 
 @interface.implementer(IDelimitedHierarchyBucket)
@@ -121,9 +123,11 @@ class AbstractKey(_AbstractDelimitedHierarchyObject):
 
     def readContents(self):
         raise NotImplementedError()
+    read_contents = readContents
 
     def readContentsAsText(self, encoding="utf-8"):
         return self.readContents().decode(encoding)
+    read_contents_as_text = readContentsAsText
 
     def readContentsAsJson(self):
         json_text = self.readContentsAsText()
@@ -147,10 +151,12 @@ class AbstractKey(_AbstractDelimitedHierarchyObject):
         json_value = component.getUtility(
             IExternalRepresentationReader, name='json').load(json_text)
         return json_value
+    read_contents_as_json = readContentsAsJson
 
     def readContentsAsETree(self):
         root = getattr(etree, 'fromstring')(self.readContents())
         return root
+    read_contents_as_etree = readContentsAsETree
 
     def _do_readContentsAsYaml(self, stream):
         try:
@@ -164,3 +170,4 @@ class AbstractKey(_AbstractDelimitedHierarchyObject):
 
     def readContentsAsYaml(self):
         return self._do_readContentsAsYaml(self.readContents())
+    read_contents_as_yaml = readContentsAsYaml

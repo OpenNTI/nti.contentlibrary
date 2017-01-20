@@ -76,8 +76,9 @@ def _package_factory(bucket, _package_factory=None, _unit_factory=None):
     temp_entry = FilesystemContentUnit(key=key)
     assert key.absolute_path == _TOCPath(directory) == temp_entry.filename
 
-    package = eclipse.EclipseContentPackage(
-        temp_entry, _package_factory, _unit_factory)
+    package = eclipse.EclipseContentPackage(temp_entry, 
+                                            _package_factory,
+                                            _unit_factory)
 
     __traceback_info__ = directory, bucket, key, temp_entry, package
     assert package.key.bucket == bucket
@@ -119,8 +120,8 @@ class _FilesystemTime(object):
         except (OSError, TypeError):
             return self.default_time
         else:
-            if 		self._name not in inst.__dict__ \
-                    or inst.__dict__[self._name] != val:
+            if        self._name not in inst.__dict__ \
+                or inst.__dict__[self._name] != val:
                 # Store only if we've changed.
                 inst.__dict__[self._name] = val
                 if hasattr(inst, '_p_changed'):
@@ -155,10 +156,12 @@ class _AbsolutePathMixin(object):
 @interface.implementer(IDCTimes)
 class _FilesystemTimesMixin(object):
 
-    lastModified = _FilesystemTime('lastModified', os.path.stat.ST_MTIME, 'absolute_path',
+    lastModified = _FilesystemTime('lastModified', 
+                                   os.path.stat.ST_MTIME, 'absolute_path',
                                    cache=False)
-    createdTime = _FilesystemTime(
-        'createdTime', os.path.stat.ST_CTIME, 'absolute_path')
+    createdTime = _FilesystemTime('createdTime',
+                                  os.path.stat.ST_CTIME, 
+                                  'absolute_path')
 
     # Here we cache the datetime object based on the timestamp
     modified = TimeProperty('lastModified', writable=False, cached=True)
@@ -300,7 +303,9 @@ class _FilesystemLibraryEnumeration(library.AbstractDelimitedHiercharchyContentP
 
     @property
     def root(self):
-        """The root bucket we will examine."""
+        """
+        The root bucket we will examine.
+        """
         return self._root
 
     @property
@@ -338,8 +343,9 @@ class AbstractFilesystemLibrary(library.AbstractContentPackageLibrary):
 
         root = root or kwargs.pop('root')
         enumeration = self._create_enumeration(root)
-        library.AbstractContentPackageLibrary.__init__(
-            self, enumeration, **kwargs)
+        library.AbstractContentPackageLibrary.__init__(self,
+                                                       enumeration,
+                                                       **kwargs)
 
     @classmethod
     def _create_enumeration(cls, root):
