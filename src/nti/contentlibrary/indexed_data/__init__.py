@@ -27,17 +27,20 @@ from nti.contentlibrary.interfaces import IGlobalContentPackageLibrary
 # catalog
 CATALOG_INDEX_NAME = '++etc++contentlibrary.container_index'
 
+
 def get_library_catalog():
-	result = component.queryUtility(IContainedObjectCatalog, name=CATALOG_INDEX_NAME)
-	return result
+    result = component.queryUtility(IContainedObjectCatalog,
+								    name=CATALOG_INDEX_NAME)
+    return result
 get_catalog = get_library_catalog
 
+
 def get_site_registry(registry=None):
-	if registry is None:
-		library = component.queryUtility(IContentPackageLibrary)
-		if IGlobalContentPackageLibrary.providedBy(library):
-			registry = component.getGlobalSiteManager()
-		else:
-			registry = component.getSiteManager()
-	return registry
+    if registry is None:
+        library = component.queryUtility(IContentPackageLibrary)
+        if IGlobalContentPackageLibrary.providedBy(library):
+            registry = component.getGlobalSiteManager()
+        else:
+            registry = component.getSiteManager()
+    return registry
 registry = get_registry = get_site_registry

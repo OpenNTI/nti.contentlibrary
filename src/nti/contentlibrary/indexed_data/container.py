@@ -39,102 +39,107 @@ from nti.site.site import get_component_hierarchy_names
 
 from nti.zope_catalog.catalog import ResultSet
 
+
 @interface.implementer(IIndexedDataContainer)
 class IndexedDataContainer(PersistentCreatedAndModifiedTimeObject):
-	# Make it persistent for BWC
+    # Make it persistent for BWC
 
-	type = None
+    type = None
 
-	__name__ = None
-	__parent__ = None
+    __name__ = None
+    __parent__ = None
 
-	def __init__(self, unit, sites=None):
-		self.sites = sites or get_component_hierarchy_names()
-		self.ntiid = 	getattr(unit, 'ntiid', None) \
-					 or getattr(unit, 'NTIID', None) \
-					 or u''
+    def __init__(self, unit, sites=None):
+        self.sites = sites or get_component_hierarchy_names()
+        self.ntiid =   getattr(unit, 'ntiid', None) \
+                    or getattr(unit, 'NTIID', None) or u''
 
-	@Lazy
-	def catalog(self):
-		return get_library_catalog()
+    @Lazy
+    def catalog(self):
+        return get_library_catalog()
 
-	@Lazy
-	def intids(self):
-		return component.getUtility(IIntIds)
+    @Lazy
+    def intids(self):
+        return component.getUtility(IIntIds)
 
-	def __getitem__(self, key):
-		items = list(self.catalog.search_objects(container_ntiids=(self.ntiid,),
-												 provided=self.type,
-												 ntiid=key,
-												 sites=self.sites,
-												 intids=self.intids))
-		if len(items) == 1:
-			return items[0]
-		else:
-			raise KeyError(key)
+    def __getitem__(self, key):
+        items = list(self.catalog.search_objects(container_ntiids=(self.ntiid,),
+                                                 provided=self.type,
+                                                 ntiid=key,
+                                                 sites=self.sites,
+                                                 intids=self.intids))
+        if len(items) == 1:
+            return items[0]
+        else:
+            raise KeyError(key)
 
-	def get(self, key, default=None):
-		try:
-			return self[key]
-		except KeyError:
-			return default
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
 
-	def __contains__(self, key):
-		items = self.catalog.get_references(container_ntiids=(self.ntiid,),
-											provided=self.type,
-											sites=self.sites,
-											ntiid=key)
-		return len(items) == 1
-	contains_data_item_with_ntiid = __contains__
+    def __contains__(self, key):
+        items = self.catalog.get_references(container_ntiids=(self.ntiid,),
+                                            provided=self.type,
+                                            sites=self.sites,
+                                            ntiid=key)
+        return len(items) == 1
+    contains_data_item_with_ntiid = __contains__
 
-	@property
-	def doc_ids(self):
-		result = self.catalog.get_references(container_ntiids=(self.ntiid,),
-											 sites=self.sites,
-											 provided=self.type)
-		return result
+    @property
+    def doc_ids(self):
+        result = self.catalog.get_references(container_ntiids=(self.ntiid,),
+                                             sites=self.sites,
+                                             provided=self.type)
+        return result
 
-	def keys(self):
-		ntiid_index = self.catalog.ntiid_index
-		for doc_id in self.doc_ids:
-			value = ntiid_index.documents_to_values.get(doc_id)
-			if value is not None:
-				yield value
+    def keys(self):
+        ntiid_index = self.catalog.ntiid_index
+        for doc_id in self.doc_ids:
+            value = ntiid_index.documents_to_values.get(doc_id)
+            if value is not None:
+                yield value
 
-	def __iter__(self):
-		return iter(self.keys())
+    def __iter__(self):
+        return iter(self.keys())
 
-	def values(self):
-		for obj in ResultSet(self.doc_ids, self.intids, True):
-			yield obj
-	get_data_items = values
+    def values(self):
+        for obj in ResultSet(self.doc_ids, self.intids, True):
+            yield obj
+    get_data_items = values
 
-	def items(self):
-		for doc_id, value in ResultSet(self.doc_ids, self.intids, True).items():
-			return doc_id, value
+    def items(self):
+        for doc_id, value in ResultSet(self.doc_ids, self.intids, True).items():
+            return doc_id, value
 
-	def __len__(self):
-		return len(self.doc_ids)
+    def __len__(self):
+        return len(self.doc_ids)
+
 
 @interface.implementer(IAudioIndexedDataContainer)
 class AudioIndexedDataContainer(IndexedDataContainer):
-	type = INTIAudio.__name__
+    type = INTIAudio.__name__
+
 
 @interface.implementer(IVideoIndexedDataContainer)
 class VideoIndexedDataContainer(IndexedDataContainer):
-	type = INTIVideo.__name__
+    type = INTIVideo.__name__
+
 
 @interface.implementer(IRelatedContentIndexedDataContainer)
 class RelatedContentIndexedDataContainer(IndexedDataContainer):
-	type = INTIRelatedWorkRef.__name__
+    type = INTIRelatedWorkRef.__name__
+
 
 @interface.implementer(ITimelineIndexedDataContainer)
 class TimelineIndexedDataContainer(IndexedDataContainer):
-	type = INTITimeline.__name__
+    type = INTITimeline.__name__
+
 
 @interface.implementer(ISlideDeckIndexedDataContainer)
 class SlideDeckIndexedDataContainer(IndexedDataContainer):
-	type = INTISlideDeck.__name__
+    type = INTISlideDeck.__name__
 
 from zope.deprecation import deprecated
 
@@ -144,4 +149,4 @@ from zc.dict import Dict
 
 deprecated('_IndexedDataDict', 'No longer used')
 class _IndexedDataDict(Dict, Contained):
-	pass
+    pass
