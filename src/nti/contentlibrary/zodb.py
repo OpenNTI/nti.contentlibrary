@@ -56,12 +56,11 @@ class PersistentHierarchyKey(TimesMixin,
                              ITitledContent):
 
     _contents = None
-    data = alias('_contents')
 
     def __init__(self, *args, **kwargs):
         contents = kwargs.pop('contents', None)
         super(PersistentHierarchyKey, self).__init__(*args, **kwargs)
-        self._contents = contents
+        self.data = contents
 
     def readContents(self):
         return self._contents
@@ -69,8 +68,9 @@ class PersistentHierarchyKey(TimesMixin,
     
     def writeContents(self, data):
         self._contents = data
-    writer_contents = writeContents
+    write_contents = writeContents
 
+    data = property(readContents, writeContents)
 
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
 class PersistentHierarchyBucket(TimesMixin,
