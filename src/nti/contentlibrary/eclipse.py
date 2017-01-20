@@ -100,8 +100,8 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
     # off (if there is one). Also, the hrefs may be URL encoded
     # if they contain spaces, and since we are in the domain of knowing
     # about URLs, it is our job to decode them.
-    tocItem.key = toc_entry.make_sibling_key(
-        _href_for_sibling_key(tocItem.href))
+    href = tocItem.href
+    tocItem.key = toc_entry.make_sibling_key(_href_for_sibling_key(href))
     for i in _toc_item_key_attrs:
         val = _node_get(node, i)
         if val:
@@ -109,8 +109,8 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
             # it needs to deal with multi-level keys, either
             # by creating a hierarchy of keys (filesystem)
             # or by simply string appending (boto)
-            setattr(tocItem, str(i), toc_entry.make_sibling_key(
-                _href_for_sibling_key(val)))
+            setattr(tocItem, str(i), 
+                    toc_entry.make_sibling_key(_href_for_sibling_key(val)))
 
     children = []
     for ordinal, child in enumerate(node.iterchildren(tag='topic'), 1):
@@ -131,8 +131,8 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
 
         if not is_valid_ntiid_string(ntiid):
             # logger.log( TRACE,
-            # 			"Ignoring ill-formed object NTIID (%s); please fix the rendering for %s",
-            # 			ntiid, tocItem)
+            #             "Ignoring ill-formed object NTIID (%s); please fix the rendering for %s",
+            #             ntiid, tocItem)
             continue
 
         if ntiid not in embeddedContainerNTIIDs:
