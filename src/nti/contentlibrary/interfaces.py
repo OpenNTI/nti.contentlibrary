@@ -723,6 +723,13 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordableContainer):
     A :class:`IContentUnit` that can be edited.
     """
 
+    def read_contents():
+        """
+        Read and return, as a sequence of bytes, the contents of this entry.
+
+        :return: Either the byte string of the contents of the entry, or if there is no such entry,
+        `None`.
+        """
 
 class IContentPackage(IContentUnit,
                       IDisplayableContent,

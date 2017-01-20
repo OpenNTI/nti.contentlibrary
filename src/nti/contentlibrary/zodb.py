@@ -66,6 +66,10 @@ class PersistentHierarchyKey(TimesMixin,
     def readContents(self):
         return self._contents
     read_contents = readContents
+    
+    def writeContents(self, data):
+        self._contents = data
+    writer_contents = writeContents
 
 
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
@@ -96,7 +100,7 @@ class PersistentHierarchyBucket(TimesMixin,
         self.updateLastMod()
 
 
-@interface.implementer(IPersistentContentUnit)
+@interface.implementer(IPersistentContentUnit, IEditableContentUnit)
 class PersistentContentUnit(TimesMixin, ContentUnit):
     """
     A persistent version of a content unit.
@@ -117,12 +121,7 @@ class PersistentContentUnit(TimesMixin, ContentUnit):
             return object.__repr__(self)
 
 
-@interface.implementer(IEditableContentUnit)
-class PersistentEditableContentUnit(PersistentContentUnit):
-    pass
-
-
-@interface.implementer(IPersistentContentPackage, INoAutoSync)
+@interface.implementer(IPersistentContentPackage, IEditableContentPackage, INoAutoSync)
 class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     """
     A persistent content package.
@@ -133,8 +132,3 @@ class PersistentContentPackage(PersistentContentUnit, ContentPackage):
             return super(PersistentContentPackage, self).__repr__()
         except ConnectionStateError:
             return object.__repr__(self)
-
-
-@interface.implementer(IEditableContentPackage)
-class PersistentEditableContentPackage(PersistentContentPackage):
-    pass
