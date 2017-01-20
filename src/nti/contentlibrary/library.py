@@ -253,22 +253,24 @@ class AbstractContentPackageLibrary(object):
         name = root.__name__ if root is not None else self.__name__
         return name
 
-    def _do_addContentPackages(self, added, lib_sync_results, params, results):
+    def _do_addContentPackages(self, added, lib_sync_results=None, params=None, results=None):
         for new in added:
             new.__parent__ = self
             register_content_units(self, new)  # get intids
             lifecycleevent.created(new)
-            lib_sync_results.added(new.ntiid)   # register
+            if lib_sync_results is not None:
+                lib_sync_results.added(new.ntiid)
             notify(ContentPackageAddedEvent(new, params, results))
 
-    def _do_removeContentPackages(self, removed, lib_sync_results, params, results):
+    def _do_removeContentPackages(self, removed, lib_sync_results=None, params=None, results=None):
         for old in removed or ():
             notify(ContentPackageRemovedEvent(old, params, results))
             old.__parent__ = None # ground
             unregister_content_units(old)
-            lib_sync_results.removed(old.ntiid)  # register
+            if lib_sync_results is not None:
+                lib_sync_results.removed(old.ntiid)
 
-    def _do_updateContentPackages(self, changed, lib_sync_results, params, results):
+    def _do_updateContentPackages(self, changed, lib_sync_results=None, params=None, results=None):
         for new, old in changed:
             # check ntiid changes
             if new.ntiid != old.ntiid:
@@ -279,7 +281,8 @@ class AbstractContentPackageLibrary(object):
             # lifecycleevent.added on 'new' objects as modified events subscribers
             # are expected to handle any change
             register_content_units(self, new)
-            lib_sync_results.modified(new.ntiid)  # register
+            if lib_sync_results is not None:
+                lib_sync_results.modified(new.ntiid)  # register
             # Note that this is the special event that shows both objects.
             notify(ContentPackageReplacedEvent(new, old, params, results))
 
