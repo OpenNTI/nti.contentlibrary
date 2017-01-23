@@ -20,6 +20,7 @@ from zope.dublincore.interfaces import IDCTimes
 from ZODB.POSException import ConnectionStateError
 
 from nti.coremetadata.mixins import RecordableMixin
+from nti.coremetadata.mixins import PublishableMixin
 
 from nti.contentlibrary.bucket import AbstractKey
 from nti.contentlibrary.bucket import AbstractBucket
@@ -104,7 +105,7 @@ class PersistentHierarchyBucket(TimesMixin,
 
 
 @interface.implementer(IPersistentContentUnit, IEditableContentUnit)
-class PersistentContentUnit(RecordableMixin, TimesMixin, ContentUnit):
+class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, ContentUnit):
     """
     A persistent version of a content unit.
     """
