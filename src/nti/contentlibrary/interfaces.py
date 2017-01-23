@@ -34,8 +34,8 @@ from persistent.interfaces import IPersistent
 
 from nti.base.interfaces import ILastModified
 
+from nti.coremetadata.interfaces import IRecordable
 from nti.coremetadata.interfaces import IPublishable
-from nti.coremetadata.interfaces import IRecordableContainer
 from nti.coremetadata.interfaces import IShouldHaveTraversablePath
 
 from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
@@ -718,7 +718,7 @@ class IContentUnit(IZContained,
                                               default=())
 
 
-class IEditableContentUnit(IContentUnit, IPublishable, IRecordableContainer):
+class IEditableContentUnit(IContentUnit, IPublishable, IRecordable):
     """
     A :class:`IContentUnit` that can be edited.
     """
@@ -729,6 +729,11 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordableContainer):
 
         :return: Either the byte string of the contents of the entry, or if there is no such entry,
         `None`.
+        """
+    
+    def write_contents():
+        """
+        Write as a sequence of bytes, the contents of this entry.
         """
 
 class IContentPackage(IContentUnit,
