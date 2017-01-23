@@ -132,12 +132,12 @@ class _FilesystemTime(object):
         # Should we allow set?
         pass
 
-from .bucket import AbstractKey
-from .bucket import AbstractBucket
-
 from zope.dublincore.interfaces import IDCTimes
 
 from nti.base.interfaces import ILastModified
+
+from nti.contentlibrary.bucket import AbstractKey
+from nti.contentlibrary.bucket import AbstractBucket
 
 from nti.dublincore.time_mixins import TimeProperty
 
