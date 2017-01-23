@@ -156,6 +156,14 @@ class IDelimitedHierarchyKey(IDelimitedHierarchyItem):
         """
 
 
+class IWritableDelimitedHierarchyKey(IDelimitedHierarchyKey):
+    
+    def writeContents(data):
+        """
+        Write the specified byte-string, to this of this leaf node.
+        """
+
+
 class IContentPackageEnumeration(interface.Interface):
     """
     Something that can enumerate content packages,

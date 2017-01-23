@@ -19,6 +19,8 @@ from zope.dublincore.interfaces import IDCTimes
 
 from ZODB.POSException import ConnectionStateError
 
+from nti.coremetadata.mixins import RecordableMixin
+
 from nti.contentlibrary.bucket import AbstractKey
 from nti.contentlibrary.bucket import AbstractBucket
 
@@ -27,10 +29,10 @@ from nti.contentlibrary.contentunit import ContentPackage
 
 from nti.contentlibrary.interfaces import INoAutoSync
 from nti.contentlibrary.interfaces import IEditableContentUnit
-from nti.contentlibrary.interfaces import IDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IPersistentContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IPersistentContentPackage
+from nti.contentlibrary.interfaces import IWritableDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 
 from nti.coremetadata.interfaces import ITitledContent
@@ -50,7 +52,7 @@ class TimesMixin(PersistentCreatedModDateTrackingObject):
         super(TimesMixin, self).__init__(*args, **kwargs)
 
 
-@interface.implementer(IDelimitedHierarchyKey)
+@interface.implementer(IWritableDelimitedHierarchyKey)
 class PersistentHierarchyKey(TimesMixin,
                              AbstractKey,
                              ITitledContent):
@@ -65,12 +67,13 @@ class PersistentHierarchyKey(TimesMixin,
     def readContents(self):
         return self._contents
     read_contents = readContents
-    
+
     def writeContents(self, data):
         self._contents = data
     write_contents = writeContents
 
     data = property(readContents, writeContents)
+
 
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
 class PersistentHierarchyBucket(TimesMixin,
@@ -101,7 +104,7 @@ class PersistentHierarchyBucket(TimesMixin,
 
 
 @interface.implementer(IPersistentContentUnit, IEditableContentUnit)
-class PersistentContentUnit(TimesMixin, ContentUnit):
+class PersistentContentUnit(RecordableMixin, TimesMixin, ContentUnit):
     """
     A persistent version of a content unit.
     """
@@ -113,6 +116,11 @@ class PersistentContentUnit(TimesMixin, ContentUnit):
 
     def read_contents(self):
         return self.key.readContents()
+    readContents = read_contents
+
+    def write_contents(self, data=None):
+        return self.key.write_contents(data)
+    writeContents = write_contents
 
     def __repr__(self):
         try:
