@@ -18,8 +18,9 @@ import boto
 
 from zope import interface
 
-from zope.component.zcml import utility
 from zope.component import getSiteManager
+
+from zope.component.zcml import utility
 
 from zope.configuration.exceptions import ConfigurationError
 
