@@ -31,8 +31,10 @@ from nti.contentlibrary.contentunit import ContentPackage
 from nti.contentlibrary.interfaces import INoAutoSync
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IPersistentContentUnit
+from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IPersistentContentPackage
+from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IWritableDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 
@@ -41,6 +43,8 @@ from nti.coremetadata.interfaces import ITitledContent
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
 from nti.property.property import alias
+
+from nti.schema.fieldproperty import createDirectFieldProperties
 
 
 @interface.implementer(IDCTimes)
@@ -57,23 +61,15 @@ class TimesMixin(PersistentCreatedModDateTrackingObject):
 class PersistentHierarchyKey(TimesMixin,
                              AbstractKey,
                              ITitledContent):
-
-    _contents = None
-
-    def __init__(self, *args, **kwargs):
-        contents = kwargs.pop('contents', None)
-        super(PersistentHierarchyKey, self).__init__(*args, **kwargs)
-        self.data = contents
+    createDirectFieldProperties(IWritableDelimitedHierarchyKey)
 
     def readContents(self):
-        return self._contents
+        return self.data
     read_contents = readContents
 
     def writeContents(self, data):
-        self._contents = data
+        self.data = data
     write_contents = writeContents
-
-    data = property(readContents, writeContents)
 
 
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
@@ -110,17 +106,20 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
     A persistent version of a content unit.
     """
 
+    _key_type = PersistentHierarchyKey
+
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)
         if self.key is None:
-            self.key = PersistentHierarchyKey()
+            self.key = self._key_type()
 
     def read_contents(self):
         return self.key.readContents()
     readContents = read_contents
 
-    def write_contents(self, data=None):
-        return self.key.write_contents(data)
+    def write_contents(self, data=None, contentType=None):
+        self.key.write_contents(data)
+        self.key.contentType = contentType
     writeContents = write_contents
 
     def __repr__(self):
@@ -141,3 +140,18 @@ class PersistentContentPackage(PersistentContentUnit, ContentPackage):
             return super(PersistentContentPackage, self).__repr__()
         except ConnectionStateError:
             return object.__repr__(self)
+
+
+@interface.implementer(IRenderableContentUnit)
+class RenderableContentUnit(PersistentContentUnit):
+    """
+    A renderable content unit.
+    """
+    createDirectFieldProperties(IRenderableContentUnit)
+
+@interface.implementer(IRenderableContentPackage)
+class RenderableContentPackage(RenderableContentUnit, PersistentContentPackage):
+    """
+    A renderable content package.
+    """
+    createDirectFieldProperties(IRenderableContentPackage)

@@ -8,6 +8,7 @@ from __future__ import print_function, unicode_literals, absolute_import, divisi
 __docformat__ = "restructuredtext en"
 
 from zope import interface
+from zope import schema
 
 from zope.annotation.interfaces import IAnnotatable
 
@@ -158,11 +159,27 @@ class IDelimitedHierarchyKey(IDelimitedHierarchyItem):
 
 class IWritableDelimitedHierarchyKey(IDelimitedHierarchyKey):
     
-    def writeContents(data):
+    contentType = schema.BytesLine(
+        title=u'Content Type',
+        description=u'The content type identifies the type of data.',
+        default=b'',
+        required=False,
+        missing_value=b''
+    )
+
+    data = schema.Bytes(
+           title=u'Data',
+           description=u'The actual content of the object.',
+           default=b'',
+           missing_value=b'',
+           required=False,
+    )
+ 
+    def writeContents(data, contentType):
         """
         Write the specified byte-string, to this of this leaf node.
         """
-
+    write_contents = writeContents
 
 class IContentPackageEnumeration(interface.Interface):
     """
@@ -739,9 +756,11 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordable):
         `None`.
         """
     
-    def write_contents():
+    def write_contents(data, contentType):
         """
         Write as a sequence of bytes, the contents of this entry.
+        
+        :param bytes data: The data to write
         """
 
 class IContentPackage(IContentUnit,
@@ -797,7 +816,24 @@ class IEditableContentPackage(IEditableContentUnit, IContentPackage):
     A :class:`IContentPackage` that can be edited.
     """
 
-
+class IRenderableContentUnit(IEditableContentUnit):
+    """
+    A :class:`IContentUnit` that can be rendered.
+    """
+    
+    render_key = Object(IDelimitedHierarchyKey,
+                         title="Key that identifies where the redenred contents for this unit are.",
+                         default=None)
+    
+class IRenderableContentPackage(IEditableContentPackage):
+    """
+    A :class:`IContentPackage` that can be rendered.
+    """
+    
+    render_root = Object(IDelimitedHierarchyItem,
+                         title="Path portion of a uri for this rendered object.",
+                         default=None)
+        
 class IContentPackageUnmodifiedEvent(IObjectEvent):
     """
     A special type of event to signal a content package
