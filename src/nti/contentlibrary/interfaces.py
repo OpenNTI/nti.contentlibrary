@@ -1036,8 +1036,8 @@ class IFilesystemKey(IDelimitedHierarchyKey):
     A string, relative to its parent.
     """
 
-    bucket = Object(
-        IFilesystemBucket, title="The bucket to which this key belongs")
+    bucket = Object(IFilesystemBucket,
+                    title="The bucket to which this key belongs")
 
     name = TextLine(
         title="The name of this key; unique within the bucket; `__name__` and `key` are aliases")
@@ -1278,3 +1278,14 @@ class INoAutoIndex(interface.Interface):
     Marker interface for objects that should not automatically
     be index.
     """
+
+
+class IContentValidator(interface.Interface):
+    """
+    Marker interface for a content validator utility
+    """
+
+    def validate(content):
+        """
+        :param content: The content to validate
+        """
