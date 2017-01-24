@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Objects for creating IContentLibrary objects based on the filesystem.
-
 .. $Id$
 """
 
