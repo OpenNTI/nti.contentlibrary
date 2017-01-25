@@ -130,7 +130,7 @@ class AbstractDelimitedHiercharchyContentPackageEnumeration(AbstractContentPacka
 
 def add_to_connection(context, obj):
     connection = IConnection(context, None)
-    if connection is not None and not IConnection(obj, None):
+    if connection is not None and IConnection(obj, None) is None:
         connection.add(obj)
         return True
     return False
