@@ -100,7 +100,7 @@ import os
 import sys
 import gzip
 import getopt
-from cStringIO import StringIO
+from six import StringIO
 
 import boto
 
