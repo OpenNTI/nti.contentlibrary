@@ -218,6 +218,8 @@ class AbstractContentPackageLibrary(object):
     # When we sync, we capture the `lastModified` timestamp
     # of the enumeration, if it provides it.
     _enumeration_last_modified = 0
+    
+    # libray last modified timestamp
     _last_modified = 0
 
     __name__ = 'Library'
@@ -692,8 +694,8 @@ class AbstractContentPackageLibrary(object):
         return result
 
 
-@interface.implementer(IAttributeAnnotatable)
 @NoPickle
+@interface.implementer(IAttributeAnnotatable)
 class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
     """
     A content package library meant only to be installed in the global
