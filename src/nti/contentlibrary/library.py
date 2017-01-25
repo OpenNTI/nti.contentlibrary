@@ -14,7 +14,6 @@ logger = __import__('logging').getLogger(__name__)
 import time
 import numbers
 import warnings
-import itertools
 
 from BTrees.OOBTree import OOBTree
 
@@ -148,7 +147,7 @@ def register_content_units(context, content_unit):
     def _register(obj):
         add_to_connection(context, obj)
         try:
-            if     IBroken.providedBy(obj) or \
+            if      IBroken.providedBy(obj) or \
                 not IPersistentContentUnit.providedBy(obj):
                 return
             intid = intids.queryId(obj)
@@ -252,19 +251,27 @@ class AbstractContentPackageLibrary(object):
 
     def _get_content_units_for_package(self, package):
         result = []
+
         def _recur(unit):
-            result.append( unit )
+            result.append(unit)
             for child in unit.children:
                 _recur(child)
         _recur(package)
         return result
 
+    def _record_units(self, package):
+        for unit in self._get_content_units_for_package(package):
+            self._contentUnitsByNTIID[unit.ntiid] = unit
+
+    def _unrecord_units(self, package):
+        for unit in self._get_content_units_for_package(package):
+            self._contentUnitsByNTIID.pop(unit.ntiid, None)
+
     def _do_addContentPackages(self, added, lib_sync_results=None, params=None, results=None):
         for new in added:
             self._contentPackages[new.ntiid] = new
-            for unit in self._get_content_units_for_package( new ):
-                self._contentUnitsByNTIID[unit.ntiid] = unit
-            new.__parent__ = self
+            self._record_units(new)
+            new.__parent__ = self # ownership
             register_content_units(self, new)  # get intids
             lifecycleevent.created(new)
             if lib_sync_results is not None:
@@ -273,12 +280,11 @@ class AbstractContentPackageLibrary(object):
 
     def _do_removeContentPackages(self, removed, lib_sync_results=None, params=None, results=None):
         for old in removed or ():
-            self._contentPackages.pop( old.ntiid, None )
-            for unit in self._get_content_units_for_package( old ):
-                self._contentUnitsByNTIID.pop( unit.ntiid, None )
+            self._contentPackages.pop(old.ntiid, None)
+            self._unrecord_units(old)
             notify(ContentPackageRemovedEvent(old, params, results))
-            old.__parent__ = None # ground
-            unregister_content_units(old)
+            old.__parent__ = None  # ground
+            unregister_content_units(old) # remove intids
             if lib_sync_results is not None:
                 lib_sync_results.removed(old.ntiid)
 
@@ -289,11 +295,9 @@ class AbstractContentPackageLibrary(object):
                 raise UnmatchedRootNTIIDException(
                     "Package NTIID changed from %s to %s" % (old.ntiid, new.ntiid))
             self._contentPackages[new.ntiid] = new
-            for unit in self._get_content_units_for_package( new ):
-                self._contentUnitsByNTIID[unit.ntiid] = unit
-            for unit in self._get_content_units_for_package( old ):
-                self._contentUnitsByNTIID.pop( unit.ntiid, None )
-            new.__parent__ = self
+            self._unrecord_units(old)
+            self._record_units(new)
+            new.__parent__ = self # ownership
             # XXX CS/JZ, 2-04-15 DO NEITHER call lifecycleevent.created nor
             # lifecycleevent.added on 'new' objects as modified events subscribers
             # are expected to handle any change
@@ -302,6 +306,11 @@ class AbstractContentPackageLibrary(object):
                 lib_sync_results.modified(new.ntiid)  # register
             # Note that this is the special event that shows both objects.
             notify(ContentPackageReplacedEvent(new, old, params, results))
+            # CS/JZ, 2-04-15  DO NOT call lifecycleevent.removed on this
+            # objects b/c this may unregister things we don't want to leaving
+            # the database in a invalid state
+            unregister_content_units(old)
+            old.__parent__ = None  # ground
 
     def _get_content_units_by_ntiid(self, packages):
         """
@@ -309,7 +318,7 @@ class AbstractContentPackageLibrary(object):
         """
         result = OOBTree()
         for package in packages:
-            for unit in self._get_content_units_for_package( package ):
+            for unit in self._get_content_units_for_package(package):
                 result[unit.ntiid] = unit
         return result
 
@@ -345,13 +354,15 @@ class AbstractContentPackageLibrary(object):
             self._contentPackages = OOBTree()
             self._contentUnitsByNTIID = OOBTree()
         current_packages = self._contentPackages.values()
-        old_content_packages = self._filter_packages(current_packages, packages)
+        old_content_packages = self._filter_packages(
+            current_packages, packages)
 
         # Make sure we get ALL packages
         contentPackages = self._enumeration.enumerateContentPackages()
         new_content_packages = self._filter_packages(contentPackages)
 
-        enumeration_last_modified = getattr(self._enumeration, 'lastModified', 0)
+        enumeration_last_modified = getattr(
+            self._enumeration, 'lastModified', 0)
 
         # Before we fire any events, compute all the work so that we can present
         # a consistent view to any listeners that will be watching.
@@ -365,8 +376,9 @@ class AbstractContentPackageLibrary(object):
         else:
             # Choosing this path WILL NOT add any new packages
             added = ()
-            current_packages = self._filter_packages( current_packages )
-            # Make sure we get current references for our filtered package_ntiids.
+            current_packages = self._filter_packages(current_packages)
+            # Make sure we get current references for our filtered
+            # package_ntiids.
             unmodified = [package
                           for package_ntiid, package in current_packages.items()
                           if package_ntiid not in old_content_packages]
@@ -421,14 +433,6 @@ class AbstractContentPackageLibrary(object):
                                         params,
                                         results)
 
-            # after updating remove parent reference for old objects
-            for _, old in changed:
-                # CS/JZ, 2-04-15  DO NOT call lifecycleevent.removed on this
-                # objects b/c this may unregister things we don't want to leaving
-                # the database in a invalid state
-                unregister_content_units(old)
-                old.__parent__ = None # ground
-
             # Ok, new let people know that 'contentPackages' changed
             attributes = lifecycleevent.Attributes(IContentPackageLibrary,
                                                    'contentPackages')
@@ -476,7 +480,7 @@ class AbstractContentPackageLibrary(object):
         # Make sure we're synced (for legacy/testing compat, also deprecated),
         # and that we build without parent packages.
         packages = self._get_contentPackages().values()
-        result = self._get_content_units_by_ntiid( packages )
+        result = self._get_content_units_by_ntiid(packages)
         return result
 
     def __delattr__(self, name):
@@ -691,8 +695,7 @@ class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
     """
 
     def _get_contentPackages(self):
-        result = super(
-            GlobalContentPackageLibrary, self)._get_contentPackages()
+        result = super(GlobalContentPackageLibrary,self)._get_contentPackages()
         for package in result.values() or ():
             if not IGlobalContentPackage.providedBy(package):
                 interface.alsoProvides(package, IGlobalContentPackage)
