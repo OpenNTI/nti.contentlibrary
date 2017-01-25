@@ -64,18 +64,15 @@ def to_iterable(value):
         result = value
     else:
         result = (value,) if value is not None else ()
-    result = tuple(getattr(x, '__name__', x) for x in result)
-    return result
+    return tuple(getattr(x, '__name__', x) for x in result)
 
 
 def get_uid(item, intids=None):
     if not isinstance(item, integer_types):
         item = removeAllProxies(item)
         intids = component.getUtility(IIntIds) if intids is None else intids
-        result = intids.queryId(item)
-    else:
-        result = item
-    return result
+        return intids.queryId(item)
+    return item
 
 
 class RetainSetIndex(AttributeSetIndex):
@@ -122,7 +119,7 @@ class RetainSetIndex(AttributeSetIndex):
             old.discard(v)
         if old:
             # call zc.catalog.index.SetIndex which does the actual indexation
-            ZC_SetIndex.index_doc(self, doc_id, old)
+            return ZC_SetIndex.index_doc(self, doc_id, old)
         else:
             super(RetainSetIndex, self).unindex_doc(doc_id)
 
