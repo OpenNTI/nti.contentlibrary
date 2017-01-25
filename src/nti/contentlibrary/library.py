@@ -250,8 +250,20 @@ class AbstractContentPackageLibrary(object):
         name = root.__name__ if root is not None else self.__name__
         return name
 
+    def _get_content_units_for_package(self, package):
+        result = []
+        def _recur(unit):
+            result.append( unit )
+            for child in unit.children:
+                _recur(child)
+        _recur(package)
+        return result
+
     def _do_addContentPackages(self, added, lib_sync_results=None, params=None, results=None):
         for new in added:
+            self._contentPackages[new.ntiid] = new
+            for unit in self._get_content_units_for_package( new ):
+                self._contentUnitsByNTIID[unit.ntiid] = unit
             new.__parent__ = self
             register_content_units(self, new)  # get intids
             lifecycleevent.created(new)
@@ -261,6 +273,9 @@ class AbstractContentPackageLibrary(object):
 
     def _do_removeContentPackages(self, removed, lib_sync_results=None, params=None, results=None):
         for old in removed or ():
+            self._contentPackages.pop( old.ntiid, None )
+            for unit in self._get_content_units_for_package( old ):
+                self._contentUnitsByNTIID.pop( unit.ntiid, None )
             notify(ContentPackageRemovedEvent(old, params, results))
             old.__parent__ = None # ground
             unregister_content_units(old)
@@ -272,7 +287,12 @@ class AbstractContentPackageLibrary(object):
             # check ntiid changes
             if new.ntiid != old.ntiid:
                 raise UnmatchedRootNTIIDException(
-                    "Pacakge NTIID changed from %s to %s" % (old.ntiid, new.ntiid))
+                    "Package NTIID changed from %s to %s" % (old.ntiid, new.ntiid))
+            self._contentPackages[new.ntiid] = new
+            for unit in self._get_content_units_for_package( new ):
+                self._contentUnitsByNTIID[unit.ntiid] = unit
+            for unit in self._get_content_units_for_package( old ):
+                self._contentUnitsByNTIID.pop( unit.ntiid, None )
             new.__parent__ = self
             # XXX CS/JZ, 2-04-15 DO NEITHER call lifecycleevent.created nor
             # lifecycleevent.added on 'new' objects as modified events subscribers
@@ -288,28 +308,17 @@ class AbstractContentPackageLibrary(object):
         Get our ntiid to content unit map.
         """
         result = OOBTree()
-
-        def _recur(unit):
-            result[unit.ntiid] = unit
-            for child in unit.children:
-                _recur(child)
         for package in packages:
-            _recur(package)
+            for unit in self._get_content_units_for_package( package ):
+                result[unit.ntiid] = unit
         return result
-
-    def _do_checkContentPackages(self, added, unmodified, changed=()):
-        _contentPackages = OOBTree()
-        for package in itertools.chain( added, unmodified, changed ):
-            _contentPackages[package.ntiid] = package
-        _content_units_by_ntiid = self._get_content_units_by_ntiid(_contentPackages.values())
-        return _contentPackages, _content_units_by_ntiid
 
     def _do_completeSyncPackages(self, unmodified, lib_sync_results, params, results,
                                  do_notify=True):
         if do_notify:
-            # Signal what pacakges WERE NOT modified
-            for pacakge in unmodified or ():
-                notify(ContentPackageUnmodifiedEvent(pacakge, params, results))
+            # Signal what packages WERE NOT modified
+            for package in unmodified or ():
+                notify(ContentPackageUnmodifiedEvent(package, params, results))
 
             # Finish up by saying that we sync'd, even if nothing changed
             notify(ContentPackageLibraryDidSyncEvent(self, params, results))
@@ -330,8 +339,12 @@ class AbstractContentPackageLibrary(object):
         lib_sync_results = LibrarySynchronizationResults(Name=self._root_name)
         results.add(lib_sync_results)
 
-        never_synced = self._contentPackages is None
-        current_packages = self._contentPackages and self._contentPackages.values()
+        never_synced = False
+        if self._contentPackages is None:
+            never_synced = True
+            self._contentPackages = OOBTree()
+            self._contentUnitsByNTIID = OOBTree()
+        current_packages = self._contentPackages.values()
         old_content_packages = self._filter_packages(current_packages, packages)
 
         # Make sure we get ALL packages
@@ -367,21 +380,11 @@ class AbstractContentPackageLibrary(object):
             else:
                 unmodified.append(old_package)
 
-        something_changed = removed or added or changed
-
-        # Now set up our view of the world
-        _contentPackages, _content_units_by_ntiid = \
-            self._do_checkContentPackages(added,
-                                          unmodified,
-                                          [x[0] for x in changed])
-
-        if something_changed or never_synced:
+        if removed or added or changed or never_synced:
             # CS/JZ, 1-29-15 We need this before event firings because some code
             # (at least question_map.py used to) relies on getting the new content units
             # via pathToNtiid.
             # TODO: Verify nothing else is doing so.
-            self._contentPackages = _contentPackages
-            self._contentUnitsByNTIID = _content_units_by_ntiid
             self._enumeration_last_modified = enumeration_last_modified
 
             if not never_synced:
