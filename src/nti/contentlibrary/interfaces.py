@@ -158,7 +158,7 @@ class IDelimitedHierarchyKey(IDelimitedHierarchyItem):
 
 
 class IWritableDelimitedHierarchyKey(IDelimitedHierarchyKey):
-    
+
     contentType = schema.BytesLine(
         title=u'Content Type',
         description=u'The content type identifies the type of data.',
@@ -174,7 +174,7 @@ class IWritableDelimitedHierarchyKey(IDelimitedHierarchyKey):
            missing_value=b'',
            required=False,
     )
- 
+
     def writeContents(data, contentType):
         """
         Write the specified byte-string, to this of this leaf node.
@@ -259,7 +259,7 @@ class IContentPackageLibrary(ILastModified,
         """
 
     def childrenOfNTIID(ntiid):
-        """ 
+        """
         Returns a flattened list of all the children entries of ntiid
         in no particular order. If there are no children, returns ``[]``
         """
@@ -594,6 +594,24 @@ class IPersistentContentPackageLibrary(IPersistent,
     """
 
 
+class IEditableContentPackageLibrary(ISyncableContentPackageLibrary):
+    """
+    A syncable content library whose state can be altered.
+    """
+
+    def add(package, event=True):
+        """
+        Add a `IContentPackage`
+        """
+    append = add
+
+    def remove(package, event=True):
+        """
+        Remove a `IContentPackage`
+        :return True if the item was removed.
+        """
+
+
 class IDisplayablePlatformPresentationResources(interface.Interface):
     """
     A (pointer to s) set of resources for presentation on a specific platform.
@@ -755,11 +773,11 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordable):
         :return: Either the byte string of the contents of the entry, or if there is no such entry,
         `None`.
         """
-    
+
     def write_contents(data, contentType):
         """
         Write as a sequence of bytes, the contents of this entry.
-        
+
         :param bytes data: The data to write
         """
 
@@ -820,20 +838,20 @@ class IRenderableContentUnit(IEditableContentUnit):
     """
     A :class:`IContentUnit` that can be rendered.
     """
-    
+
     render_key = Object(IDelimitedHierarchyKey,
                          title="Key that identifies where the redenred contents for this unit are.",
                          default=None)
-    
+
 class IRenderableContentPackage(IEditableContentPackage):
     """
     A :class:`IContentPackage` that can be rendered.
     """
-    
+
     render_root = Object(IDelimitedHierarchyItem,
                          title="Path portion of a uri for this rendered object.",
                          default=None)
-        
+
 class IContentPackageUnmodifiedEvent(IObjectEvent):
     """
     A special type of event to signal a content package

@@ -35,7 +35,6 @@ class TestBundle(ContentlibraryLayerTest):
 	def setUp(self):
 		global_library = self.global_library = filesystem.GlobalFilesystemContentPackageLibrary( os.path.dirname(__file__) )
 		global_library.syncContentPackages()
-
 		component.getGlobalSiteManager().registerUtility( global_library,
 														  provided=IContentPackageLibrary )
 

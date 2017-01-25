@@ -134,7 +134,7 @@ def sync_bundles_when_library_synched(library, event):
     """
     When a persistent content library is synchronized
     with the disk contents, whether or not anything actually changed,
-    we also synchronize the corresponding bundle library. 
+    we also synchronize the corresponding bundle library.
     (Because they could change independently and in unknown ways)
     """
 
@@ -155,7 +155,7 @@ def sync_bundles_when_library_synched(library, event):
     bundle_bucket = enumeration_root.getChildNamed(bundle_library.__name__)
     if bundle_bucket is None:
         logger.info("Not synchronizing: no directory named %s in %s for library %s",
-                    bundle_library.__name__, 
+                    bundle_library.__name__,
                     getattr(enumeration_root, 'absolute_path', enumeration_root),
                     library)
         return

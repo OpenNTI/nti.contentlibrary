@@ -45,7 +45,7 @@ from nti.contentlibrary.interfaces import ContentPackageRemovedEvent
 from nti.contentlibrary.interfaces import IContentPackageEnumeration
 from nti.contentlibrary.interfaces import ContentPackageReplacedEvent
 from nti.contentlibrary.interfaces import ContentPackageUnmodifiedEvent
-from nti.contentlibrary.interfaces import ISyncableContentPackageLibrary
+from nti.contentlibrary.interfaces import IEditableContentPackageLibrary
 from nti.contentlibrary.interfaces import ContentPackageLibraryDidSyncEvent
 from nti.contentlibrary.interfaces import ContentPackageLibraryWillSyncEvent
 from nti.contentlibrary.interfaces import ContentPackageLibraryModifiedOnSyncEvent
@@ -185,7 +185,7 @@ def unregister_content_units(content_unit):
     _unregister(content_unit)
 
 
-@interface.implementer(ISyncableContentPackageLibrary)
+@interface.implementer(IEditableContentPackageLibrary)
 class AbstractContentPackageLibrary(object):
     """
     A library that uses an enumeration and cooperates with parent
@@ -267,7 +267,7 @@ class AbstractContentPackageLibrary(object):
         for unit in self._get_content_units_for_package(package):
             self._contentUnitsByNTIID.pop(unit.ntiid, None)
 
-    def _do_addContentPackages(self, added, lib_sync_results=None, params=None, results=None):
+    def _do_addContentPackages(self, added, lib_sync_results=None, params=None, results=None, event=True):
         for new in added:
             self._contentPackages[new.ntiid] = new
             self._record_units(new)
@@ -276,17 +276,26 @@ class AbstractContentPackageLibrary(object):
             lifecycleevent.created(new)
             if lib_sync_results is not None:
                 lib_sync_results.added(new.ntiid)
-            notify(ContentPackageAddedEvent(new, params, results))
+            if event:
+                notify(ContentPackageAddedEvent(new, params, results))
 
-    def _do_removeContentPackages(self, removed, lib_sync_results=None, params=None, results=None):
+    def _do_removeContentPackages(self, removed, lib_sync_results=None, params=None, results=None, event=True):
         for old in removed or ():
             self._contentPackages.pop(old.ntiid, None)
             self._unrecord_units(old)
-            notify(ContentPackageRemovedEvent(old, params, results))
+            if event:
+                notify(ContentPackageRemovedEvent(old, params, results))
             old.__parent__ = None  # ground
             unregister_content_units(old) # remove intids
             if lib_sync_results is not None:
                 lib_sync_results.removed(old.ntiid)
+
+    def add(self, package, event=True):
+        self._do_addContentPackages( (package,), event=event)
+    append = add
+
+    def remove(self, package, event=True):
+        self._do_removeContentPackages( (package,), event=event)
 
     def _do_updateContentPackages(self, changed, lib_sync_results=None, params=None, results=None):
         for new, old in changed:
@@ -713,7 +722,6 @@ def EmptyLibrary(prefix=''):
     A library that is perpetually empty.
     """
     return GlobalContentPackageLibrary(_EmptyEnumeration(), prefix=prefix)
-
 
 class PersistentContentPackageLibrary(Persistent,
                                       AbstractContentPackageLibrary):
