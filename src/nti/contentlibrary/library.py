@@ -14,6 +14,7 @@ logger = __import__('logging').getLogger(__name__)
 import time
 import numbers
 import warnings
+import itertools
 
 from BTrees.OOBTree import OOBTree
 
@@ -210,7 +211,7 @@ class AbstractContentPackageLibrary(object):
 
     # storage of content units by their ntiids
     _contentUnitsByNTIID = None
-    
+
     # The enumeration we will use when asked to sync
     # content packages.
     _enumeration = None
@@ -229,26 +230,19 @@ class AbstractContentPackageLibrary(object):
         if prefix:
             self.url_prefix = prefix
 
-    def _filter_packages(self, contentPackages=()):
+    def _filter_packages(self, contentPackages=(), package_ntiids=None):
+        """
+        Filter to relevent packages (by `package_ntiids` if given), and
+        return a dict of package-ntiid -> package.
+        """
+        result = dict()
         for package in contentPackages or ():
             if not INoAutoSync.providedBy(package):
-                yield package
-
-    def _content_packages_tuple(self, contentPackages=(), packages=None):
-        if not packages:
-            by_list = list(self._filter_packages(contentPackages))
-            by_ntiid = {x.ntiid: x for x in by_list}
-        else:
-            by_list = []
-            by_ntiid = {}
-            for content_package in self._filter_packages(contentPackages):
-                if content_package.ntiid in packages:
-                    by_list.append(content_package)
-                    by_ntiid[content_package.ntiid] = content_package
-            if not by_list:
-                raise Exception("No package to update was found")
-
-        return by_list, by_ntiid
+                if not package_ntiids or package.ntiid in package_ntiids:
+                    result[package.ntiid] = package
+        if package_ntiids and not result:
+            raise Exception("No package to update was found")
+        return result
 
     @property
     def _root_name(self):
@@ -304,16 +298,11 @@ class AbstractContentPackageLibrary(object):
         return result
 
     def _do_checkContentPackages(self, added, unmodified, changed=()):
-        _contentPackages = []
-        _contentPackages.extend(added)
-        _contentPackages.extend(unmodified)
-        _contentPackages.extend(changed)
-
-        _contentPackages = tuple(_contentPackages)
-        _content_packages_by_ntiid = {x.ntiid: x for x in _contentPackages}
-        _content_units_by_ntiid = self._get_content_units_by_ntiid(_contentPackages)
-        assert len(_contentPackages) == len(_content_packages_by_ntiid), "Invalid library"
-        return _contentPackages, _content_packages_by_ntiid, _content_units_by_ntiid
+        _contentPackages = OOBTree()
+        for package in itertools.chain( added, unmodified, changed ):
+            _contentPackages[package.ntiid] = package
+        _content_units_by_ntiid = self._get_content_units_by_ntiid(_contentPackages.values())
+        return _contentPackages, _content_units_by_ntiid
 
     def _do_completeSyncPackages(self, unmodified, lib_sync_results, params, results,
                                  do_notify=True):
@@ -341,54 +330,47 @@ class AbstractContentPackageLibrary(object):
         lib_sync_results = LibrarySynchronizationResults(Name=self._root_name)
         results.add(lib_sync_results)
 
-        # filter packages if specified
         never_synced = self._contentPackages is None
-        old_content_packages, old_content_packages_by_ntiid = \
-                self._content_packages_tuple(self._contentPackages, packages)
+        current_packages = self._contentPackages and self._contentPackages.values()
+        old_content_packages = self._filter_packages(current_packages, packages)
 
-        # make sure we get ALL packages
+        # Make sure we get ALL packages
         contentPackages = self._enumeration.enumerateContentPackages()
-        new_content_packages, new_content_packages_by_ntiid = \
-                self._content_packages_tuple(contentPackages)
-        assert len(new_content_packages) == len(new_content_packages_by_ntiid), \
-               "Invalid library"
+        new_content_packages = self._filter_packages(contentPackages)
 
         enumeration_last_modified = getattr(self._enumeration, 'lastModified', 0)
 
-        # Before we fire any events, compute all the work so that
-        # we can present a consistent view to any listeners that
-        # will be watching
+        # Before we fire any events, compute all the work so that we can present
+        # a consistent view to any listeners that will be watching.
         removed = []
         changed = []
         if not packages:  # no filter
             unmodified = []
             added = [package
-                     for ntiid, package in new_content_packages_by_ntiid.items()
-                     if ntiid not in old_content_packages_by_ntiid]
+                     for ntiid, package in new_content_packages.items()
+                     if ntiid not in old_content_packages]
         else:
-            # chosing this path WILL NOT add any new package
+            # Choosing this path WILL NOT add any new packages
             added = ()
-            unfiltered_content_packages, _ = \
-                self._content_packages_tuple(self._contentPackages)
-
-            # make sure we get old references
+            current_packages = self._filter_packages( current_packages )
+            # Make sure we get current references for our filtered package_ntiids.
             unmodified = [package
-                          for package in unfiltered_content_packages
-                          if package.ntiid not in old_content_packages_by_ntiid]
+                          for package_ntiid, package in current_packages.items()
+                          if package_ntiid not in old_content_packages]
 
-        for old in old_content_packages:
-            new = new_content_packages_by_ntiid.get(old.ntiid)
-            if new is None:
-                removed.append(old)
-            elif old.lastModified < new.lastModified:
-                changed.append((new, old))
+        for old_key, old_package in old_content_packages.items():
+            new_package = new_content_packages.get(old_key)
+            if new_package is None:
+                removed.append(old_package)
+            elif old_package.lastModified < new_package.lastModified:
+                changed.append((new_package, old_package))
             else:
-                unmodified.append(old)
+                unmodified.append(old_package)
 
         something_changed = removed or added or changed
 
-        # now set up our view of the world
-        _contentPackages, _content_packages_by_ntiid, _content_units_by_ntiid = \
+        # Now set up our view of the world
+        _contentPackages, _content_units_by_ntiid = \
             self._do_checkContentPackages(added,
                                           unmodified,
                                           [x[0] for x in changed])
@@ -399,9 +381,8 @@ class AbstractContentPackageLibrary(object):
             # via pathToNtiid.
             # TODO: Verify nothing else is doing so.
             self._contentPackages = _contentPackages
-            self._content_units_by_ntiid = _content_units_by_ntiid
+            self._contentUnitsByNTIID = _content_units_by_ntiid
             self._enumeration_last_modified = enumeration_last_modified
-            self._content_packages_by_ntiid = _content_packages_by_ntiid
 
             if not never_synced:
                 logger.info("Library %s adding packages %s", self, added)
@@ -410,7 +391,7 @@ class AbstractContentPackageLibrary(object):
 
             if removed and params != None and not params.allowRemoval:
                 raise ContentRemovalException(
-                    "Cannot remove content pacakges without explicitly allowing it")
+                    "Cannot remove content packages without explicitly allowing it")
 
             # Now fire the events letting listeners (e.g., index and question adders)
             # know that we have content. Randomize the order of this across worker
@@ -427,8 +408,8 @@ class AbstractContentPackageLibrary(object):
                                            params,
                                            results)
 
-            self._do_updateContentPackages(changed, 
-                                           lib_sync_results, 
+            self._do_updateContentPackages(changed,
+                                           lib_sync_results,
                                            params,
                                            results)
 
@@ -446,10 +427,10 @@ class AbstractContentPackageLibrary(object):
                 old.__parent__ = None # ground
 
             # Ok, new let people know that 'contentPackages' changed
-            attributes = lifecycleevent.Attributes(IContentPackageLibrary, 
+            attributes = lifecycleevent.Attributes(IContentPackageLibrary,
                                                    'contentPackages')
             event = ContentPackageLibraryModifiedOnSyncEvent(self,
-                                                             params, 
+                                                             params,
                                                              results,
                                                              attributes)
             notify(event)
@@ -459,12 +440,6 @@ class AbstractContentPackageLibrary(object):
                                       params,
                                       results)
         return lib_sync_results
-
-    # Maps from top-level content-package NTIIDs to the content package.
-    # This is cached based on the value of the _contentPackages variable,
-    # and uses that variable, which must not be modified outside the
-    # confines of this class.
-    _content_packages_by_ntiid = ()
 
     def _get_contentPackages(self):
         if self._contentPackages is None:
@@ -479,25 +454,26 @@ class AbstractContentPackageLibrary(object):
         # we get from the parent
         parent = queryNextUtility(self, IContentPackageLibrary)
         if parent is None:
-            # We can directly return our tuple, yay
+            # We can directly return our store
             return self._contentPackages
 
-        contentPackages = list(self._contentPackages)
-        for i in parent.contentPackages:
-            if i.ntiid not in self._content_packages_by_ntiid:
-                contentPackages.append(i)
+        # Now duplicate and merge with parent
+        contentPackages = dict(self._contentPackages or {})
+        for parent_package in parent.contentPackages:
+            if parent_package.ntiid not in self._contentPackages:
+                contentPackages[parent_package.ntiid] = parent_package
         return contentPackages
 
     @property
     def contentPackages(self):
-        return self._get_contentPackages()
+        return self._get_contentPackages().values()
 
     @Lazy
-    def _content_units_by_ntiid(self):
+    def _contentUnitsByNTIID(self):
         # Make sure we're synced (for legacy/testing compat, also deprecated),
         # and that we build without parent packages.
-        self._get_contentPackages()
-        result = self._get_content_units_by_ntiid(self._contentPackages)
+        packages = self._get_contentPackages().values()
+        result = self._get_content_units_by_ntiid( packages )
         return result
 
     def __delattr__(self, name):
@@ -534,16 +510,13 @@ class AbstractContentPackageLibrary(object):
         # so that people that care can clean up.
         # TODO: What's the right order for this, before or after
         # we do the delete?
-        for title in self._contentPackages:
-            lifecycleevent.removed(title)
-            unregister_content_units(title)
-            title.__parent__ = None  # ground
+        if self._contentPackages:
+            for title in self._contentPackages.values():
+                lifecycleevent.removed(title)
+                unregister_content_units(title)
+                title.__parent__ = None  # ground
 
-        # Must also take care to clear its dependents
-        if '_content_packages_by_ntiid' in self.__dict__:
-            del self._content_packages_by_ntiid
-        if '_content_units_by_ntiid' in self.__dict__:
-            del self._content_units_by_ntiid
+        del self._contentUnitsByNTIID
         del self._contentPackages
 
     @property
@@ -581,18 +554,17 @@ class AbstractContentPackageLibrary(object):
             # This should only be done by tests
             return list(self.contentPackages)[key]
 
-        # In the past this worked even if the library
-        # had not been synced because it used self.contentPackages
-        # to do the implicit sync
-        if key in self._content_packages_by_ntiid:
-            return self._content_packages_by_ntiid[key]
-
-        # We no longer check titles
-        parent = queryNextUtility(self, IContentPackageLibrary)
-        if parent is None:
-            raise KeyError(key)
-
-        return parent.__getitem__(key)
+        # In the past this worked even if the library had not been synced
+        # because it used self.contentPackages to do the implicit sync.
+        try:
+            result = self._contentPackages[key]
+        except KeyError:
+            # We no longer check titles
+            parent = queryNextUtility(self, IContentPackageLibrary)
+            if parent is None:
+                raise KeyError(key)
+            result = parent.__getitem__(key)
+        return result
 
     def get(self, key, default=None):
         try:
@@ -609,7 +581,7 @@ class AbstractContentPackageLibrary(object):
 
     def __len__(self):
         # XXX: This doesn't make much sense
-        return len(self._content_packages_by_ntiid)
+        return len(self._contentPackages)
 
     def __contains__(self, key):
         return self.get(key) is not None
@@ -630,7 +602,7 @@ class AbstractContentPackageLibrary(object):
         """
         if not key:
             return None
-        result = self._content_units_by_ntiid.get(key)
+        result = self._contentUnitsByNTIID.get(key)
         if result is None:
             # Check our parent
             parent = queryNextUtility(self, IContentPackageLibrary)
@@ -695,7 +667,7 @@ class AbstractContentPackageLibrary(object):
         particular order.
         """
         result = []
-        for unit in self._content_units_by_ntiid.values():
+        for unit in self._contentUnitsByNTIID.values():
             if ntiid in unit.embeddedContainerNTIIDs:
                 result.append(self.pathToNTIID(unit.ntiid))
         if not result:
@@ -718,7 +690,7 @@ class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
     def _get_contentPackages(self):
         result = super(
             GlobalContentPackageLibrary, self)._get_contentPackages()
-        for package in result or ():
+        for package in result.values() or ():
             if not IGlobalContentPackage.providedBy(package):
                 interface.alsoProvides(package, IGlobalContentPackage)
         return result

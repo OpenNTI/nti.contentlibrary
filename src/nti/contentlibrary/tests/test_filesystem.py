@@ -35,7 +35,7 @@ from zope import component
 from zope.dublincore.interfaces import IWriteZopeDublinCore
 
 from nti.contentlibrary import filesystem
-from nti.contentlibrary import interfaces 
+from nti.contentlibrary import interfaces
 
 from nti.externalization.externalization import to_external_object
 

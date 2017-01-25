@@ -95,8 +95,8 @@ class TestBundle(ContentlibraryLayerTest):
 		sync_bundle_from_json_key(key, bundle, self.global_library, _meta=meta)
 
 		# Empty our library
-		self.global_library._contentPackages = ()
-		self.global_library._content_packages_by_ntiid = {}
+		self.global_library._contentPackages = {}
+		self.global_library._contentPackagesByNtiid = {}
 		# We will raise if the package is missing
 		assert_that( calling( sync_bundle_from_json_key ) \
 						.with_args(key, bundle, self.global_library, _meta=meta),
