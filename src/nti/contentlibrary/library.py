@@ -218,6 +218,7 @@ class AbstractContentPackageLibrary(object):
     # When we sync, we capture the `lastModified` timestamp
     # of the enumeration, if it provides it.
     _enumeration_last_modified = 0
+    _last_modified = 0
 
     __name__ = 'Library'
     __parent__ = None
@@ -291,10 +292,12 @@ class AbstractContentPackageLibrary(object):
                 lib_sync_results.removed(old.ntiid)
 
     def add(self, package, event=True):
+        self._last_modified = time.time()
         self._do_addContentPackages( (package,), event=event)
     append = add
 
     def remove(self, package, event=True):
+        self._last_modified = time.time()
         self._do_removeContentPackages( (package,), event=event)
 
     def _do_updateContentPackages(self, changed, lib_sync_results=None, params=None, results=None):
@@ -482,7 +485,7 @@ class AbstractContentPackageLibrary(object):
 
     @property
     def contentPackages(self):
-        return self._get_contentPackages().values()
+        return list(self._get_contentPackages().values())
 
     @Lazy
     def _contentUnitsByNTIID(self):
@@ -542,21 +545,16 @@ class AbstractContentPackageLibrary(object):
     @property
     def lastModified(self):
         """
-        This object is deemed to be last modified at least
-        as recently as any of its content packages and its enumeration.
-        Note: This fails if removal is supported by the subclass (last modified could go
-        backwards). If you support removal, you should override this
-        method.
+        This object is deemed to be last modified at least as recently as any
+        of its content packages and its enumeration.
         """
         # Refuse to do this if we're not sync'd!
         if self._contentPackages is None:
             return -1
 
-        lastModified = -1
-        for x in self.contentPackages:
-            lastModified = max(lastModified, x.index_last_modified or -1)
-
-        lastModified = max(self._enumeration_last_modified, lastModified)
+        # We used to base this on the packages `index_last_modified`, now
+        # we take the max of our enumeration and last add/remove.
+        lastModified = max(self._enumeration_last_modified, self._last_modified)
         return lastModified
 
     def __getitem__(self, key):
