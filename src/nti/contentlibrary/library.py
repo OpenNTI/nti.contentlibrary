@@ -208,6 +208,9 @@ class AbstractContentPackageLibrary(object):
     # to implicitly sync is deprecated.
     _contentPackages = None
 
+    # storage of content units by their ntiids
+    _contentUnitsByNTIID = None
+    
     # The enumeration we will use when asked to sync
     # content packages.
     _enumeration = None
