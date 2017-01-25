@@ -36,7 +36,8 @@ from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IWritableDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 
-from nti.coremetadata.interfaces import ITitledContent
+from nti.coremetadata.interfaces import INoPublishLink
+from nti.coremetadata.interfaces import ITitledContent 
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
@@ -98,7 +99,7 @@ class PersistentHierarchyBucket(TimesMixin,
         self.updateLastMod()
 
 
-@interface.implementer(IPersistentContentUnit, IEditableContentUnit)
+@interface.implementer(IPersistentContentUnit, IEditableContentUnit, INoPublishLink)
 class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, ContentUnit):
     """
     A persistent version of a content unit.
