@@ -37,7 +37,6 @@ from nti.contentlibrary.interfaces import IWritableDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 
 from nti.coremetadata.interfaces import INoPublishLink
-from nti.coremetadata.interfaces import ITitledContent 
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
@@ -57,43 +56,41 @@ class TimesMixin(PersistentCreatedModDateTrackingObject):
 
 
 @interface.implementer(IWritableDelimitedHierarchyKey)
-class PersistentHierarchyKey(TimesMixin,
-                             AbstractKey,
-                             ITitledContent):
+class PersistentHierarchyKey(TimesMixin, AbstractKey):
     createDirectFieldProperties(IWritableDelimitedHierarchyKey)
-
+ 
     def readContents(self):
         return self.data
     read_contents = readContents
-
+ 
     def writeContents(self, data):
         self.data = data
     write_contents = writeContents
-
-
+ 
+ 
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
 class PersistentHierarchyBucket(TimesMixin,
                                 AbstractBucket,
                                 OrderedContainer):
-
+ 
     _key_type = PersistentHierarchyKey
-
+ 
     def __init__(self, *args, **kwargs):
         OrderedContainer.__init__(self)
         AbstractBucket.__init__(*args, **kwargs)
-
+ 
     def enumerateChildren(self):
         return list(self.values())
     enumerate_children = enumerateChildren
-
+ 
     def getChildNamed(self, name):
         return self.get(name)
     get_child_named = getChildNamed
-
+ 
     def __setitem__(self, key, value):
         self.updateLastMod()
         return OrderedContainer.__setitem__(self, key, value)
-
+ 
     def __delitem__(self, key):
         OrderedContainer.__delitem__(self, key)
         self.updateLastMod()
@@ -106,7 +103,7 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
     """
     mime_type = mimeType = 'application/vnd.nextthought.persistentcontentunit'
 
-    _key_type = PersistentHierarchyKey
+    #_key_type = PersistentHierarchyKey
 
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)

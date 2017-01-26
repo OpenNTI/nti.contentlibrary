@@ -82,12 +82,11 @@ def get_platform_resentation_resources(root=None):
     result = list()
     for x in data:
         ip_name = 'shared' if inherit and x[0].name != 'shared' else None
-        dr = DisplayablePlatformPresentationResources(PlatformName=x[0].name,
-                                                      root=x[1],
-                                                      Version=x[2],
-                                                      InheritPlatformName=ip_name)
-        result.append(dr)
-    result = tuple(result)
+        result.append(
+            DisplayablePlatformPresentationResources(PlatformName=x[0].name,
+                                                     root=x[1],
+                                                     Version=x[2],
+                                                     InheritPlatformName=ip_name))
     return result
 
 
@@ -101,8 +100,7 @@ class DisplayableContentMixin(object):
 
     @classmethod
     def get_platform_resentation_resources(self, root=None):
-        result = get_platform_resentation_resources(root)
-        return result
+        return get_platform_resentation_resources(root)
 
     @property
     def _v_root(self):
@@ -111,20 +109,16 @@ class DisplayableContentMixin(object):
         # as a missing attribute...and SchemaConfigured would try
         # to copy in the default value, which would overwrite
         # our CachedProperty. Thus we have to be defensive.
-        root = getattr(self, 'root', None)
-        return root
+        return getattr(self, 'root', None)
 
     @property
     def _v_rootLastModified(self):
-        result = getattr(self._v_root, 'lastModified', 0)
-        return result
+        return getattr(self._v_root, 'lastModified', 0)
 
     @CachedProperty('root', '_v_rootLastModified')
     def _v_PlatformPresentationResources(self):
-        result = get_platform_resentation_resources(self._v_root)
-        return result
+        return get_platform_resentation_resources(self._v_root)
 
     @CachedProperty('root')
     def PlatformPresentationResources(self):
-        result = get_platform_resentation_resources(self._v_root)
-        return result
+        return get_platform_resentation_resources(self._v_root)

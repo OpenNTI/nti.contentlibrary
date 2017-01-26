@@ -85,6 +85,9 @@
 						 .interfaces.ILibrarySynchronizationResults"
 		modules=".synchronize" />
 
+	<!-- Mime factories -->
+	<ext:registerMimeFactories module=".zodb" />
+
 	<adapter factory=".externalization._ContentPackageExternal" />
 	<adapter factory=".externalization._ContentPackageLibraryExternal" />
 	<adapter factory=".externalization._LegacyCourseConflatedContentPackageExternal" />
