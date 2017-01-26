@@ -58,7 +58,6 @@ from nti.contentlibrary.synchronize import LibrarySynchronizationResults
 
 from nti.externalization.persistence import NoPickle
 
-from nti.property.property import Lazy
 from nti.property.property import alias
 
 from nti.site.localutility import queryNextUtility
@@ -155,7 +154,7 @@ def register_content_units(context, content_unit):
                 intids.register(obj)
         except (TypeError, POSError):  # Broken object
             return
-        for child in obj.children:
+        for child in obj.children or ():
             _register(child)
     _register(content_unit)
 
@@ -179,7 +178,7 @@ def unregister_content_units(content_unit):
                 intids.unregister(obj)
         except (TypeError, POSError):  # Broken object
             pass
-        for child in obj.children:
+        for child in obj.children or ():
             _unregister(child)
 
     _unregister(content_unit)
@@ -262,18 +261,18 @@ class AbstractContentPackageLibrary(object):
         _recur(package)
         return result
 
-    def _record_units(self, package):
+    def _record_units_by_ntiid(self, package):
         for unit in self._get_content_units_for_package(package):
             self._contentUnitsByNTIID[unit.ntiid] = unit
 
-    def _unrecord_units(self, package):
+    def _unrecord_units_by_ntiid(self, package):
         for unit in self._get_content_units_for_package(package):
             self._contentUnitsByNTIID.pop(unit.ntiid, None)
 
     def _do_addContentPackages(self, added, lib_sync_results=None, params=None, results=None, event=True):
         for new in added:
             self._contentPackages[new.ntiid] = new
-            self._record_units(new)
+            self._record_units_by_ntiid(new)
             new.__parent__ = self # ownership
             register_content_units(self, new)  # get intids
             lifecycleevent.created(new)
@@ -285,7 +284,7 @@ class AbstractContentPackageLibrary(object):
     def _do_removeContentPackages(self, removed, lib_sync_results=None, params=None, results=None, event=True):
         for old in removed or ():
             self._contentPackages.pop(old.ntiid, None)
-            self._unrecord_units(old)
+            self._unrecord_units_by_ntiid(old)
             if event:
                 notify(ContentPackageRemovedEvent(old, params, results))
             old.__parent__ = None  # ground
@@ -309,8 +308,8 @@ class AbstractContentPackageLibrary(object):
                 raise UnmatchedRootNTIIDException(
                     "Package NTIID changed from %s to %s" % (old.ntiid, new.ntiid))
             self._contentPackages[new.ntiid] = new
-            self._unrecord_units(old)
-            self._record_units(new)
+            self._unrecord_units_by_ntiid(old)
+            self._record_units_by_ntiid(new)
             new.__parent__ = self # ownership
             # XXX CS/JZ, 2-04-15 DO NEITHER call lifecycleevent.created nor
             # lifecycleevent.added on 'new' objects as modified events subscribers
@@ -368,15 +367,14 @@ class AbstractContentPackageLibrary(object):
             self._contentPackages = OOBTree()
             self._contentUnitsByNTIID = OOBTree()
         current_packages = self._contentPackages.values()
-        old_content_packages = self._filter_packages(
-            current_packages, packages)
+        old_content_packages = self._filter_packages(current_packages,
+                                                     packages)
 
         # Make sure we get ALL packages
         contentPackages = self._enumeration.enumerateContentPackages()
         new_content_packages = self._filter_packages(contentPackages)
 
-        enumeration_last_modified = getattr(
-            self._enumeration, 'lastModified', 0)
+        enumeration_last_modified = getattr(self._enumeration, 'lastModified', 0)
 
         # Before we fire any events, compute all the work so that we can present
         # a consistent view to any listeners that will be watching.
@@ -462,12 +460,14 @@ class AbstractContentPackageLibrary(object):
                                       results)
         return lib_sync_results
 
-    def _get_contentPackages(self):
+    def _checkSync(self):
         if self._contentPackages is None:
             warnings.warn("Please sync the library first.", stacklevel=2)
             warnings.warn("Please sync the library first.", stacklevel=3)
             self.syncContentPackages()
 
+    def _get_contentPackages(self):
+        self._checkSync()
         # We would like to use a generator here, to avoid
         # copying in case of a parent, but our interface
         # requires that this be indexable, for some reason.
@@ -477,7 +477,6 @@ class AbstractContentPackageLibrary(object):
         if parent is None:
             # We can directly return our store
             return self._contentPackages
-
         # Now duplicate and merge with parent
         contentPackages = dict(self._contentPackages or {})
         for parent_package in parent.contentPackages:
@@ -489,13 +488,18 @@ class AbstractContentPackageLibrary(object):
     def contentPackages(self):
         return list(self._get_contentPackages().values())
 
-    @Lazy
-    def _contentUnitsByNTIID(self):
-        # Make sure we're synced (for legacy/testing compat, also deprecated),
-        # and that we build without parent packages.
-        packages = self._get_contentPackages().values()
-        result = self._get_content_units_by_ntiid(packages)
-        return result
+    @property
+    def contentUnitsByNTIID(self):
+        self._checkSync()
+        parent = queryNextUtility(self, IContentPackageLibrary)
+        if parent is None:
+            return self._contentUnitsByNTIID
+        # Now duplicate and merge with parent
+        contentUnitsByNTIID = dict(self._contentUnitsByNTIID or {})
+        for ntiid, unit in parent.contentUnitsByNTIID.items():
+            if ntiid not in self._contentUnitsByNTIID:
+                contentUnitsByNTIID[ntiid] = unit
+        return contentUnitsByNTIID
 
     def __delattr__(self, name):
         """
