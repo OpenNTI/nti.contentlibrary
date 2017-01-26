@@ -67,6 +67,7 @@ setup(
         'nti.traversal',
         'nti.wref',
         'nti.zodb',
+        'nti.zope_catalog',
         'persistent',
         'PyYAML',
         'repoze.lru',

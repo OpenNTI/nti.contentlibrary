@@ -48,7 +48,7 @@ from nti.zope_catalog.catalog import ResultSet
 from nti.zope_catalog.index import AttributeSetIndex
 from nti.zope_catalog.index import AttributeValueIndex as ValueIndex
 
-CATALOG_INDEX_NAME = '++etc++contentlibrary.catalog'
+ASSETS_CATALOG_INDEX_NAME = '++etc++contentlibrary.assets.catalog'
 
 IX_SITE = 'site'
 IX_TYPE = 'type'
@@ -172,16 +172,16 @@ class SlideDeckVideosIndex(AttributeSetIndex):
     interface = default_interface = ISlideDeckAdapter
 
 
-class LibraryCatalog(Catalog):
+class AssetsLibraryCatalog(Catalog):
 
     family = BTrees.family64
 
     def __init__(self, family=None):
-        super(LibraryCatalog, self).__init__(family=family)
+        super(AssetsLibraryCatalog, self).__init__(family=family)
         self.last_modified = self.family.OI.BTree()
 
     def clear(self):
-        super(LibraryCatalog, self).clear()
+        super(AssetsLibraryCatalog, self).clear()
         for index in self.values():
             index.clear()
         self.last_modified.clear()
@@ -313,8 +313,8 @@ class LibraryCatalog(Catalog):
         return result
 
 
-def create_library_catalog(catalog=None, family=None):
-    catalog = LibraryCatalog() if catalog is None else catalog
+def create_assets_library_catalog(catalog=None, family=None):
+    catalog = AssetsLibraryCatalog() if catalog is None else catalog
     for name, clazz in ((IX_SITE, SiteIndex),
                         (IX_TYPE, TypeIndex),
                         (IX_NTIID, NTIIDIndex),
@@ -328,19 +328,21 @@ def create_library_catalog(catalog=None, family=None):
     return catalog
 
 
-def install_library_catalog(site_manager_container, intids=None):
+def install_assets_library_catalog(site_manager_container, intids=None):
     lsm = site_manager_container.getSiteManager()
     intids = lsm.getUtility(IIntIds) if intids is None else intids
-    catalog = lsm.queryUtility(ICatalog, name=CATALOG_INDEX_NAME)
+    catalog = lsm.queryUtility(ICatalog, name=ASSETS_CATALOG_INDEX_NAME)
     if catalog is not None:
         return catalog
 
-    catalog = LibraryCatalog()
-    locate(catalog, site_manager_container, CATALOG_INDEX_NAME)
+    catalog = AssetsLibraryCatalog()
+    locate(catalog, site_manager_container, ASSETS_CATALOG_INDEX_NAME)
     intids.register(catalog)
-    lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_INDEX_NAME)
+    lsm.registerUtility(catalog, 
+                        provided=ICatalog, 
+                        name=ASSETS_CATALOG_INDEX_NAME)
 
-    catalog = create_library_catalog(catalog=catalog, family=intids.family)
+    catalog = create_assets_library_catalog(catalog=catalog, family=intids.family)
     for index in catalog.values():
         intids.register(index)
     return catalog
