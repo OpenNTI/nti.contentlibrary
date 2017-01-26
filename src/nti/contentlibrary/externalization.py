@@ -128,20 +128,25 @@ class _ContentPackageExternal(object):
         root_url = _root_url_of_unit(self.package)
         result._root_url = root_url
 
-        result['icon'] = IContentUnitHrefMapper(
-            self.package.icon).href if self.package.icon else None
-        result['href'] = IContentUnitHrefMapper(
-            self.package.key).href if self.package.key else None
+        icon = self.package.icon
+        result['icon'] = IContentUnitHrefMapper(icon).href if icon else None
+
+        key = self.package.key
+        result['href'] = IContentUnitHrefMapper(key).href if key else None
+
         result['root'] = root_url
         result['title'] = self.package.title  # Matches result['DCTitle']
 
         index_dc = ''
-        if self.package.index_last_modified and self.package.index_last_modified > 0:
+        if      self.package.index_last_modified \
+            and self.package.index_last_modified > 0:
             index_dc = '?dc=' + str(self.package.index_last_modified)
-        result['index'] = IContentUnitHrefMapper(
-            self.package.index).href + index_dc if self.package.index else None
-        result['index_jsonp'] = IContentUnitHrefMapper(
-            self.package.index_jsonp).href if self.package.index_jsonp else None
+
+        index = self.package.index
+        result['index'] = IContentUnitHrefMapper(index).href + index_dc if index else None
+        
+        jsonp = self.package.index_jsonp
+        result['index_jsonp'] = IContentUnitHrefMapper(jsonp).href if jsonp else None
 
         # This field was never defined. What does it mean?  I think we were
         # thinking of generations
@@ -150,11 +155,10 @@ class _ContentPackageExternal(object):
         result[StandardExternalFields.NTIID] = self.package.ntiid
 
         result['installable'] = self.package.installable
-        if self.package.installable:
-            result['archive'] = IContentUnitHrefMapper(
-                self.package.archive_unit).href
-            result[
-                'Archive Last Modified'] = self.package.archive_unit.lastModified
+        if self.package.installable and self.package.archive_unit:
+            a_unit = self.package.archive_unit
+            result['archive'] = IContentUnitHrefMapper(a_unit).href
+            result['Archive Last Modified'] = a_unit.lastModified
 
         # Attach presentation properties. This is here for several reasons:
         # - This information is not normative, not used by the server,
@@ -168,13 +172,14 @@ class _ContentPackageExternal(object):
         # (IContentPackage,IRequest)
 
         presentation_properties_cache_name = '_v_presentation_properties'
-        presentation_properties = getattr(
-            self.package, presentation_properties_cache_name, None)
+        presentation_properties = getattr(self.package, 
+                                          presentation_properties_cache_name,
+                                          None)
         if presentation_properties is None:
             presentation_properties = {}
             try:
-                ext_data = self.package.read_contents_of_sibling_entry(
-                    DEFAULT_PRESENTATION_PROPERTIES_FILE)
+                name = DEFAULT_PRESENTATION_PROPERTIES_FILE
+                ext_data = self.package.read_contents_of_sibling_entry(name)
             except self.package.TRANSIENT_EXCEPTIONS:
                 ext_data = None
                 presentation_properties = None  # So we retry next time
@@ -184,12 +189,14 @@ class _ContentPackageExternal(object):
                 for k in presentation_properties:
                     assert isinstance(k, six.string_types)
 
-            setattr(self.package, presentation_properties_cache_name,
+            setattr(self.package, 
+                    presentation_properties_cache_name,
                     presentation_properties)
 
         result['PresentationProperties'] = presentation_properties
-        result['PlatformPresentationResources'] = toExternalObject(
-            self.package.PlatformPresentationResources)
+        ppr = self.package.PlatformPresentationResources
+        if ppr is not None:
+            result['PlatformPresentationResources'] = toExternalObject(ppr)
         return result
 
 
@@ -197,8 +204,8 @@ class _ContentPackageExternal(object):
 class _LegacyCourseConflatedContentPackageExternal(_ContentPackageExternal):
 
     def toExternalObject(self, **kwargs):
-        result = super(
-            _LegacyCourseConflatedContentPackageExternal, self).toExternalObject(**kwargs)
+        result = super(_LegacyCourseConflatedContentPackageExternal,
+                       self).toExternalObject(**kwargs)
         result['isCourse'] = self.package.isCourse
         result['courseName'] = self.package.courseName
         result['courseTitle'] = self.package.courseTitle
@@ -301,7 +308,8 @@ class _FilesystemBucketHrefMapper(object):
                     parents.append(pfx)
                 break
 
-            if hasattr(p, 'parent_enumeration') and p.parent_enumeration is not None:
+            if      hasattr(p, 'parent_enumeration') \
+                    and p.parent_enumeration is not None:
                 # XXX: Tight coupling. We're passing here into
                 # the layers of libraries and how they are set up.
                 # We expect a relationship like this:
@@ -372,8 +380,7 @@ class _S3KeyHrefMapper(object):
             # origin first
             self.href = 'http://' + sites[0] + '/' + key.key
         else:
-            quoted_key = _path_maybe_quote(
-                key.key) if request_sites is None else key.key
+            quoted_key = _path_maybe_quote(key.key) if request_sites is None else key.key
             self.href = 'http://' + key.bucket.name + '/' + quoted_key
 
 
