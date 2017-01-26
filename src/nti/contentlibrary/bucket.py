@@ -148,9 +148,8 @@ class AbstractKey(_AbstractDelimitedHierarchyObject):
         # A simple copy is faster, but not equivalent
         # In [49]: %timeit copy.copy(data)
         # 1000000 loops, best of 3: 984 ns per loop
-        json_value = component.getUtility(
-            IExternalRepresentationReader, name='json').load(json_text)
-        return json_value
+        value = component.getUtility(IExternalRepresentationReader, name='json').load(json_text)
+        return value
     read_contents_as_json = readContentsAsJson
 
     def readContentsAsETree(self):

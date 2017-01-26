@@ -103,7 +103,7 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
     """
     mime_type = mimeType = 'application/vnd.nextthought.persistentcontentunit'
 
-    #_key_type = PersistentHierarchyKey
+    _key_type = PersistentHierarchyKey
 
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)
@@ -133,12 +133,6 @@ class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     """
 
     mime_type = mimeType = 'application/vnd.nextthought.persistentcontentpackage'
-
-    def __repr__(self):
-        try:
-            return super(PersistentContentPackage, self).__repr__()
-        except ConnectionStateError:
-            return object.__repr__(self)
 
 
 @interface.implementer(IRenderableContentUnit)

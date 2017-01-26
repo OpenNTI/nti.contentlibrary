@@ -7,8 +7,10 @@
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
-from zope import interface
+logger = __import__('logging').getLogger(__name__)
+
 from zope import schema
+from zope import interface
 
 from zope.annotation.interfaces import IAnnotatable
 
@@ -754,11 +756,11 @@ class IContentUnit(IZContained,
     children = Iterable(title="Any :class:`IContentUnit` objects this item has.",
                         default=())
 
-    embeddedContainerNTIIDs = IndexedIterable(title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
-                                              value_type=ValidNTIID(
-                                                  title="The embedded NTIID"),
-                                              unique=True,
-                                              default=())
+    embeddedContainerNTIIDs = IndexedIterable(
+                                title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
+                                value_type=ValidNTIID(title="The embedded NTIID"),
+                                unique=True,
+                                default=())
 
 
 class IEditableContentUnit(IContentUnit, IPublishable, IRecordable):
@@ -869,6 +871,7 @@ class IContentPackageUnmodifiedEvent(IObjectEvent):
 
 @interface.implementer(IContentPackageUnmodifiedEvent)
 class ContentPackageUnmodifiedEvent(ObjectEvent):
+
     pacakge = alias('object')
 
     def __init__(self, obj, params=None, results=None):
@@ -1029,8 +1032,8 @@ class IS3Key(IDelimitedHierarchyKey):
 
 class IS3ContentUnit(dub_interfaces.IDCTimes, IDelimitedHierarchyContentUnit):
 
-    key = Object(
-        IS3Key, title="The key identifying the unit of content this belongs to.")
+    key = Object(IS3Key, 
+                 title="The key identifying the unit of content this belongs to.")
     # @deprecated: Prefer IDCTimes
     lastModified = Number(title="Time since the epoch this unit was last modified.",
                           readonly=True)
