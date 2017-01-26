@@ -20,13 +20,15 @@ from zope.container.interfaces import IContentContainer
 
 from zope.dublincore import interfaces as dub_interfaces
 
+from zope.interface.common.sequence import IFiniteSequence
+
 from zope.interface.interfaces import ObjectEvent
 from zope.interface.interfaces import IObjectEvent
-from zope.interface.common.sequence import IFiniteSequence
 
 from zope.lifecycleevent import ObjectAddedEvent
 from zope.lifecycleevent import ObjectRemovedEvent
 from zope.lifecycleevent import ObjectModifiedEvent
+
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
@@ -35,7 +37,8 @@ from zope.location.interfaces import IContained as IZContained
 
 from persistent.interfaces import IPersistent
 
-from nti.base.interfaces import ILastModified
+from nti.base.interfaces import ICreated
+from nti.base.interfaces import ILastModified 
 
 from nti.coremetadata.interfaces import IRecordable
 from nti.coremetadata.interfaces import IPublishable
@@ -763,7 +766,7 @@ class IContentUnit(IZContained,
                                 default=())
 
 
-class IEditableContentUnit(IContentUnit, IPublishable, IRecordable):
+class IEditableContentUnit(IContentUnit, IPublishable, IRecordable, ICreated):
     """
     A :class:`IContentUnit` that can be edited.
     """
