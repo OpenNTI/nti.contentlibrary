@@ -31,6 +31,7 @@ from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentUnitHrefMapper
 from nti.contentlibrary.interfaces import IFilesystemContentUnit
+from nti.contentlibrary.interfaces import IEditableContentPackage 
 from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
 from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
@@ -91,24 +92,24 @@ root_url_of_unit = _root_url_of_unit
 # (when a dot is used, it means the key nested inside the containing dictionary):
 #
 # ``numbering``
-# 		 A dictionary that controls the presentation of "chapter numbers" and "section numbers"
+#          A dictionary that controls the presentation of "chapter numbers" and "section numbers"
 # ``numbering.suppressed``
-# 		A boolean; if `True`, then the user interface should not attempt to
-# 		add and display automatic numbering information (default is False, and the UI should display
-# 		automatic numbering).
+#         A boolean; if `True`, then the user interface should not attempt to
+#         add and display automatic numbering information (default is False, and the UI should display
+#         automatic numbering).
 # ``numbering.type``
-# 		A one character string as in HTML (1, a, A, i, I) giving the type of marker to use
-# 		for automatic numbering (for decimal numbers, lowercase alphabetic, uppercase alphabetic,
-# 		and lower and upper Roman, respectively); the default is 1
+#         A one character string as in HTML (1, a, A, i, I) giving the type of marker to use
+#         for automatic numbering (for decimal numbers, lowercase alphabetic, uppercase alphabetic,
+#         and lower and upper Roman, respectively); the default is 1
 # ``numbering.start``
-# 		An integer giving the starting number; defaults to 1.
+#         An integer giving the starting number; defaults to 1.
 # ``numbering.separator``
-# 		A string giving the value to put between levels in the tree when autonumbering
-# 		a complete path. Defaults to '.'
+#         A string giving the value to put between levels in the tree when autonumbering
+#         a complete path. Defaults to '.'
 # ``toc``
-# 		 A dictionary that controls the presentation of various table of contents menus.
+#          A dictionary that controls the presentation of various table of contents menus.
 # ``toc.max-level``
-# 		An integer giving the maximum level to show in toc menus; defaults to all levels.
+#         An integer giving the maximum level to show in toc menus; defaults to all levels.
 #
 DEFAULT_PRESENTATION_PROPERTIES_FILE = 'nti_default_presentation_properties.json'
 
@@ -162,7 +163,7 @@ class _ContentPackageExternal(object):
 
         # Attach presentation properties. This is here for several reasons:
         # - This information is not normative, not used by the server,
-        #	and thus not part of the IContentPackage interface;
+        #    and thus not part of the IContentPackage interface;
         # - We are moving toward having IContentPackages be dynamic and constructed
         #  from sub-parts of other IContentPackages; if this were a static part of the IContentPackage,
         #  extracted from eclipse-toc.xml, such information would get lost when nodes are used
@@ -209,6 +210,18 @@ class _LegacyCourseConflatedContentPackageExternal(_ContentPackageExternal):
         result['isCourse'] = self.package.isCourse
         result['courseName'] = self.package.courseName
         result['courseTitle'] = self.package.courseTitle
+        return result
+
+
+@component.adapter(IEditableContentPackage)
+class _EditableContentPackageExternal(_ContentPackageExternal):
+
+    def toExternalObject(self, **kwargs):
+        result = super(_EditableContentPackageExternal,
+                       self).toExternalObject(**kwargs)
+        result['isLocked'] = self.package.is_locked()
+        result['isPublished'] = self.package.is_published()
+        result['publishLastModified'] = self.package.publishLastModified
         return result
 
 
@@ -309,14 +322,14 @@ class _FilesystemBucketHrefMapper(object):
                 break
 
             if      hasattr(p, 'parent_enumeration') \
-                    and p.parent_enumeration is not None:
+                and p.parent_enumeration is not None:
                 # XXX: Tight coupling. We're passing here into
                 # the layers of libraries and how they are set up.
                 # We expect a relationship like this:
                 # GlobalLibrary/
                 # GlobalEnumeration
                 #  p (this enumeration)
-                #	 bucket/...
+                #     bucket/...
                 # This path is only partly tested in this code base,
                 # but see nti.app.products.courseware.tests.test_workspaces
                 # TODO: Test this case in this code base.
@@ -357,7 +370,7 @@ class _S3ContentUnitHrefMapper(object):
 @component.adapter(IS3Key)
 class _S3KeyHrefMapper(object):
     """
-    Produces HTTP URLs for keys in buckets.	Takes steps to work with CORS
+    Produces HTTP URLs for keys in buckets.    Takes steps to work with CORS
     and other distribution strategies.
 
     Use this mapper when the bucket name is a DNS name, and the bucket name

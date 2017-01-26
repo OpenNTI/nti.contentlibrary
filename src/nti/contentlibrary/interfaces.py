@@ -768,6 +768,9 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordable):
     A :class:`IContentUnit` that can be edited.
     """
 
+    content = interface.Attribute("Unit content")
+    content.setTaggedValue('_ext_excluded_out', True)
+ 
     def read_contents():
         """
         Read and return, as a sequence of bytes, the contents of this entry.

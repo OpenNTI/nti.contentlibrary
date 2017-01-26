@@ -95,6 +95,7 @@ class PersistentHierarchyBucket(TimesMixin,
         OrderedContainer.__delitem__(self, key)
         self.updateLastMod()
 
+_marker = object()
 
 @interface.implementer(IPersistentContentUnit, IEditableContentUnit, INoPublishLink)
 class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, ContentUnit):
@@ -114,10 +115,13 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
         return self.key.readContents()
     readContents = read_contents
 
-    def write_contents(self, data=None, contentType=None):
+    def write_contents(self, data=None, contentType=_marker):
         self.key.write_contents(data)
-        self.key.contentType = contentType
+        if contentType is not _marker:
+            self.key.contentType = contentType
     writeContents = write_contents
+
+    data = content = property(read_contents, write_contents)
 
     def __repr__(self):
         try:
