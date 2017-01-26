@@ -58,6 +58,9 @@ from nti.contentlibrary.synchronize import LibrarySynchronizationResults
 
 from nti.externalization.persistence import NoPickle
 
+from nti.intid.common import addIntId
+from nti.intid.common import removeIntId
+
 from nti.property.property import alias
 
 from nti.site.localutility import queryNextUtility
@@ -135,6 +138,13 @@ def add_to_connection(context, obj):
     return False
 
 
+def is_indexable(obj):
+    try:
+        return not IBroken.providedBy(obj) \
+               and IPersistentContentUnit.providedBy(obj)
+    except (TypeError, POSError): # Broken object
+        return False
+
 def register_content_units(context, content_unit):
     """
     Recursively register content units.
@@ -145,17 +155,12 @@ def register_content_units(context, content_unit):
 
     def _register(obj):
         add_to_connection(context, obj)
-        try:
-            if      IBroken.providedBy(obj) or \
-                not IPersistentContentUnit.providedBy(obj):
-                return
-            intid = intids.queryId(obj)
-            if intid is None:
-                intids.register(obj)
-        except (TypeError, POSError):  # Broken object
-            return
         for child in obj.children or ():
             _register(child)
+        if is_indexable(obj):
+            intid = intids.queryId(obj)
+            if intid is None:
+                addIntId(obj)
     _register(content_unit)
 
 
@@ -168,18 +173,12 @@ def unregister_content_units(content_unit):
         return
 
     def _unregister(obj):
-        intid = None
-        try:
-            if      IBroken.providedBy(obj) or \
-                not IPersistentContentUnit.providedBy(obj):
-                return
-            intid = intids.queryId(obj)
-            if intid is not None:
-                intids.unregister(obj)
-        except (TypeError, POSError):  # Broken object
-            pass
         for child in obj.children or ():
             _unregister(child)
+        if is_indexable(obj):
+            intid = intids.queryId(obj)
+            if intid is not None:
+                removeIntId(obj)
 
     _unregister(content_unit)
 
@@ -269,19 +268,21 @@ class AbstractContentPackageLibrary(object):
         for unit in self._get_content_units_for_package(package):
             self._contentUnitsByNTIID.pop(unit.ntiid, None)
 
-    def _do_addContentPackages(self, added, lib_sync_results=None, params=None, results=None, event=True):
+    def _do_addContentPackages(self, added, event=True, 
+                               lib_sync_results=None, params=None, results=None, ):
         for new in added:
             self._contentPackages[new.ntiid] = new
             self._record_units_by_ntiid(new)
             new.__parent__ = self # ownership
-            register_content_units(self, new)  # get intids
             lifecycleevent.created(new)
+            register_content_units(self, new)  # get intids
             if lib_sync_results is not None:
                 lib_sync_results.added(new.ntiid)
             if event:
                 notify(ContentPackageAddedEvent(new, params, results))
 
-    def _do_removeContentPackages(self, removed, lib_sync_results=None, params=None, results=None, event=True):
+    def _do_removeContentPackages(self, removed, event=True,
+                                  lib_sync_results=None, params=None, results=None):
         for old in removed or ():
             self._contentPackages.pop(old.ntiid, None)
             self._unrecord_units_by_ntiid(old)
@@ -294,12 +295,12 @@ class AbstractContentPackageLibrary(object):
 
     def add(self, package, event=True):
         self._last_modified = time.time()
-        self._do_addContentPackages( (package,), event=event)
+        self._do_addContentPackages((package,), event=event)
     append = add
 
     def remove(self, package, event=True):
         self._last_modified = time.time()
-        self._do_removeContentPackages( (package,), event=event)
+        self._do_removeContentPackages((package,), event=event)
 
     def _do_updateContentPackages(self, changed, lib_sync_results=None, params=None, results=None):
         for new, old in changed:
