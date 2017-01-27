@@ -773,6 +773,9 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordable, ICreated):
 
     content = interface.Attribute("Unit content")
     content.setTaggedValue('_ext_excluded_out', True)
+    
+    contentType = interface.Attribute("Unit content type")
+    contentType.setTaggedValue('_ext_excluded_out', True)
  
     def read_contents():
         """

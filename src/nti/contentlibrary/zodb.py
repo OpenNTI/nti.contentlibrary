@@ -58,44 +58,45 @@ class TimesMixin(PersistentCreatedModDateTrackingObject):
 @interface.implementer(IWritableDelimitedHierarchyKey)
 class PersistentHierarchyKey(TimesMixin, AbstractKey):
     createDirectFieldProperties(IWritableDelimitedHierarchyKey)
- 
+
     def readContents(self):
         return self.data
     read_contents = readContents
- 
+
     def writeContents(self, data):
         self.data = data
     write_contents = writeContents
- 
- 
+
+
 @interface.implementer(IEnumerableDelimitedHierarchyBucket)
 class PersistentHierarchyBucket(TimesMixin,
                                 AbstractBucket,
                                 OrderedContainer):
- 
+
     _key_type = PersistentHierarchyKey
- 
+
     def __init__(self, *args, **kwargs):
         OrderedContainer.__init__(self)
         AbstractBucket.__init__(*args, **kwargs)
- 
+
     def enumerateChildren(self):
         return list(self.values())
     enumerate_children = enumerateChildren
- 
+
     def getChildNamed(self, name):
         return self.get(name)
     get_child_named = getChildNamed
- 
+
     def __setitem__(self, key, value):
         self.updateLastMod()
         return OrderedContainer.__setitem__(self, key, value)
- 
+
     def __delitem__(self, key):
         OrderedContainer.__delitem__(self, key)
         self.updateLastMod()
 
 _marker = object()
+
 
 @interface.implementer(IPersistentContentUnit, IEditableContentUnit, INoPublishLink)
 class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, ContentUnit):
@@ -118,10 +119,20 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
     def write_contents(self, data=None, contentType=_marker):
         self.key.write_contents(data)
         if contentType is not _marker:
-            self.key.contentType = contentType
+            self.contentType = contentType
     writeContents = write_contents
 
-    data = content = property(read_contents, write_contents)
+    content = property(read_contents, write_contents)
+
+    def get_content_type(self):
+        return self.key.contentType
+    getContentType = get_content_type
+
+    def set_content_type(self, contentType):
+        self.key.contentType = contentType
+    setContentType = set_content_type
+
+    contentType = property(get_content_type, set_content_type)
 
     def __repr__(self):
         try:
@@ -145,8 +156,9 @@ class RenderableContentUnit(PersistentContentUnit):
     A renderable content unit.
     """
     createDirectFieldProperties(IRenderableContentUnit)
-    
+
     mime_type = mimeType = 'application/vnd.nextthought.renderablecontentunit'
+
 
 @interface.implementer(IRenderableContentPackage)
 class RenderableContentPackage(RenderableContentUnit, PersistentContentPackage):
