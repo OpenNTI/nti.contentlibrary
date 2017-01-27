@@ -53,8 +53,10 @@ class _ContentPackageLibraryExternal(object):
         self.library = library
 
     def toExternalObject(self):
-        return {'title': "Library",
-                'titles': [toExternalObject(x) for x in self.library.contentPackages]}
+        return {
+            'title': "Library",
+            'titles': [toExternalObject(x) for x in self.library.contentPackages or ()]
+        }
 
 
 def _path_maybe_quote(path):

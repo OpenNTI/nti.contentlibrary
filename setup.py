@@ -71,6 +71,7 @@ setup(
         'persistent',
         'PyYAML',
         'repoze.lru',
+        'six',
         'zc.catalog',
         'ZODB',
         'zope.annotation',

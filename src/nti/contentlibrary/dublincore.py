@@ -83,7 +83,8 @@ def read_dublincore_from_source(dublin_object, source, lastModified=None):
 
 
 def read_dublincore_from_named_key(dublin_object, bucket,
-                                   filename=DCMETA_FILENAME, force=False):
+                                   filename=DCMETA_FILENAME,
+                                   force=False):
     dublin_key = bucket.getChildNamed(DCMETA_FILENAME)
     if not IDelimitedHierarchyKey.providedBy(dublin_key):
         return
@@ -97,8 +98,9 @@ def read_dublincore_from_named_key(dublin_object, bucket,
         return
 
     source = dublin_key.readContents()
-    result = read_dublincore_from_source(
-        dublin_object, source, dublin_key.lastModified)
+    result = read_dublincore_from_source(dublin_object, 
+                                         source, 
+                                         dublin_key.lastModified)
     return result
 
 #: A standard adapter for the content packages and bundles
