@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import schema
+from zope import component
 from zope import interface
 
 from zope.annotation.interfaces import IAnnotatable
@@ -1325,4 +1326,15 @@ class IContentUnitLinks(interface.Interface):
     Marker interface for subscribers that return object that are linked to
     a particular content unit
     """
-    pass
+
+    def iter_objects():
+        """
+        return the objects linked to a particular content unit
+        """
+
+def resolve_content_unit_links(context):
+    result = set()
+    for resolver in component.subscribers((context,), IContentUnitLinks):
+        result.update(resolver.iter_objects())
+    return list(result)
+
