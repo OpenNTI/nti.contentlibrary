@@ -24,7 +24,7 @@ from zc.catalog.index import SetIndex as ZC_SetIndex
 
 import BTrees
 
-from nti.contentlibrary.indexed_data._compat import integer_types
+from nti.contentlibrary._compat import integer_types
 
 from nti.contentlibrary.indexed_data.interfaces import INTIIDAdapter
 from nti.contentlibrary.indexed_data.interfaces import ITargetAdapter

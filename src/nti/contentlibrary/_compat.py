@@ -30,3 +30,16 @@ else:
     class_types = (type, types.ClassType)
     text_type = unicode
     binary_type = str
+
+if PY3:  # pragma: no cover
+    _unicode = unicode
+else:
+    _unicode = lambda s: s
+
+
+def to_unicode(s, encoding='utf-8', err='strict'):
+    """
+    Decode a byte sequence and unicode result
+    """
+    s = s.decode(encoding, err) if isinstance(s, bytes) else s
+    return _unicode(s) if s is not None else None
