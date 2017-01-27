@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope import component
+
 from zope.catalog.interfaces import ICatalog
 
 from zope.intid.interfaces import IIntIds
@@ -155,6 +157,10 @@ def PublishLastModifiedIndex(family=None):
 
 class LibraryCatalog(Catalog):
     family = BTrees.family64
+
+
+def get_contentlibrary_catalog():
+    return component.queryUtility(ICatalog, name=CATALOG_INDEX_NAME)
 
 
 def create_library_catalog(catalog=None, family=None):
