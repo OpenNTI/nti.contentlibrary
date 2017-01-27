@@ -1319,3 +1319,10 @@ class IContentValidator(interface.Interface):
         """
         :param content: The content to validate
         """
+
+class IContentUnitLinks(interface.Interface):
+    """
+    Marker interface for subscribers that return object that are linked to
+    a particular content unit
+    """
+    pass
