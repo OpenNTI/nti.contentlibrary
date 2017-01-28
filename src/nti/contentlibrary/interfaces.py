@@ -1327,13 +1327,13 @@ class IContentUnitAssociations(interface.Interface):
     a content unit
     """
 
-    def iter_objects():
+    def associations(context):
         """
-        return the objects linked to a particular content unit
+        return the objects associated to the specified content unit
         """
 
 def resolve_content_unit_associations(context):
     result = set()
     for resolver in component.subscribers((context,), IContentUnitAssociations):
-        result.update(resolver.iter_objects())
+        result.update(resolver.associations(context))
     return list(result)
