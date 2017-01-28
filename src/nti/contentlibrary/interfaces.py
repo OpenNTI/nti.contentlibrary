@@ -1321,10 +1321,10 @@ class IContentValidator(interface.Interface):
         :param content: The content to validate
         """
 
-class IContentUnitLinks(interface.Interface):
+class IContentUnitAssociations(interface.Interface):
     """
-    Marker interface for subscribers that return object that are linked to
-    a particular content unit
+    Marker interface for subscribers that return object that are associated to
+    a content unit
     """
 
     def iter_objects():
@@ -1332,9 +1332,8 @@ class IContentUnitLinks(interface.Interface):
         return the objects linked to a particular content unit
         """
 
-def resolve_content_unit_links(context):
+def resolve_content_unit_associations(context):
     result = set()
-    for resolver in component.subscribers((context,), IContentUnitLinks):
+    for resolver in component.subscribers((context,), IContentUnitAssociations):
         result.update(resolver.iter_objects())
     return list(result)
-
