@@ -43,7 +43,7 @@ def get_content_packages(sites=(), mime_types=(CONTENT_PACKAGE_MIME_TYPE,)):
             IX_MIMETYPE: {'any_of': mime_types},
         }
         for doc_id in catalog.apply(query) or ():
-            context = intids.queryId(doc_id)
+            context = intids.queryObject(doc_id)
             if      IContentPackage.providedBy(context) \
                 and context.ntiid not in result:
                 result[context.ntiid] = context

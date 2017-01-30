@@ -23,6 +23,8 @@ from zope import lifecycleevent
 
 from zope.annotation.interfaces import IAttributeAnnotatable
 
+from zope.component.hooks import getSite
+
 from zope.event import notify
 
 from zope.intid.interfaces import IIntIds
@@ -55,6 +57,8 @@ from nti.contentlibrary.synchronize import SynchronizationResults
 from nti.contentlibrary.synchronize import ContentRemovalException
 from nti.contentlibrary.synchronize import UnmatchedRootNTIIDException
 from nti.contentlibrary.synchronize import LibrarySynchronizationResults
+
+from nti.contentlibrary.utils import get_content_packages
 
 from nti.externalization.persistence import NoPickle
 
@@ -253,7 +257,6 @@ class AbstractContentPackageLibrary(object):
 
     def _get_content_units_for_package(self, package):
         result = []
-
         def _recur(unit):
             result.append(unit)
             for child in unit.children:
@@ -351,6 +354,16 @@ class AbstractContentPackageLibrary(object):
         self._enumeration.lastSynchronized = time.time()
         return lib_sync_results
 
+    def _get_current_packages(self):
+        site = getSite()
+        site = site.__name__ if site is not None else None
+        if     not site \
+            or site == 'dataserver2' \
+            or component.getGlobalSiteManager() == component.getSiteManager():
+            return self._contentPackages.values()
+        else:
+            return get_content_packages(sites=(site,))
+
     def syncContentPackages(self, params=None, results=None):
         """
         Fires created, added, modified, or removed events for each
@@ -368,7 +381,7 @@ class AbstractContentPackageLibrary(object):
             never_synced = True
             self._contentPackages = OOBTree()
             self._contentUnitsByNTIID = OOBTree()
-        current_packages = self._contentPackages.values()
+        current_packages = self._get_current_packages()
         old_content_packages = self._filter_packages(current_packages,
                                                      packages)
 
@@ -376,8 +389,8 @@ class AbstractContentPackageLibrary(object):
         contentPackages = self._enumeration.enumerateContentPackages()
         new_content_packages = self._filter_packages(contentPackages)
 
-        enumeration_last_modified = getattr(
-            self._enumeration, 'lastModified', 0)
+        enumeration = self._enumeration
+        enumeration_last_modified = getattr(enumeration, 'lastModified', 0)
 
         # Before we fire any events, compute all the work so that we can present
         # a consistent view to any listeners that will be watching.
