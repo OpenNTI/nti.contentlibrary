@@ -15,8 +15,6 @@ import time
 import numbers
 import warnings
 
-from BTrees.OOBTree import OOBTree
-
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -36,6 +34,8 @@ from ZODB.POSException import POSError
 from ZODB.POSException import ConnectionStateError
 
 from persistent import Persistent
+
+from BTrees.OOBTree import OOBTree
 
 from nti.contentlibrary.interfaces import INoAutoSync
 from nti.contentlibrary.interfaces import IContentPackage
@@ -564,7 +564,10 @@ class AbstractContentPackageLibrary(object):
 
     @property
     def createdTime(self):
-        return getattr(self._enumeration, 'createdTime', 0)
+        try:
+            return self._enumeration.createdTime
+        except AttributeError:
+            return 0
 
     @property
     def lastModified(self):
@@ -578,8 +581,8 @@ class AbstractContentPackageLibrary(object):
 
         # We used to base this on the packages `index_last_modified`, now
         # we take the max of our enumeration and last add/remove.
-        lastModified = max(
-            self._enumeration_last_modified, self._last_modified)
+        lastModified = max(self._enumeration_last_modified,
+                           self._last_modified)
         return lastModified
 
     def __getitem__(self, key):
@@ -632,8 +635,10 @@ class AbstractContentPackageLibrary(object):
 
     @property
     def lastSynchronized(self):
-        result = getattr(self._enumeration, 'lastSynchronized', 0)
-        return result
+        try:
+            return self._enumeration.lastSynchronized
+        except AttributeError:
+            return 0
 
     def _get_content_unit(self, key):
         """
