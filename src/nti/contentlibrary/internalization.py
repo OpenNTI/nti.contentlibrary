@@ -28,14 +28,15 @@ from nti.externalization.interfaces import StandardExternalFields
 NTIID = StandardExternalFields.NTIID
 MIME_TYPE = StandardExternalFields.MIMETYPE
 
+
 @component.adapter(IEditableContentUnit)
 @interface.implementer(IInternalObjectUpdater)
 class _EditableContentUnitUpdater(InterfaceObjectIO):
 
-    ALLOWED_KEYS = tuple(IPublishable.names()) + \
-                   tuple(IDCExtended.names())  + \
-                   tuple(IDCDescriptiveProperties.names()) + \
-                   ('icon', 'thumbnail', 'content', 'ntiid', NTIID, MIME_TYPE)
+    ALLOWED_KEYS =  tuple(IPublishable.names()) + \
+                    tuple(IDCExtended.names())  + \
+                    tuple(IDCDescriptiveProperties.names()) + \
+                    ('icon', 'thumbnail', 'content', 'ntiid', NTIID, MIME_TYPE)
 
     _ext_iface_upper_bound = IEditableContentUnit
 
