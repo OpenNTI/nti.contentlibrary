@@ -51,6 +51,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
         parsed = self._clean_input(parsed)
         result = super(_EditableContentUnitUpdater,
                        self).updateFromExternalObject(parsed, *args, **kwargs)
+        assert self._ext_self.ntiid, 'must provide a valid NTIID'
         return result
 
 
