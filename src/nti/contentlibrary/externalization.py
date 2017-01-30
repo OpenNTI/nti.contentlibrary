@@ -13,6 +13,7 @@ logger = __import__('logging').getLogger(__name__)
 
 import six
 import urllib
+import numbers
 import collections
 from urlparse import urljoin
 
@@ -228,8 +229,17 @@ class _EditableContentPackageExternal(_ContentPackageExternal):
     def toExternalObject(self, **kwargs):
         result = super(_EditableContentPackageExternal,
                        self).toExternalObject(**kwargs)
+        is_published = self.package.is_published()
+        # remove anything empty
+        if not is_published:
+            for name in list(result.keys()):
+                value = result.get(name)
+                if not value and not isinstance(value, numbers.Number):
+                    result.pop(name, None)
+        # add locking/publishing
+        result['isPublished'] = is_published
         result['isLocked'] = self.package.is_locked()
-        result['isPublished'] = self.package.is_published()
+        result['description'] = self.package.description
         result['publishLastModified'] = self.package.publishLastModified
         return result
 

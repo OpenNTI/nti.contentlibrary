@@ -12,10 +12,14 @@ from hamcrest import none
 from hamcrest import is_not
 from hamcrest import assert_that
 from hamcrest import has_entries
+from hamcrest import has_property
 
 from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.externalization.externalization import to_external_object
+
+from nti.externalization.internalization import find_factory_for
+from nti.externalization.internalization import update_from_external_object
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
 
@@ -27,9 +31,25 @@ class TestZODB(ContentlibraryLayerTest):
         package.ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
         package.title = u'Cohen vs California'
         package.description = u'Cohen vs California'
-        package.publishLastModified = 0
+        package.publishLastModified = 10000
         ext_obj = to_external_object(package)
         assert_that(ext_obj,
-                    has_entries(u'publishLastModified', is_not(none()),
-								u'NTIID', is_(u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'),
-								u'title', is_(u'Cohen vs California')))
+                    has_entries(u'isPublished', is_(False),
+                                u'publishLastModified', is_(10000),
+                                u'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
+                                u'NTIID', u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.',
+                                u'title', is_(u'Cohen vs California')))
+
+        factory = find_factory_for(ext_obj)
+        assert_that(factory, is_not(none()))
+        new_package = factory()
+        update_from_external_object(new_package, ext_obj)
+
+        assert_that(new_package,
+                    has_property('ntiid', u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'))
+        assert_that(new_package,
+                    has_property('title', u'Cohen vs California'))
+        assert_that(new_package,
+                    has_property('description', u'Cohen vs California'))
+        assert_that(new_package,
+                    has_property('publishLastModified', is_(10000)))

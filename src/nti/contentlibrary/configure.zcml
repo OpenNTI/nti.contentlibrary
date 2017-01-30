@@ -11,6 +11,9 @@
 	<include package="zope.security" />
 	<include package="zope.location" />
 
+	<!-- Publishing -->
+	<include package="nti.coremetadata" />
+	
 	<!-- for IComponentLookup(context) and queryNextUtility to work -->
 	<include package="zope.site" />
 
@@ -85,8 +88,9 @@
 						 .interfaces.ILibrarySynchronizationResults"
 		modules=".synchronize" />
 
-	<!-- Mime factories -->
-	<ext:registerMimeFactories module=".zodb" />
+	<ext:registerAutoPackageIO
+		root_interfaces=".interfaces.IEditableContentUnit"
+		modules=".zodb" />
 
 	<adapter factory=".externalization._ContentPackageExternal" />
 	<adapter factory=".externalization._ContentPackageLibraryExternal" />

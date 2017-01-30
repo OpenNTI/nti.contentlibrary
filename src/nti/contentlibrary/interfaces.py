@@ -851,10 +851,10 @@ class IRenderableContentUnit(IEditableContentUnit):
     A :class:`IContentUnit` that can be rendered.
     """
 
-    content_key = Object(IDelimitedHierarchyKey,
-                         title="Contents key.",
-                         default=None)
-    content_key.setTaggedValue('_ext_excluded_out', True)
+    contents_key = Object(IDelimitedHierarchyKey,
+                          title="Contents key.",
+                          default=None)
+    contents_key.setTaggedValue('_ext_excluded_out', True)
     
 class IRenderableContentPackage(IEditableContentPackage):
     """
