@@ -432,6 +432,7 @@ class AbstractContentPackageLibrary(object):
             # ZODB site access, we can have issues. Also not we're not
             # randomizing because we expect to be preloaded.
             self._do_removeContentPackages(removed,
+                                           event=True,
                                            lib_sync_results,
                                            params,
                                            results)
@@ -442,6 +443,7 @@ class AbstractContentPackageLibrary(object):
                                            results)
 
             self._do_addContentPackages(added,
+                                        event=True,
                                         lib_sync_results,
                                         params,
                                         results)
