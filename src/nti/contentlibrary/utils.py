@@ -34,7 +34,7 @@ def get_content_packages(sites=(), mime_types=(CONTENT_PACKAGE_MIME_TYPE,)):
     if not mime_types:
         mime_types = (CONTENT_PACKAGE_MIME_TYPE,)
 
-    result = []
+    result = dict()
     intids = component.getUtility(IIntIds)
     catalog = get_contentlibrary_catalog()
     for site in sites:
