@@ -103,7 +103,7 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
     """
     A persistent version of a content unit.
     """
-    mime_type = mimeType = 'application/vnd.nextthought.persistentcontentunit'
+    mime_type = mimeType = u'application/vnd.nextthought.persistentcontentunit'
 
     _key_type = PersistentHierarchyKey
 
@@ -147,7 +147,7 @@ class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     A persistent content package.
     """
 
-    mime_type = mimeType = 'application/vnd.nextthought.persistentcontentpackage'
+    mime_type = mimeType = u'application/vnd.nextthought.persistentcontentpackage'
 
 
 @interface.implementer(IRenderableContentUnit)
@@ -157,7 +157,7 @@ class RenderableContentUnit(PersistentContentUnit):
     """
     createDirectFieldProperties(IRenderableContentUnit)
 
-    mime_type = mimeType = 'application/vnd.nextthought.renderablecontentunit'
+    mime_type = mimeType = u'application/vnd.nextthought.renderablecontentunit'
 
 
 @interface.implementer(IRenderableContentPackage)
@@ -167,4 +167,4 @@ class RenderableContentPackage(RenderableContentUnit, PersistentContentPackage):
     """
     createDirectFieldProperties(IRenderableContentPackage)
 
-    mime_type = mimeType = 'application/vnd.nextthought.renderablecontentpackage'
+    mime_type = mimeType = u'application/vnd.nextthought.renderablecontentpackage'
