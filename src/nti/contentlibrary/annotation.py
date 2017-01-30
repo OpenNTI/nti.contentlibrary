@@ -48,8 +48,10 @@ from nti.externalization.persistence import NoPickle
 
 @NoPickle
 class _WithId(object):
-    """A pseudo-principal like thing for ease of compatibility with
-    principalannotations."""
+    """
+    A pseudo-principal like thing for ease of compatibility with
+    principalannotations.
+    """
 
     __slots__ = (b'id',)
 
@@ -60,10 +62,9 @@ class _WithId(object):
         # ntiid
         self.id = unit.ntiid
         if self.id is None:
-            raise ValueError(
-                "ContentUnit with no NTIID cannot be annotated", unit)
+            raise ValueError("ContentUnit with no NTIID cannot be annotated", 
+                             unit)
         self.id = self.id + ':ordinal %s' % unit.ordinal
-
         try:
             self.id += _WithId(unit.__parent__).id
         except (AttributeError, ValueError):

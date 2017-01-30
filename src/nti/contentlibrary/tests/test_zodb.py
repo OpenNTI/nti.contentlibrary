@@ -26,7 +26,7 @@ from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 class TestZODB(ContentlibraryLayerTest):
 
-    def test_renderable(self):
+    def test_renderable_io(self):
         package = RenderableContentPackage()
         package.ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
         package.title = u'Cohen vs California'
@@ -53,3 +53,13 @@ class TestZODB(ContentlibraryLayerTest):
                     has_property('description', u'Cohen vs California'))
         assert_that(new_package,
                     has_property('publishLastModified', is_(10000)))
+        assert_that(new_package,
+                    has_property('contents_key', is_not(none())))
+
+    def test_renderable_contents(self):
+        package = RenderableContentPackage()
+        package.write_contents(b'foo', b'text/x-rst')
+        assert_that(package,
+                    has_property('content', is_(b'foo')))
+        assert_that(package,
+                    has_property('contentType', is_('text/x-rst')))
