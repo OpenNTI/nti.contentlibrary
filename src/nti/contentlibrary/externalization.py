@@ -82,7 +82,11 @@ def _root_url_of_key(key):
 
 
 def _root_url_of_unit(unit):
-    return _root_url_of_key(unit.get_parent_key())
+    try:
+        parent_key = unit.get_parent_key()
+        return _root_url_of_key(parent_key) if parent_key else None
+    except AttributeError:
+        return None
 root_url_of_unit = _root_url_of_unit
 
 # This file, if present, will be read to gain a dictionary
@@ -134,8 +138,8 @@ class _ContentPackageExternal(object):
         icon = self.package.icon
         result['icon'] = IContentUnitHrefMapper(icon).href if icon else None
 
-        key = self.package.key
-        result['href'] = IContentUnitHrefMapper(key).href if key else None
+        mapper = IContentUnitHrefMapper(self.package.key, None)
+        result['href'] = mapper.href if mapper else None
 
         result['root'] = root_url
         result['title'] = self.package.title  # Matches result['DCTitle']
@@ -182,7 +186,10 @@ class _ContentPackageExternal(object):
             presentation_properties = {}
             try:
                 name = DEFAULT_PRESENTATION_PROPERTIES_FILE
-                ext_data = self.package.read_contents_of_sibling_entry(name)
+                try:
+                    ext_data = self.package.read_contents_of_sibling_entry(name)
+                except AttributeError:
+                    ext_data = None
             except self.package.TRANSIENT_EXCEPTIONS:
                 ext_data = None
                 presentation_properties = None  # So we retry next time

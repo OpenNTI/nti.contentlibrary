@@ -359,6 +359,7 @@ class AbstractContentPackageLibrary(object):
         site = site.__name__ if site is not None else None
         if     not site \
             or site == 'dataserver2' \
+            or component.queryUtility(IIntIds) is None \
             or component.getGlobalSiteManager() == component.getSiteManager():
             return self._contentPackages.values()
         else:

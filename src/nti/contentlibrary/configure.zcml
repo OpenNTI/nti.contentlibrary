@@ -104,6 +104,15 @@
 	<adapter factory=".externalization._S3KeyHrefMapper" />
 	<adapter factory=".externalization._S3ContentUnitHrefMapper" />
 
+	<!-- Internalization -->
+	<adapter factory=".internalization._EditableContentUnitUpdater"
+			 for=".interfaces.IEditableContentUnit"
+			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
+		
+	<adapter factory=".internalization._RenderableContentUnitUpdater"
+			 for=".interfaces.IRenderableContentUnit"
+			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
+	 
 	<include package=".indexed_data" />
 
 </configure>

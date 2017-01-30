@@ -851,18 +851,15 @@ class IRenderableContentUnit(IEditableContentUnit):
     A :class:`IContentUnit` that can be rendered.
     """
 
-    render_key = Object(IDelimitedHierarchyKey,
-                         title="Key that identifies where the redenred contents for this unit are.",
+    content_key = Object(IDelimitedHierarchyKey,
+                         title="Contents key.",
                          default=None)
-
+    content_key.setTaggedValue('_ext_excluded_out', True)
+    
 class IRenderableContentPackage(IEditableContentPackage):
     """
     A :class:`IContentPackage` that can be rendered.
     """
-
-    render_root = Object(IDelimitedHierarchyItem,
-                         title="Path portion of a uri for this rendered object.",
-                         default=None)
 
 class IContentPackageUnmodifiedEvent(IObjectEvent):
     """

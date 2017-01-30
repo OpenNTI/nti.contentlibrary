@@ -11,6 +11,8 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
+from zope.cachedescriptors.property import readproperty
+
 from zope.container.ordered import OrderedContainer
 
 from zope.dublincore.interfaces import IDCTimes
@@ -106,18 +108,21 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
     mime_type = mimeType = u'application/vnd.nextthought.persistentcontentunit'
 
     _key_type = PersistentHierarchyKey
-
+    
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)
-        if self.key is None:
-            self.key = self._key_type()
+        self.contents_key = self._key_type(name="contents")
+
+    @readproperty
+    def key(self):
+        return self.contents_key
 
     def read_contents(self):
-        return self.key.readContents()
+        return self.contents_key.readContents()
     readContents = read_contents
 
     def write_contents(self, data=None, contentType=_marker):
-        self.key.write_contents(data)
+        self.contents_key.write_contents(data)
         if contentType is not _marker:
             self.contentType = contentType
     writeContents = write_contents
@@ -125,14 +130,17 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
     content = property(read_contents, write_contents)
 
     def get_content_type(self):
-        return self.key.contentType
+        return self.contents_key.contentType
     getContentType = get_content_type
 
     def set_content_type(self, contentType):
-        self.key.contentType = contentType
+        self.contents_key.contentType = contentType
     setContentType = set_content_type
 
     contentType = property(get_content_type, set_content_type)
+
+    def read_contents_of_sibling_entry(self, name):
+        pass
 
     def __repr__(self):
         try:
@@ -158,7 +166,6 @@ class RenderableContentUnit(PersistentContentUnit):
     createDirectFieldProperties(IRenderableContentUnit)
 
     mime_type = mimeType = u'application/vnd.nextthought.renderablecontentunit'
-
 
 @interface.implementer(IRenderableContentPackage)
 class RenderableContentPackage(RenderableContentUnit, PersistentContentPackage):
