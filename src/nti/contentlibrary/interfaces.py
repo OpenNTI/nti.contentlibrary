@@ -772,8 +772,8 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordable, ICreated):
     A :class:`IContentUnit` that can be edited.
     """
 
-    content = interface.Attribute("Unit content")
-    content.setTaggedValue('_ext_excluded_out', True)
+    contents = interface.Attribute("Unit content")
+    contents.setTaggedValue('_ext_excluded_out', True)
     
     contentType = interface.Attribute("Unit content type")
     contentType.setTaggedValue('_ext_excluded_out', True)

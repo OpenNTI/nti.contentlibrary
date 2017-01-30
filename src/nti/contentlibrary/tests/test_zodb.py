@@ -31,8 +31,9 @@ class TestZODB(ContentlibraryLayerTest):
         package.ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
         package.title = u'Cohen vs California'
         package.description = u'Cohen vs California'
+        package.contentType = b'text/x-rst'
         package.publishLastModified = 10000
-        ext_obj = to_external_object(package)
+        ext_obj = to_external_object(package, name='exporter')
         assert_that(ext_obj,
                     has_entries(u'isPublished', is_(False),
                                 u'publishLastModified', is_(10000),
@@ -60,6 +61,6 @@ class TestZODB(ContentlibraryLayerTest):
         package = RenderableContentPackage()
         package.write_contents(b'foo', b'text/x-rst')
         assert_that(package,
-                    has_property('content', is_(b'foo')))
+                    has_property('contents', is_(b'foo')))
         assert_that(package,
                     has_property('contentType', is_('text/x-rst')))

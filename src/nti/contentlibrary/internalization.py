@@ -9,6 +9,9 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import zlib
+import base64
+
 from zope import component
 from zope import interface
 
@@ -36,7 +39,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
     ALLOWED_KEYS =  tuple(IPublishable.names()) + \
                     tuple(IDCExtended.names())  + \
                     tuple(IDCDescriptiveProperties.names()) + \
-                    ('icon', 'thumbnail', 'content', 'ntiid', NTIID, MIME_TYPE)
+                    ('contentType', 'contents', 'ntiid', NTIID, MIME_TYPE)
 
     _ext_iface_upper_bound = IEditableContentUnit
 
@@ -53,6 +56,10 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
         result = super(_EditableContentUnitUpdater,
                        self).updateFromExternalObject(parsed, *args, **kwargs)
         assert self._ext_self.ntiid, 'must provide a valid NTIID'
+        if 'contents' in parsed:
+            self.contents = zlib.decompress(base64.b64decode(parsed['contents']))
+        if 'contentType' in parsed:
+            self.contentType = str(parsed['contentType'])
         return result
 
 

@@ -12,6 +12,8 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
+import zlib
+import base64
 import urllib
 import numbers
 import collections
@@ -226,21 +228,35 @@ class _LegacyCourseConflatedContentPackageExternal(_ContentPackageExternal):
 @component.adapter(IEditableContentPackage)
 class _EditableContentPackageExternal(_ContentPackageExternal):
 
+    def _remove_empty(self, result):
+        for name in list(result.keys()):
+            value = result.get(name)
+            if not value and not isinstance(value, numbers.Number):
+                result.pop(name, None)
+        return result
+
     def toExternalObject(self, **kwargs):
-        result = super(_EditableContentPackageExternal,
-                       self).toExternalObject(**kwargs)
+        result = super(_EditableContentPackageExternal, self).toExternalObject(**kwargs)
         is_published = self.package.is_published()
         # remove anything empty
         if not is_published:
-            for name in list(result.keys()):
-                value = result.get(name)
-                if not value and not isinstance(value, numbers.Number):
-                    result.pop(name, None)
+            self._remove_empty(result)
         # add locking/publishing
         result['isPublished'] = is_published
         result['isLocked'] = self.package.is_locked()
         result['description'] = self.package.description
         result['publishLastModified'] = self.package.publishLastModified
+        return result
+
+
+@component.adapter(IEditableContentPackage)
+class _EditableContentPackageExporter(_EditableContentPackageExternal):
+
+    def toExternalObject(self, **kwargs):
+        result = super(_EditableContentPackageExporter, self).toExternalObject(**kwargs)
+        data = base64.b64encode(zlib.compress(self.package.contents or b''))
+        result['contents'] = data
+        result['contentType'] = self.package.contentType
         return result
 
 

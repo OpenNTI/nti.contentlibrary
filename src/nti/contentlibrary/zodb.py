@@ -127,7 +127,7 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
             self.contentType = contentType
     writeContents = write_contents
 
-    content = property(read_contents, write_contents)
+    contents = property(read_contents, write_contents)
 
     def get_content_type(self):
         return self.contents_key.contentType
