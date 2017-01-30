@@ -93,7 +93,7 @@ def read_dublincore_from_named_key(dublin_object, bucket,
     if dublin_properties is None:
         return
 
-    if     not force \
+    if      not force \
         and dublin_key.lastModified <= getattr(dublin_properties, 'lastModified', 0):
         return
 

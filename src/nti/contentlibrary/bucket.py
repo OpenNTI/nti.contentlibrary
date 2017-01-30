@@ -148,7 +148,8 @@ class AbstractKey(_AbstractDelimitedHierarchyObject):
         # A simple copy is faster, but not equivalent
         # In [49]: %timeit copy.copy(data)
         # 1000000 loops, best of 3: 984 ns per loop
-        value = component.getUtility(IExternalRepresentationReader, name='json').load(json_text)
+        reader = component.getUtility(IExternalRepresentationReader, name='json')
+        value = reader.load(json_text)
         return value
     read_contents_as_json = readContentsAsJson
 
@@ -159,7 +160,8 @@ class AbstractKey(_AbstractDelimitedHierarchyObject):
 
     def _do_readContentsAsYaml(self, stream):
         try:
-            return component.getUtility(IExternalRepresentationReader, name='yaml').load(stream)
+            reader = component.getUtility(IExternalRepresentationReader, name='yaml')
+            return reader.load(stream)
         except ScannerError:
             # most of our use cases for this are transitioning
             # off of JSON and yaml 1.1 isn't a strictly compatible
