@@ -732,9 +732,8 @@ class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
     """
 
     def _get_contentPackages(self):
-        result = super(
-            GlobalContentPackageLibrary, self)._get_contentPackages()
-        for package in result.values() or ():
+        result = super(GlobalContentPackageLibrary, self)._get_contentPackages()
+        for package in result.values():
             if not IGlobalContentPackage.providedBy(package):
                 interface.alsoProvides(package, IGlobalContentPackage)
         return result
