@@ -141,9 +141,10 @@ def add_to_connection(context, obj):
 def is_indexable(obj):
     try:
         return not IBroken.providedBy(obj) \
-               and IPersistentContentUnit.providedBy(obj)
-    except (TypeError, POSError): # Broken object
+            and IPersistentContentUnit.providedBy(obj)
+    except (TypeError, POSError):  # Broken object
         return False
+
 
 def register_content_units(context, content_unit):
     """
@@ -216,7 +217,7 @@ class AbstractContentPackageLibrary(object):
     # When we sync, we capture the `lastModified` timestamp
     # of the enumeration, if it provides it.
     _enumeration_last_modified = 0
-    
+
     # libray last modified timestamp
     _last_modified = 0
 
@@ -268,12 +269,12 @@ class AbstractContentPackageLibrary(object):
         for unit in self._get_content_units_for_package(package):
             self._contentUnitsByNTIID.pop(unit.ntiid, None)
 
-    def _do_addContentPackages(self, added, event=True, 
+    def _do_addContentPackages(self, added, event=True,
                                lib_sync_results=None, params=None, results=None, ):
         for new in added:
             self._contentPackages[new.ntiid] = new
             self._record_units_by_ntiid(new)
-            new.__parent__ = self # ownership
+            new.__parent__ = self  # ownership
             lifecycleevent.created(new)
             register_content_units(self, new)  # get intids
             if lib_sync_results is not None:
@@ -289,7 +290,7 @@ class AbstractContentPackageLibrary(object):
             if event:
                 notify(ContentPackageRemovedEvent(old, params, results))
             old.__parent__ = None  # ground
-            unregister_content_units(old) # remove intids
+            unregister_content_units(old)  # remove intids
             if lib_sync_results is not None:
                 lib_sync_results.removed(old.ntiid)
 
@@ -311,7 +312,7 @@ class AbstractContentPackageLibrary(object):
             self._contentPackages[new.ntiid] = new
             self._unrecord_units_by_ntiid(old)
             self._record_units_by_ntiid(new)
-            new.__parent__ = self # ownership
+            new.__parent__ = self  # ownership
             # XXX CS/JZ, 2-04-15 DO NEITHER call lifecycleevent.created nor
             # lifecycleevent.added on 'new' objects as modified events subscribers
             # are expected to handle any change
@@ -375,7 +376,8 @@ class AbstractContentPackageLibrary(object):
         contentPackages = self._enumeration.enumerateContentPackages()
         new_content_packages = self._filter_packages(contentPackages)
 
-        enumeration_last_modified = getattr(self._enumeration, 'lastModified', 0)
+        enumeration_last_modified = getattr(
+            self._enumeration, 'lastModified', 0)
 
         # Before we fire any events, compute all the work so that we can present
         # a consistent view to any listeners that will be watching.
@@ -433,20 +435,20 @@ class AbstractContentPackageLibrary(object):
             # randomizing because we expect to be preloaded.
             self._do_removeContentPackages(removed,
                                            event=True,
-                                           lib_sync_results,
-                                           params,
-                                           results)
+                                           params=params,
+                                           results=results,
+                                           lib_sync_results=lib_sync_results)
 
             self._do_updateContentPackages(changed,
-                                           lib_sync_results,
-                                           params,
-                                           results)
+                                           params=params,
+                                           results=results,
+                                           lib_sync_results=lib_sync_results,)
 
             self._do_addContentPackages(added,
                                         event=True,
-                                        lib_sync_results,
-                                        params,
-                                        results)
+                                        params=params,
+                                        results=results,
+                                        lib_sync_results=lib_sync_results)
 
             # Ok, new let people know that 'contentPackages' changed
             attributes = lifecycleevent.Attributes(IContentPackageLibrary,
@@ -563,7 +565,8 @@ class AbstractContentPackageLibrary(object):
 
         # We used to base this on the packages `index_last_modified`, now
         # we take the max of our enumeration and last add/remove.
-        lastModified = max(self._enumeration_last_modified, self._last_modified)
+        lastModified = max(
+            self._enumeration_last_modified, self._last_modified)
         return lastModified
 
     def __getitem__(self, key):
@@ -711,7 +714,8 @@ class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
     """
 
     def _get_contentPackages(self):
-        result = super(GlobalContentPackageLibrary,self)._get_contentPackages()
+        result = super(
+            GlobalContentPackageLibrary, self)._get_contentPackages()
         for package in result.values() or ():
             if not IGlobalContentPackage.providedBy(package):
                 interface.alsoProvides(package, IGlobalContentPackage)
@@ -729,6 +733,7 @@ def EmptyLibrary(prefix=''):
     A library that is perpetually empty.
     """
     return GlobalContentPackageLibrary(_EmptyEnumeration(), prefix=prefix)
+
 
 class PersistentContentPackageLibrary(Persistent,
                                       AbstractContentPackageLibrary):
