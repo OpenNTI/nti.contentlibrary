@@ -29,10 +29,10 @@ from zope.event import notify
 from ZODB.POSException import ConnectionStateError
 
 from BTrees.OOBTree import OOSet
+from BTrees.OOBTree import difference as ooset_difference
 
 from nti.containers.containers import CheckingLastModifiedBTreeContainer
 
-from nti.contentlibrary import DuplicatePacakgeException
 from nti.contentlibrary import MissingContentBundleNTIIDException
 from nti.contentlibrary import MissingContentPacakgeReferenceException
 
@@ -60,13 +60,6 @@ from nti.schema.schema import SchemaConfigured
 from nti.wref.interfaces import IWeakRef
 
 from nti.zodb.persistentproperty import PersistentPropertyHolder
-
-
-def unique_iter(*args):
-    if True:
-        return tuple(*args)
-    else:
-        return OOSet(*args)
 
 
 @WithRepr
@@ -141,9 +134,7 @@ class PersistentContentPackageBundle(ContentPackageBundle,
     _ContentPackages_wrefs = ()
 
     def _set_ContentPackages(self, packages):
-        self._ContentPackages_wrefs = unique_iter(IWeakRef(p) for p in packages)
-        if len(self._ContentPackages_wrefs) != len(set(self._ContentPackages_wrefs)):
-            raise DuplicatePacakgeException("Duplicate packages")
+        self._ContentPackages_wrefs = OOSet(IWeakRef(p) for p in packages)
 
     def _get_ContentPackages(self):
         result = list()
@@ -322,14 +313,14 @@ class ContentBundleMetaInfo(object):
         to actual packages (which we then weak ref, so that equality works out),
         or weak refs to missing ntiids
         """
-        cps = []
-        for ntiid in self.ContentPackages:
+        result = OOSet()
+        for ntiid in self.ContentPackages or ():
             cp = library.get(ntiid)
             if cp:
-                cps.append(IWeakRef(cp))
+                result.add(IWeakRef(cp))
             else:
-                cps.append(contentunit_wref_to_missing_ntiid(ntiid))
-        return unique_iter(cps)
+                result.add(contentunit_wref_to_missing_ntiid(ntiid))
+        return result
 _ContentBundleMetaInfo = ContentBundleMetaInfo  # alias
 
 
@@ -353,6 +344,15 @@ def _validate_package_refs(bundle, meta):
     except AttributeError:
         # Not sure we can do anything here.
         pass
+
+
+def _are_package_refs_equal(a, b):
+    if isinstance(a, OOSet) and isinstance(b, OOSet):
+        return not bool(ooset_difference(a,b))
+    elif isinstance(a, (set,tuple)) and isinstance(b, (set,tuple)):
+        return a == b
+    else:
+        return set(a) == set(b)
 
 
 def synchronize_bundle(data_source, bundle,
@@ -408,7 +408,8 @@ def synchronize_bundle(data_source, bundle,
             # weak references; if everything was *missing*, the ContentPackages
             # could come back as empty both places
             try:
-                needs_copy = bundle._ContentPackages_wrefs != meta._ContentPackages_wrefs
+                needs_copy = not _are_package_refs_equal(bundle._ContentPackages_wrefs, 
+                                                         meta._ContentPackages_wrefs)
             except AttributeError:
                 needs_copy = getattr(bundle, k, None) != getattr(meta, k)
             if needs_copy:
@@ -501,7 +502,8 @@ class _ContentPackageBundleLibrarySynchronizer(object):
             for k in list(self.context):
                 del self.context[k]  # fires bunches of events
         else:
-            bundle_metas = {_ContentBundleMetaInfo(k, content_library) for k in bundle_meta_keys}
+            bundle_metas = {_ContentBundleMetaInfo(k, content_library) 
+                            for k in bundle_meta_keys}
             all_ntiids = {x.ntiid for x in bundle_metas}
             # Now determine what to add/update/remove.
             # Order matters here, very much.
