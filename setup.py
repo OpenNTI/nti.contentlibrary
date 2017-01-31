@@ -51,7 +51,6 @@ setup(
     install_requires=[
         'setuptools',
         'anyjson',
-        'brownie',
         'BTrees',
         'boto',
         'lxml',

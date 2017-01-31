@@ -28,7 +28,7 @@ from zope.event import notify
 
 from ZODB.POSException import ConnectionStateError
 
-from brownie.datastructures.sets import OrderedSet
+from BTrees.OOBTree import OOSet
 
 from nti.containers.containers import CheckingLastModifiedBTreeContainer
 
@@ -66,7 +66,7 @@ def unique_iter(*args):
     if True:
         return tuple(*args)
     else:
-        return OrderedSet(*args)
+        return OOSet(*args)
 
 
 @WithRepr
