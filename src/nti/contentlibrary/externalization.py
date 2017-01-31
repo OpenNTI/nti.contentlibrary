@@ -261,7 +261,7 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
 
 
 @component.adapter(IContentPackageBundle)
-class _ContentBundleIO(InterfaceObjectIO):
+class ContentBundleIO(InterfaceObjectIO):
 
     _ext_iface_upper_bound = IContentPackageBundle
 
@@ -274,7 +274,7 @@ class _ContentBundleIO(InterfaceObjectIO):
 
     def updateFromExternalObject(self, *args, **kwargs):
         raise NotImplementedError()
-
+_ContentBundleIO = ContentBundleIO
 
 @component.adapter(IDisplayablePlatformPresentationResources)
 class _DisplayablePlatformPresentationResourcesIO(InterfaceObjectIO):
