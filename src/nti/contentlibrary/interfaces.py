@@ -39,7 +39,7 @@ from zope.location.interfaces import IContained as IZContained
 from persistent.interfaces import IPersistent
 
 from nti.base.interfaces import ICreated
-from nti.base.interfaces import ILastModified 
+from nti.base.interfaces import ILastModified
 
 from nti.coremetadata.interfaces import IRecordable
 from nti.coremetadata.interfaces import IPublishable
@@ -174,11 +174,11 @@ class IWritableDelimitedHierarchyKey(IDelimitedHierarchyKey):
     )
 
     data = schema.Bytes(
-           title=u'Data',
-           description=u'The actual content of the object.',
-           default=b'',
-           missing_value=b'',
-           required=False,
+        title=u'Data',
+        description=u'The actual content of the object.',
+        default=b'',
+        missing_value=b'',
+        required=False,
     )
 
     def writeContents(data, contentType):
@@ -186,6 +186,7 @@ class IWritableDelimitedHierarchyKey(IDelimitedHierarchyKey):
         Write the specified byte-string, to this of this leaf node.
         """
     write_contents = writeContents
+
 
 class IContentPackageEnumeration(interface.Interface):
     """
@@ -233,10 +234,12 @@ class IDelimitedHierarchyContentPackageEnumeration(IContentPackageEnumeration):
         the given named bucket.
         """
 
+
 class INoAutoSync(interface.Interface):
     """
     Marker for objects that should not be automatically sync
     """
+
 
 class IContentPackageLibrary(ILastModified,
                              IZContained):
@@ -761,10 +764,10 @@ class IContentUnit(IZContained,
                         default=())
 
     embeddedContainerNTIIDs = IndexedIterable(
-                                title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
-                                value_type=ValidNTIID(title="The embedded NTIID"),
-                                unique=True,
-                                default=())
+        title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
+        value_type=ValidNTIID(title="The embedded NTIID"),
+        unique=True,
+        default=())
 
 
 class IEditableContentUnit(IContentUnit, IPublishable, IRecordable, ICreated):
@@ -774,10 +777,10 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordable, ICreated):
 
     contents = interface.Attribute("Unit content")
     contents.setTaggedValue('_ext_excluded_out', True)
-    
+
     contentType = interface.Attribute("Unit content type")
     contentType.setTaggedValue('_ext_excluded_out', True)
- 
+
     def read_contents():
         """
         Read and return, as a sequence of bytes, the contents of this entry.
@@ -792,6 +795,7 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordable, ICreated):
 
         :param bytes data: The data to write
         """
+
 
 class IContentPackage(IContentUnit,
                       IDisplayableContent,
@@ -846,6 +850,7 @@ class IEditableContentPackage(IEditableContentUnit, IContentPackage):
     A :class:`IContentPackage` that can be edited.
     """
 
+
 class IRenderableContentUnit(IEditableContentUnit):
     """
     A :class:`IContentUnit` that can be rendered.
@@ -855,11 +860,13 @@ class IRenderableContentUnit(IEditableContentUnit):
                           title="Contents key.",
                           default=None)
     contents_key.setTaggedValue('_ext_excluded_out', True)
-    
+
+
 class IRenderableContentPackage(IEditableContentPackage):
     """
     A :class:`IContentPackage` that can be rendered.
     """
+
 
 class IContentPackageUnmodifiedEvent(IObjectEvent):
     """
@@ -1039,7 +1046,7 @@ class IS3Key(IDelimitedHierarchyKey):
 
 class IS3ContentUnit(dub_interfaces.IDCTimes, IDelimitedHierarchyContentUnit):
 
-    key = Object(IS3Key, 
+    key = Object(IS3Key,
                  title="The key identifying the unit of content this belongs to.")
     # @deprecated: Prefer IDCTimes
     lastModified = Number(title="Time since the epoch this unit was last modified.",
@@ -1175,6 +1182,22 @@ class IContentPackageBundle(IDisplayableContent,
     ContentPackages = UniqueIterable(value_type=Object(IContentPackage, title="A content package"),
                                      title="The referenced content packages",
                                      default=())
+
+
+class IEditableContentPackageBundle(IContentPackageBundle):
+    """
+    An editable context package bundle
+    """
+
+    def add(context):
+        """
+        Add a context pacakge"
+        """
+
+    def remove(context):
+        """
+        remove a context pacakge
+        """
 
 
 class IContentPackageBundleLibrary(IContentContainer):
@@ -1318,6 +1341,7 @@ class IContentValidator(interface.Interface):
         :param content: The content to validate
         """
 
+
 class IContentUnitAssociations(interface.Interface):
     """
     Marker interface for subscribers that return object that are associated to
@@ -1328,6 +1352,7 @@ class IContentUnitAssociations(interface.Interface):
         """
         return the objects associated to the specified content unit
         """
+
 
 def resolve_content_unit_associations(context):
     result = set()
