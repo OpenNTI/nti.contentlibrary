@@ -258,7 +258,7 @@ from nti.schema.field import IndexedIterable
 class IContentBundleMetaInfo(IContentPackageBundle):
 
     ContentPackages = IndexedIterable(
-                              title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
+                            title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
                             value_type=ValidNTIID(title="The embedded NTIID"),
                             unique=True,
                             default=())
