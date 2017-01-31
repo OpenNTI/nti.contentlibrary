@@ -39,6 +39,7 @@ from nti.contentlibrary import MissingContentPacakgeReferenceException
 from nti.contentlibrary.interfaces import IDisplayableContent
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
+from nti.contentlibrary.interfaces import IEditableContentPackageBundle
 
 from nti.contentlibrary.presentationresource import DisplayableContentMixin
 
@@ -119,6 +120,7 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
         return ()
 
 
+@interface.implementer(IEditableContentPackageBundle)
 class PersistentContentPackageBundle(ContentPackageBundle,
                                      PersistentPropertyHolder):
     """
@@ -144,6 +146,20 @@ class PersistentContentPackageBundle(ContentPackageBundle,
                 result.append(x)
         return result
     ContentPackages = property(_get_ContentPackages, _set_ContentPackages)
+
+    def add(self, context):
+        if not isinstance(self._ContentPackages_wrefs, OOSet):
+            self._ContentPackages_wrefs = OOSet(self._ContentPackages_wrefs)
+        self._ContentPackages_wrefs.add(IWeakRef(context))
+
+    def remove(self, context):
+        if not isinstance(self._ContentPackages_wrefs, OOSet):
+            self._ContentPackages_wrefs = OOSet(self._ContentPackages_wrefs)
+        try:
+            self._ContentPackages_wrefs.add(IWeakRef(context))
+            return True
+        except KeyError:
+            return False
 
     def __repr__(self):
         try:
