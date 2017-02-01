@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 entry_points = {
     'console_scripts': [
         "nti_s3put = nti.contentlibrary.nti_s3put:main",
+        "nti_render = nti.contentlibrary.render.scripts.render:main",
     ]
 }
 
