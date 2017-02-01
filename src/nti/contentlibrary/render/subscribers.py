@@ -13,7 +13,7 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
-from nti.contentlibrary.interfaces import IEditableContentPackage
+from nti.contentlibrary.interfaces import IRenderableContentPackage
 
 from nti.contentlibrary.render import CONTENT_UNITS_QUEUE
 
@@ -28,16 +28,16 @@ from nti.coremetadata.interfaces import IObjectPublishedEvent
 
 from nti.externalization.interfaces import IObjectModifiedFromExternalEvent
 
-@component.adapter(IEditableContentPackage, IObjectPublishedEvent)
+@component.adapter(IRenderableContentPackage, IObjectPublishedEvent)
 def _content_published(package, event):
     """
-    When a persistent content library is published, push
+    When a renderable content package is published, push
     it into our processing factory
     """
     queue_add(CONTENT_UNITS_QUEUE, render_package, package)
 
 
-@component.adapter(IEditableContentPackage, IObjectModifiedFromExternalEvent)
+@component.adapter(IRenderableContentPackage, IObjectModifiedFromExternalEvent)
 def _content_updated(package, event):
     """
     When a persistent content library is modified, push
