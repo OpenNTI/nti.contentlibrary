@@ -75,9 +75,9 @@ def get_job_queue(name):
     return factory.get_queue(name)
 
 
-def put_job(queue_name, jid, *args, **kwargs):
+def put_job(queue_name, func, jid=None, *args, **kwargs):
     queue = get_job_queue(queue_name)
-    job = create_job(_execute_job, *args, **kwargs)
+    job = create_job(_execute_job, func, *args, **kwargs)
     job.id = jid
     queue.put(job)
     return job
