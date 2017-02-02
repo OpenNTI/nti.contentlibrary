@@ -114,8 +114,7 @@ class AbstractContentPackageEnumeration(object):
 
 
 @interface.implementer(IDelimitedHierarchyContentPackageEnumeration)
-class AbstractDelimitedHiercharchyContentPackageEnumeration(
-        AbstractContentPackageEnumeration):
+class AbstractDelimitedHiercharchyContentPackageEnumeration(AbstractContentPackageEnumeration):
     """
     An object that works with a root bucket to enumerate content paths.
     We override :meth:`_possible_content_packages`, you still
@@ -308,8 +307,8 @@ class AbstractContentPackageLibrary(object):
         self._last_modified = time.time()
         self._do_removeContentPackages((package,), event=event)
 
-    def _do_updateContentPackages(
-            self, changed, lib_sync_results=None, params=None, results=None):
+    def _do_updateContentPackages(self, changed, lib_sync_results=None, 
+                                  params=None, results=None):
         for new, old in changed:
             # check ntiid changes
             if new.ntiid != old.ntiid:
