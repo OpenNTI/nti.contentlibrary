@@ -114,7 +114,8 @@ class AbstractContentPackageEnumeration(object):
 
 
 @interface.implementer(IDelimitedHierarchyContentPackageEnumeration)
-class AbstractDelimitedHiercharchyContentPackageEnumeration(AbstractContentPackageEnumeration):
+class AbstractDelimitedHiercharchyContentPackageEnumeration(
+        AbstractContentPackageEnumeration):
     """
     An object that works with a root bucket to enumerate content paths.
     We override :meth:`_possible_content_packages`, you still
@@ -257,6 +258,7 @@ class AbstractContentPackageLibrary(object):
 
     def _get_content_units_for_package(self, package):
         result = []
+
         def _recur(unit):
             result.append(unit)
             for child in unit.children:
@@ -273,7 +275,7 @@ class AbstractContentPackageLibrary(object):
             self._contentUnitsByNTIID.pop(unit.ntiid, None)
 
     def _do_addContentPackages(self, added, event=True,
-                               lib_sync_results=None, params=None, results=None, ):
+                               lib_sync_results=None, params=None, results=None):
         for new in added:
             self._contentPackages[new.ntiid] = new
             self._record_units_by_ntiid(new)
@@ -306,7 +308,8 @@ class AbstractContentPackageLibrary(object):
         self._last_modified = time.time()
         self._do_removeContentPackages((package,), event=event)
 
-    def _do_updateContentPackages(self, changed, lib_sync_results=None, params=None, results=None):
+    def _do_updateContentPackages(
+            self, changed, lib_sync_results=None, params=None, results=None):
         for new, old in changed:
             # check ntiid changes
             if new.ntiid != old.ntiid:
@@ -356,7 +359,7 @@ class AbstractContentPackageLibrary(object):
 
     def _get_current_packages(self):
         site = getSite()
-        site = site.__name__ if site is not None else 'dataserver2' 
+        site = site.__name__ if site is not None else 'dataserver2'
         if     site == 'dataserver2' \
             or component.queryUtility(IIntIds) is None \
             or component.getGlobalSiteManager() == component.getSiteManager():
@@ -432,7 +435,7 @@ class AbstractContentPackageLibrary(object):
                 logger.info("Library %s removing packages %s", self, removed)
                 logger.info("Library %s changing packages %s", self, changed)
 
-            if removed and params != None and not params.allowRemoval:
+            if removed and params is not None and not params.allowRemoval:
                 raise ContentRemovalException(
                     "Cannot remove content packages without explicitly allowing it")
 
