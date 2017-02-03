@@ -491,8 +491,7 @@ class ContentPackageLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
     """
 
     def __init__(self, obj, params=None, results=None, *descriptions):
-        super(ContentPackageLibraryModifiedOnSyncEvent, self).__init__(
-            obj, *descriptions)
+        super(ContentPackageLibraryModifiedOnSyncEvent, self).__init__(obj, *descriptions)
         self.params = params
         self.results = results
 
@@ -628,10 +627,12 @@ class IDisplayablePlatformPresentationResources(interface.Interface):
 
     PlatformName = TextLine(
         title="The name of the platform this package is meant for.")
+
     InheritPlatformName = TextLine(title="A platform to inherit from",
                                    description="If present, this object should merge missing resources "
                                    "from this named platform.",
                                    required=False)
+
     Version = Int(title="The version of the layout of resources",
                   default=1, min=1)
 
@@ -741,25 +742,31 @@ class IContentUnit(IZContained,
     """
     ordinal = Int(title="The number (starting at 1) representing which nth child of the parent I am.",
                   default=1, min=1)
+
     href = TextLine(title="A relative path within the containing bucket",
                     description="This may include URL fragments when the same key is re-used",
                     default='')
+
     key = Object(IDelimitedHierarchyKey,
                  title="Key that identifies where the contents for this unit are",
                  description="Should have a bucket its relative to; will not have fragment"
                  " identifiers, and thus may be reused within a hierarchy",
                  default=None)
+
     ntiid = ValidNTIID(title="The NTIID for this item",
                        default=None,
                        required=False)
+
     icon = Object(IDelimitedHierarchyKey,
                   title="URI for an image for this item, typically specially designed",
                   required=False,
                   default=None)
+
     thumbnail = Object(IDelimitedHierarchyKey,
                        title="URI for a thumbnail for this item, typically auto-generated",
                        required=False,
                        default=None)
+
     children = Iterable(title="Any :class:`IContentUnit` objects this item has.",
                         default=())
 
@@ -819,27 +826,34 @@ class IContentPackage(IContentUnit,
     root = Object(IDelimitedHierarchyItem,
                   title="Path portion of a uri for this object.",
                   default=None)
+
     index = Object(IDelimitedHierarchyKey,
                    title="Path portion to an XML file representing this content package",
                    default=None,
                    required=False)
+
     index_jsonp = Object(IDelimitedHierarchyKey,
                          title="Optional location of a JSONP version of the index.",
                          required=False,
                          default=None)
+
     index_last_modified = Number(title="Time since the epoch the index for this package was last modified.",
                                  description="This is currently the best indication of when this package as a whole may have changed.",
                                  readonly=True,
                                  default=-1)
+
     installable = Bool(title="Whether or not this content package can be installed locally (offline)",
                        default=False)
+
     archive = TextLine(title="DEPRECATED. If this content is installable, this is the relative path to a ZIP archive of the content",
                        default=None,
                        required=False)
+
     archive_unit = Object(IContentUnit,
                           title="A child object representing the ZIP archive.",
                           default=None,
                           required=False)
+
     renderVersion = Int(title="Version of the rendering process that produced this package.",
                         default=1,
                         min=1)
@@ -931,7 +945,8 @@ class ContentPackageReplacedEvent(ObjectModifiedEvent):
     original = None
     replacement = alias('object')
 
-    def __init__(self, replacement, original, params=None, results=None, *descriptions):
+    def __init__(self, replacement, original, 
+                 params=None, results=None, *descriptions):
         ObjectModifiedEvent.__init__(self, replacement, *descriptions)
         self.original = original
         self.params = params
@@ -980,10 +995,13 @@ class ILegacyCourseConflatedContentPackage(IPotentialLegacyCourseConflatedConten
     isCourse = Bool(title="If this package is for a course",
                     default=False,
                     required=True)
+    
     courseName = TextLine(title="Course name",
                           required=True)
+
     courseTitle = TextLine(title="Course title",
                            required=True)
+
     courseInfoSrc = TextLine(title="The relative path to a JSON file",
                              description="This should be a IDelimitedHierarchyKey, but isn't; Assume it is a sibling",
                              required=True,
@@ -997,21 +1015,24 @@ class IDelimitedHierarchyContentUnit(IContentUnit, IDelimitedHierarchyEntry):
     """
 
 
-class IDelimitedHierarchyEditableContentUnit(IEditableContentUnit, IDelimitedHierarchyContentUnit):
+class IDelimitedHierarchyEditableContentUnit(IEditableContentUnit, 
+                                             IDelimitedHierarchyContentUnit):
     """
     The unification of :class:`IEditableContentUnit` and :class:`IDelimitedHierarchyEntry`, to make writing adapters
     easier. All content units provided by this package will implement this interface.
     """
 
 
-class IDelimitedHierarchyContentPackage(IContentPackage, IDelimitedHierarchyContentUnit):
+class IDelimitedHierarchyContentPackage(
+        IContentPackage, IDelimitedHierarchyContentUnit):
     """
     The unification of :class:`IContentPackage` and :class:`IDelimitedHierarchyEntry`, to make writing adapters
     easier. All content packages provided by this package will implement this interface.
     """
 
 
-class IDelimitedHierarchyEditableContentPackage(IEditableContentPackage, IDelimitedHierarchyEditableContentUnit):
+class IDelimitedHierarchyEditableContentPackage(
+        IEditableContentPackage, IDelimitedHierarchyEditableContentUnit):
     """
     The unification of :class:`IEditableContentPackage` and :class:`IDelimitedHierarchyEntry`, to make writing adapters
     easier. All content units provided by this package will implement this interface.
@@ -1080,7 +1101,9 @@ class IFilesystemKey(IDelimitedHierarchyKey):
     absolute_path = TextLine(title="The absolute path on disk for this key.")
 
 
-class IFilesystemEntry(interface.Interface, dub_interfaces.IDCTimes, IDelimitedHierarchyEntry):
+class IFilesystemEntry(interface.Interface, 
+                       dub_interfaces.IDCTimes, 
+                       IDelimitedHierarchyEntry):
     """
     A mixin interface for things that are backed by items on the filesystem.
 
@@ -1106,7 +1129,8 @@ class IFilesystemContentUnit(IDelimitedHierarchyContentUnit, IFilesystemEntry):
     """
 
 
-class IFilesystemContentPackage(IDelimitedHierarchyContentPackage, IFilesystemEntry):
+class IFilesystemContentPackage(IDelimitedHierarchyContentPackage,
+                                IFilesystemEntry):
     """
     A content package backed by a file on disk.
 
@@ -1115,11 +1139,13 @@ class IFilesystemContentPackage(IDelimitedHierarchyContentPackage, IFilesystemEn
     """
 
 
-class IPersistentFilesystemContentUnit(IPersistentContentUnit, IFilesystemContentUnit):
+class IPersistentFilesystemContentUnit(
+        IPersistentContentUnit, IFilesystemContentUnit):
     pass
 
 
-class IPersistentFilesystemContentPackage(IPersistentContentPackage, IFilesystemContentPackage):
+class IPersistentFilesystemContentPackage(
+        IPersistentContentPackage, IFilesystemContentPackage):
     pass
 
 
@@ -1331,6 +1357,12 @@ class INoAutoIndex(interface.Interface):
     """
 
 
+class IContentRendered(interface.Interface):
+    """
+    Marker interface for rendered content
+    """
+
+
 class IContentValidator(interface.Interface):
     """
     Marker interface for a content validator utility
@@ -1356,6 +1388,8 @@ class IContentUnitAssociations(interface.Interface):
 
 def resolve_content_unit_associations(context):
     result = set()
-    for resolver in component.subscribers((context,), IContentUnitAssociations):
+    subscribers = component.subscribers((context,), 
+                                        IContentUnitAssociations)
+    for resolver in subscribers:
         result.update(resolver.associations(context))
     return list(result)

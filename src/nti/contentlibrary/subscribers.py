@@ -68,8 +68,8 @@ def install_site_content_library(local_site_manager, _=None):
 
     site_library_factory = ISiteLibraryFactory(global_library, None)
     if site_library_factory is None:
-        logger.warning(
-            "No site factory for %s; should only happen in tests", global_library)
+        logger.warning("No site factory for %s; should only happen in tests",
+                       global_library)
         return
 
     library = site_library_factory.library_for_site_named(local_site.__name__)
@@ -129,7 +129,8 @@ def uninstall_bundle_library(library, event):
                                         event)
 
 
-@component.adapter(IPersistentContentPackageLibrary, IContentPackageLibraryDidSyncEvent)
+@component.adapter(IPersistentContentPackageLibrary, 
+                   IContentPackageLibraryDidSyncEvent)
 def sync_bundles_when_library_synched(library, event):
     """
     When a persistent content library is synchronized
@@ -146,7 +147,8 @@ def sync_bundles_when_library_synched(library, event):
         return
 
     bundle_library = site_manager.getUtility(IContentPackageBundleLibrary)
-    assert bundle_library.__parent__ is site_manager, "Make sure we got the immediate parent"
+    assert bundle_library.__parent__ is site_manager, \
+           "Make sure we got the immediate parent"
 
     enumeration = IDelimitedHierarchyContentPackageEnumeration(library)
 
@@ -156,12 +158,15 @@ def sync_bundles_when_library_synched(library, event):
     if bundle_bucket is None:
         logger.info("Not synchronizing: no directory named %s in %s for library %s",
                     bundle_library.__name__,
-                    getattr(enumeration_root, 'absolute_path', enumeration_root),
+                    getattr(
+                        enumeration_root,
+                        'absolute_path',
+                        enumeration_root),
                     library)
         return
 
     logger.info("Synchronizing bundle library %s in site %s from directory %s",
                 bundle_library, site_manager.__parent__.__name__,
                 getattr(bundle_bucket, 'absolute_path', bundle_bucket))
-    ISyncableContentPackageBundleLibrary(
-        bundle_library).syncFromBucket(bundle_bucket)
+    syncable = ISyncableContentPackageBundleLibrary(bundle_library)
+    syncable.syncFromBucket(bundle_bucket)

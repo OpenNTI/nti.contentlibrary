@@ -121,6 +121,11 @@
 			 for=".interfaces.IRenderableContentUnit"
 			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
 
+	<!-- Publishing -->
+	<subscriber	factory=".predicates.RenderableContentUnitPublishablePredicate"
+				provides="nti.coremetadata.interfaces.IPublishablePredicate"/>
+	
+	<!-- Presentation assets -->			
 	<include package=".indexed_data" />
 
 </configure>
