@@ -58,7 +58,7 @@ def _isTOC(path):
     return os.path.basename(path) == eclipse.TOC_FILENAME
 
 
-def _package_factory(bucket, _package_factory=None, _unit_factory=None):
+def package_factory(bucket, _package_factory=None, _unit_factory=None):
     """
     Given a FilesystemBucket, return a package if it is suitable.
     """
@@ -85,6 +85,7 @@ def _package_factory(bucket, _package_factory=None, _unit_factory=None):
     assert package is not temp_entry
 
     return package
+_package_factory = package_factory
 
 
 class _FilesystemTime(object):
