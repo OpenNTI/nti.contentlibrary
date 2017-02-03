@@ -309,6 +309,7 @@ class AbstractContentPackageLibrary(object):
 
     def _do_updateContentPackages(self, changed, lib_sync_results=None, 
                                   params=None, results=None):
+        result = []
         for new, old in changed:
             # check ntiid changes
             if new.ntiid != old.ntiid:
@@ -331,6 +332,9 @@ class AbstractContentPackageLibrary(object):
             # the database in a invalid state
             unregister_content_units(old)
             old.__parent__ = None  # ground
+            # track
+            result.append(new)
+        return result
 
     def _get_content_units_by_ntiid(self, packages):
         """
@@ -454,10 +458,10 @@ class AbstractContentPackageLibrary(object):
                                            results=results,
                                            lib_sync_results=lib_sync_results)
 
-            self._do_updateContentPackages(changed,
-                                           params=params,
-                                           results=results,
-                                           lib_sync_results=lib_sync_results,)
+            modified = self._do_updateContentPackages(changed,
+                                                      params=params,
+                                                      results=results,
+                                                      lib_sync_results=lib_sync_results)
 
             self._do_addContentPackages(added,
                                         event=True,
@@ -469,9 +473,12 @@ class AbstractContentPackageLibrary(object):
             attributes = lifecycleevent.Attributes(IContentPackageLibrary,
                                                    'contentPackages')
             event = ContentPackageLibraryModifiedOnSyncEvent(self,
-                                                             params,
-                                                             results,
-                                                             attributes)
+                                                             added=added,
+                                                             removed=removed,
+                                                             changed=modified,
+                                                             descriptions=attributes,
+                                                             params=params,
+                                                             results=results,)
             notify(event)
 
         self._do_completeSyncPackages(unmodified,

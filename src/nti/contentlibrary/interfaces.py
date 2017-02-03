@@ -465,37 +465,6 @@ class ContentPackageLibraryDidSyncEvent(ObjectEvent):
         self.results = results
 
 
-class IContentPackageLibraryModifiedOnSyncEvent(IObjectModifiedEvent):
-    """
-    An event fired when a content package library has completed
-    a synchronization that resulted in changes. This is fired
-    after events for individual content package changes.
-    """
-    params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
-                    required=False)
-
-    results = Object(ISynchronizationResults,
-                     title="Synchronization results",
-                     required=False)
-    # JAM: Should this be a plain ObjectEvent, not
-    # ObjectModifiedEvent (that way none of the indexing logic or
-    # similar gets invoked)? But the `attributes` property
-    # of ModifiedEvent might be useful
-
-
-@interface.implementer(IContentPackageLibraryModifiedOnSyncEvent)
-class ContentPackageLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
-    """
-    Content package library synced event.
-    """
-
-    def __init__(self, obj, params=None, results=None, *descriptions):
-        super(ContentPackageLibraryModifiedOnSyncEvent, self).__init__(obj, *descriptions)
-        self.params = params
-        self.results = results
-
-
 class IAllContentPackageLibrariesWillSyncEvent(interface.Interface):
     """
     An event fired before all ContentPackage Libraries are synced
@@ -1292,6 +1261,53 @@ class ContentPackageBundleLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
     Content package bundle synced event.
     """
 
+
+class IContentPackageLibraryModifiedOnSyncEvent(IObjectModifiedEvent):
+    """
+    An event fired when a content package library has completed
+    a synchronization that resulted in changes. This is fired
+    after events for individual content package changes.
+    """
+
+    added = IndexedIterable(title="Content package added",
+                            value_type=Object(IContentPackage),
+                            required=False)
+
+    removed = IndexedIterable(title="Content package removed",
+                            value_type=Object(IContentPackage),
+                            required=False)
+    
+    changed = IndexedIterable(title="Content package modified",
+                            value_type=Object(IContentPackage),
+                            required=False)
+
+    params = Object(ISynchronizationParams,
+                    title="Synchronization parameters",
+                    required=False)
+
+    results = Object(ISynchronizationResults,
+                     title="Synchronization results",
+                     required=False)
+    # JAM: Should this be a plain ObjectEvent, not
+    # ObjectModifiedEvent (that way none of the indexing logic or
+    # similar gets invoked)? But the `attributes` property
+    # of ModifiedEvent might be useful
+
+
+@interface.implementer(IContentPackageLibraryModifiedOnSyncEvent)
+class ContentPackageLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
+    """
+    Content package library synced event.
+    """
+
+    def __init__(self, obj, added=None, changed=None, removed=None, 
+                 params=None, results=None, descriptions=()):
+        super(ContentPackageLibraryModifiedOnSyncEvent, self).__init__(obj, descriptions)
+        self.added = added
+        self.params = params
+        self.changed = changed
+        self.removed = removed 
+        self.results = results
 
 class IContentUnitHrefMapper(interface.Interface):
     """
