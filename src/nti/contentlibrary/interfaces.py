@@ -992,16 +992,16 @@ class IDelimitedHierarchyEditableContentUnit(IEditableContentUnit,
     """
 
 
-class IDelimitedHierarchyContentPackage(
-        IContentPackage, IDelimitedHierarchyContentUnit):
+class IDelimitedHierarchyContentPackage(IContentPackage, 
+                                        IDelimitedHierarchyContentUnit):
     """
     The unification of :class:`IContentPackage` and :class:`IDelimitedHierarchyEntry`, to make writing adapters
     easier. All content packages provided by this package will implement this interface.
     """
 
 
-class IDelimitedHierarchyEditableContentPackage(
-        IEditableContentPackage, IDelimitedHierarchyEditableContentUnit):
+class IDelimitedHierarchyEditableContentPackage(IEditableContentPackage,
+                                                IDelimitedHierarchyEditableContentUnit):
     """
     The unification of :class:`IEditableContentPackage` and :class:`IDelimitedHierarchyEntry`, to make writing adapters
     easier. All content units provided by this package will implement this interface.
@@ -1303,10 +1303,12 @@ class ContentPackageLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
     def __init__(self, obj, added=None, changed=None, removed=None, 
                  params=None, results=None, descriptions=()):
         super(ContentPackageLibraryModifiedOnSyncEvent, self).__init__(obj, descriptions)
+        # packages
         self.added = added
-        self.params = params
         self.changed = changed
-        self.removed = removed 
+        self.removed = removed
+        # results
+        self.params = params
         self.results = results
 
 class IContentUnitHrefMapper(interface.Interface):
