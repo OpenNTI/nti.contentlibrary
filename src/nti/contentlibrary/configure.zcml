@@ -62,6 +62,10 @@
 			 for=".interfaces.IContentUnit"
 			 provides="zope.dublincore.interfaces.IWriteZopeDublinCore"/>
 
+	<!-- Adapters -->
+	<adapter factory=".boto_s3._KeyDelimitedHierarchyEntry" />
+	<adapter factory=".filesystem._KeyDelimitedHierarchyEntry" />
+			 
 	<!-- Event listeners -->
 	<subscriber handler=".subscribers.install_site_content_library"
 				for="nti.site.interfaces.IHostPolicySiteManager

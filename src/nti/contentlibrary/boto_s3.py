@@ -21,6 +21,7 @@ from six import StringIO
 
 import webob.datetime_utils
 
+from zope import component
 from zope import interface
 
 from zope.cachedescriptors.property import Lazy
@@ -37,6 +38,7 @@ from nti.contentlibrary.interfaces import IS3Key
 from nti.contentlibrary.interfaces import IS3Bucket
 from nti.contentlibrary.interfaces import IS3ContentUnit
 from nti.contentlibrary.interfaces import IS3ContentPackage
+from nti.contentlibrary.interfaces import IDelimitedHierarchyEntry
 
 # We mark all of the classes declared here as
 # non-pickalable, because we don't have their persistence
@@ -49,10 +51,10 @@ from nti.property.property import alias
 # ILocation like and giving them interfaces
 import boto.s3.key
 import boto.s3.bucket
-import boto.exception
+from boto.exception import AWSConnectionError
 
-interface.classImplements(boto.s3.bucket.Bucket, IS3Bucket)
 interface.classImplements(boto.s3.key.Key, IS3Key)
+interface.classImplements(boto.s3.bucket.Bucket, IS3Bucket)
 
 
 class _WithName:  # NOTE: Not new-style
@@ -82,7 +84,8 @@ class NameEqualityKey(boto.s3.key.Key):
 
     def __eq__(self, other):
         try:
-            return self is other or (self.name == other.name and self.bucket == other.bucket)
+            return self is other or (
+                self.name == other.name and self.bucket == other.bucket)
         except AttributeError:  # pragma: no cover
             return NotImplemented
 
@@ -156,6 +159,49 @@ def _read_key(key):
     return data
 
 
+@component.adapter(IS3Key)
+@interface.implementer(IDelimitedHierarchyEntry)
+class _KeyDelimitedHierarchyEntry(object):
+
+    __slots__ = ('key',)
+
+    def __init__(self, key):
+        self.key = key
+
+    def make_sibling_key(self, sibling_name):
+        split = self.key.name.split('/')
+        split[-1] = sibling_name
+        new_key = type(self.key)(bucket=self.key.bucket, name='/'.join(split))
+        return new_key
+
+    def get_parent_key(self):
+        split = self.key.name.split('/')
+        parent_part = split[0:-1]
+        new_key = type(self.key)(
+            bucket=self.key.bucket, name='/'.join(parent_part))
+        return new_key
+
+    def read_contents(self):
+        return _read_key(self.key)
+
+    def read_contents_of_sibling_entry(self, sibling_name):
+        new_key = self.does_sibling_entry_exist(sibling_name)
+        return _read_key(new_key)
+
+    def does_sibling_entry_exist(self, sibling_name):
+        """
+        :return: Either a Key containing some information about an existing
+                sibling (and which is True) or None for an absent sibling (False).
+        """
+        bucket = self.key.bucket
+        sib_key = self.make_sibling_key(sibling_name).name
+        try:
+            return bucket.get_key(sib_key)
+        except AttributeError:  # seen when we are not connected
+            exc_info = sys.exc_info()
+            raise AWSConnectionError("No connection"), None, exc_info[2]
+
+
 @NoPickle
 @interface.implementer(IS3ContentUnit)
 class BotoS3ContentUnit(ContentUnit):
@@ -202,50 +248,32 @@ class BotoS3ContentUnit(ContentUnit):
     created = modified
 
     def make_sibling_key(self, sibling_name):
-        split = self.key.name.split('/')
-        split[-1] = sibling_name
-        new_key = type(self.key)(bucket=self.key.bucket, name='/'.join(split))
-        return new_key
+        entry = IDelimitedHierarchyEntry(self.key)
+        return entry.make_sibling_key(sibling_name)
 
     def get_parent_key(self):
-        split = self.key.name.split('/')
-        parent_part = split[0:-1]
-        new_key = type(self.key)(
-            bucket=self.key.bucket, name='/'.join(parent_part))
-        return new_key
+        return IDelimitedHierarchyEntry(self.key).get_parent_key()
 
     def read_contents(self):
-        return _read_key(self.key)
+        return IDelimitedHierarchyEntry(self.key).read_contents()
 
     def read_contents_of_sibling_entry(self, sibling_name):
-        data = None
         if self.key:
-            new_key = self.does_sibling_entry_exist(sibling_name)
-            data = _read_key(new_key)
-        return data
+            entry = IDelimitedHierarchyEntry(self.key)
+            return entry.read_contents_of_sibling_entry(sibling_name)
 
     # first arg is ignored. This caches with the key (self, sibling_name)
     @repoze.lru.lru_cache(None, cache=_exist_cache)
     def does_sibling_entry_exist(self, sibling_name):
-        """
-        :return: Either a Key containing some information about an existing sibling (and which is True)
-                or None for an absent sibling (False).
-        """
-        sib_key = self.make_sibling_key(sibling_name).name
-        bucket = self.key.bucket
-        try:
-            return bucket.get_key(sib_key)
-        except AttributeError:  # seen when we are not connected
-            exc_info = sys.exc_info()
-            raise boto.exception.AWSConnectionError(
-                "No connection"), None, exc_info[2]
+        entry = IDelimitedHierarchyEntry(self.key)
+        return entry.does_sibling_entry_exist(sibling_name)
 
 
 @NoPickle
 @interface.implementer(IS3ContentPackage)
 class BotoS3ContentPackage(ContentPackage, BotoS3ContentUnit):
 
-    TRANSIENT_EXCEPTIONS = (boto.exception.AWSConnectionError,)
+    TRANSIENT_EXCEPTIONS = (AWSConnectionError,)
 
     # XXX: Note that this needs the same lastModified fixes as
     # the filesystem version
@@ -263,7 +291,8 @@ def _package_factory(key):
 
 
 @NoPickle
-class _BotoS3BucketContentLibraryEnumeration(library.AbstractContentPackageEnumeration):
+class _BotoS3BucketContentLibraryEnumeration(
+        library.AbstractContentPackageEnumeration):
 
     def __init__(self, bucket):
         """

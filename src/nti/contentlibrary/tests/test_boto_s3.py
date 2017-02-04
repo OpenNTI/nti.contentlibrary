@@ -16,7 +16,7 @@ from hamcrest import has_property
 from hamcrest import same_instance
 
 import gzip
-from cStringIO import StringIO
+from six import StringIO
 
 import boto.exception
 
@@ -36,6 +36,7 @@ from nti.testing.matchers import validly_provides
 class TestBotoS3(ContentlibraryLayerTest):
 
 	def test_unit_provides(self):
+
 		@interface.implementer(interfaces.IS3Bucket)
 		class Bucket(object):
 			name = __name__ = 'bucket'
@@ -68,17 +69,15 @@ class TestBotoS3(ContentlibraryLayerTest):
 		unit.description = 'comment'
 		unit.href = 'index.html'
 
-
 		assert_that( unit, validly_provides( interfaces.IS3ContentUnit ) )
 
-
-
-
 	def test_does_exist_cached(self):
+		@interface.implementer(interfaces.IS3Bucket)
 		class Bucket(object):
 			def get_key( self, k ):
 				return object()
 
+		@interface.implementer(interfaces.IS3Key)
 		class Key(object):
 			bucket = None
 			name = None
@@ -91,7 +90,6 @@ class TestBotoS3(ContentlibraryLayerTest):
 			def open(self):
 				self.last_modified = 1234.5
 
-
 		key = Key()
 		key.name = 'foo/bar'
 		key.bucket = Bucket()
@@ -103,10 +101,12 @@ class TestBotoS3(ContentlibraryLayerTest):
 		assert_that( unit.does_sibling_entry_exist( 'bar' ), is_not( same_instance( unit.does_sibling_entry_exist( 'baz' ) ) ) )
 
 	def test_response_exception(self):
+		@interface.implementer(interfaces.IS3Bucket)
 		class Bucket(object):
 			def get_key( self, k ):
 				return object()
 
+		@interface.implementer(interfaces.IS3Key)
 		class Key(object):
 			bucket = None
 			name = None
@@ -115,7 +115,6 @@ class TestBotoS3(ContentlibraryLayerTest):
 			def __init__( self, bucket=None, name=None ):
 				if bucket: self.bucket = bucket
 				if name: self.name = name
-
 
 			def open(self):
 				raise boto.exception.S3ResponseError("404", "Key not found")
@@ -126,8 +125,8 @@ class TestBotoS3(ContentlibraryLayerTest):
 		unit = BotoS3ContentUnit( key=key )
 		assert_that( unit.lastModified, is_( -1 ) )
 
-
 	def test_key_mapper(self):
+		@interface.implementer(interfaces.IS3Bucket)
 		class Bucket(object):
 			name = None
 			def get_key( self, k ):
@@ -166,6 +165,7 @@ class TestBotoS3(ContentlibraryLayerTest):
 						 has_property( 'href', 'http://content.nextthought.com/mathcounts2012/index.html' ) )
 
 	def test_read_contents( self ):
+		@interface.implementer(interfaces.IS3Key)
 		class Key(object):
 			bucket = None
 			name = None

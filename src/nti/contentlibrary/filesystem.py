@@ -31,6 +31,7 @@ from nti.contentlibrary.interfaces import IFilesystemKey
 from nti.contentlibrary.interfaces import IFilesystemBucket
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IFilesystemContentUnit
+from nti.contentlibrary.interfaces import IDelimitedHierarchyEntry
 from nti.contentlibrary.interfaces import IFilesystemContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackageLibrary
 from nti.contentlibrary.interfaces import IFilesystemContentPackageLibrary
@@ -364,6 +365,48 @@ class AbstractFilesystemLibrary(library.AbstractContentPackageLibrary):
             return object.__repr__(self)
 
 
+@component.adapter(IFilesystemKey)
+@interface.implementer(IDelimitedHierarchyEntry)
+class _KeyDelimitedHierarchyEntry(object):
+    
+    __slots__ = ('key',)
+    
+    def __init__(self, key):
+        self.key = key
+        
+    def read_contents(self):
+        return self.key.readContents()
+    readContents = read_contents
+
+    def get_parent_key(self):
+        return self.key.bucket
+    
+    def make_sibling_key(self, sibling_name):
+        assert bool(sibling_name)
+        assert not sibling_name.startswith('/')
+        # At this point, everything should already be URL-decoded,
+        # (and fragments removed) and unicode
+        # If we get a multi-segment path, we need to deconstruct it
+        # into bucket parts to be sure that it externalizes
+        # correctly.
+        parts = sibling_name.split('/')
+        parent = self.key.bucket
+        for part in parts[:-1]:
+            parent = type(self.key.bucket)(bucket=parent, name=part)
+
+        key = type(self.key)(bucket=parent, name=parts[-1])
+        dirname = os.path.dirname(self.key.absolute_path)
+        assert key.absolute_path == os.path.join(dirname, *parts)
+        return key
+
+    def read_contents_of_sibling_entry(self, sibling_name):
+        return self.make_sibling_key(sibling_name).readContents()
+
+    def does_sibling_entry_exist(self, sibling_name):
+        sib_key = self.make_sibling_key(sibling_name)
+        return sib_key if os.path.exists(sib_key.absolute_path) else None
+
+
 @interface.implementer(IFilesystemContentUnit)
 class FilesystemContentUnit(_FilesystemTimesMixin,
                             ContentUnit):
@@ -381,8 +424,10 @@ class FilesystemContentUnit(_FilesystemTimesMixin,
         self.__dict__[str('key')] = nk
     key = property(_get_key, _set_key)
 
-    filename = property(
-        lambda self: self.key.absolute_path if self.key else None)
+    @property
+    def filename(self):
+        if self.key:
+            return self.key.absolute_path
     absolute_path = filename
 
     @property
@@ -392,47 +437,30 @@ class FilesystemContentUnit(_FilesystemTimesMixin,
             return os.path.dirname(filename)
 
     def read_contents(self):
-        return self.key.readContents()
+        return IDelimitedHierarchyEntry(self.key).read_contents()
 
     def get_parent_key(self):
-        return self.key.bucket
+        return IDelimitedHierarchyEntry(self.key).get_parent_key()
 
     @cachedIn('_v_make_sibling_keys')
     def make_sibling_key(self, sibling_name):
         # Because keys cache things like dates and contents, it is useful
         # to return the same instance
-
         __traceback_info__ = self.filename, sibling_name
-        assert bool(sibling_name)
-        assert not sibling_name.startswith('/')
-
-        # At this point, everything should already be URL-decoded,
-        # (and fragments removed) and unicode
-        # If we get a multi-segment path, we need to deconstruct it
-        # into bucket parts to be sure that it externalizes
-        # correctly.
-        parts = sibling_name.split('/')
-        parent = self.key.bucket
-        for part in parts[:-1]:
-            parent = type(self.key.bucket)(bucket=parent, name=part)
-
-        key = type(self.key)(bucket=parent, name=parts[-1])
-
-        dirname = os.path.dirname(self.filename)
-        assert key.absolute_path == os.path.join(dirname, *parts)
-
-        return key
+        entry = IDelimitedHierarchyEntry(self.key)
+        return entry.make_sibling_key(sibling_name)
 
     def _do_read_contents_of_sibling_entry(self, sibling_name):
-        return self.make_sibling_key(sibling_name).readContents()
+        entry = IDelimitedHierarchyEntry(self.key)
+        return entry.read_contents_of_sibling_entry(sibling_name)
 
     def read_contents_of_sibling_entry(self, sibling_name):
         if self.filename:
             return self._do_read_contents_of_sibling_entry(sibling_name)
 
     def does_sibling_entry_exist(self, sibling_name):
-        sib_key = self.make_sibling_key(sibling_name)
-        return sib_key if os.path.exists(sib_key.absolute_path) else None
+        entry = IDelimitedHierarchyEntry(self.key)
+        return entry.does_sibling_entry_exist(sibling_name)
 
     def __repr__(self):
         return "<%s.%s '%s' '%s'>" % (self.__class__.__module__, self.__class__.__name__,
