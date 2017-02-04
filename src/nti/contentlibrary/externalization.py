@@ -34,7 +34,7 @@ from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentUnitHrefMapper
 from nti.contentlibrary.interfaces import IFilesystemContentUnit
-from nti.contentlibrary.interfaces import IEditableContentPackage 
+from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
 from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
@@ -149,14 +149,16 @@ class _ContentPackageExternal(object):
 
         index_dc = ''
         if      self.package.index_last_modified \
-            and self.package.index_last_modified > 0:
+                and self.package.index_last_modified > 0:
             index_dc = '?dc=' + str(self.package.index_last_modified)
 
         index = self.package.index
-        result['index'] = IContentUnitHrefMapper(index).href + index_dc if index else None
-        
+        result['index'] = IContentUnitHrefMapper(
+            index).href + index_dc if index else None
+
         jsonp = self.package.index_jsonp
-        result['index_jsonp'] = IContentUnitHrefMapper(jsonp).href if jsonp else None
+        result['index_jsonp'] = IContentUnitHrefMapper(
+            jsonp).href if jsonp else None
 
         # This field was never defined. What does it mean?  I think we were
         # thinking of generations
@@ -182,7 +184,7 @@ class _ContentPackageExternal(object):
         # (IContentPackage,IRequest)
 
         presentation_properties_cache_name = '_v_presentation_properties'
-        presentation_properties = getattr(self.package, 
+        presentation_properties = getattr(self.package,
                                           presentation_properties_cache_name,
                                           None)
         if presentation_properties is None:
@@ -202,7 +204,7 @@ class _ContentPackageExternal(object):
                 for k in presentation_properties:
                     assert isinstance(k, six.string_types)
 
-            setattr(self.package, 
+            setattr(self.package,
                     presentation_properties_cache_name,
                     presentation_properties)
 
@@ -275,6 +277,7 @@ class ContentBundleIO(InterfaceObjectIO):
     def updateFromExternalObject(self, *args, **kwargs):
         raise NotImplementedError()
 _ContentBundleIO = ContentBundleIO
+
 
 @component.adapter(IDisplayablePlatformPresentationResources)
 class _DisplayablePlatformPresentationResourcesIO(InterfaceObjectIO):
@@ -357,7 +360,7 @@ class _FilesystemBucketHrefMapper(object):
                 break
 
             if      hasattr(p, 'parent_enumeration') \
-                and p.parent_enumeration is not None:
+                    and p.parent_enumeration is not None:
                 # XXX: Tight coupling. We're passing here into
                 # the layers of libraries and how they are set up.
                 # We expect a relationship like this:
@@ -428,7 +431,10 @@ class _S3KeyHrefMapper(object):
             # origin first
             self.href = 'http://' + sites[0] + '/' + key.key
         else:
-            quoted_key = _path_maybe_quote(key.key) if request_sites is None else key.key
+            if request_sites is None:
+                quoted_key = _path_maybe_quote(key.key) 
+            else:
+                quoted_key = key.key
             self.href = 'http://' + key.bucket.name + '/' + quoted_key
 
 
