@@ -29,15 +29,18 @@ from nti.contentlibrary.contentunit import ContentUnit
 from nti.contentlibrary.contentunit import ContentPackage
 
 from nti.contentlibrary.interfaces import INoAutoSync
-from nti.contentlibrary.interfaces import IContentRendered 
+from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IPersistentContentUnit
 from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
+from nti.contentlibrary.interfaces import IDelimitedHierarchyEntry
 from nti.contentlibrary.interfaces import IPersistentContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IWritableDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
+from nti.contentlibrary.interfaces import IDelimitedHierarchyEditableContentUnit
+from nti.contentlibrary.interfaces import IDelimitedHierarchyEditableContentPackage
 
 from nti.coremetadata.interfaces import INoPublishLink
 
@@ -145,11 +148,6 @@ class PersistentContentUnit(RecordableMixin,
 
     contentType = property(get_content_type, set_content_type)
 
-    def read_contents_of_sibling_entry(self, name):
-        # For persistent content unit we return none, since it's not
-        # supported
-        return None
-
     def __repr__(self):
         try:
             return super(PersistentContentUnit, self).__repr__()
@@ -158,7 +156,7 @@ class PersistentContentUnit(RecordableMixin,
 
 
 @interface.implementer(IPersistentContentPackage,
-                       IEditableContentPackage, 
+                       IEditableContentPackage,
                        INoAutoSync)
 class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     """
@@ -168,7 +166,8 @@ class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     mime_type = mimeType = u'application/vnd.nextthought.persistentcontentpackage'
 
 
-@interface.implementer(IRenderableContentUnit)
+@interface.implementer(IRenderableContentUnit,
+                       IDelimitedHierarchyEditableContentUnit)
 class RenderableContentUnit(PersistentContentUnit):
     """
     A renderable content unit.
@@ -177,13 +176,37 @@ class RenderableContentUnit(PersistentContentUnit):
 
     mime_type = mimeType = u'application/vnd.nextthought.renderablecontentunit'
 
-    def read_contents_of_sibling_entry(self, name):
-        # check it has been rendered
-        if IContentRendered.providedBy(self) and self.key:
-            pass
-        return None
+    @property
+    def has_key(self):
+        return IContentRendered.providedBy(self) and self.key
 
-@interface.implementer(IRenderableContentPackage)
+    def read_contents(self):
+        if self.has_key:
+            return IDelimitedHierarchyEntry(self.key).read_contents()
+        return super(RenderableContentUnit, self).read_contents()
+
+    def get_parent_key(self):
+        if self.has_key:
+            return IDelimitedHierarchyEntry(self.key).get_parent_key()
+
+    def make_sibling_key(self, sibling_name):
+        if self.has_key:
+            entry = IDelimitedHierarchyEntry(self.key)
+            return entry.make_sibling_key(sibling_name)
+
+    def read_contents_of_sibling_entry(self, sibling_name):
+        if self.has_key:
+            entry = IDelimitedHierarchyEntry(self.key)
+            return entry.read_contents_of_sibling_entry(sibling_name)
+
+    def does_sibling_entry_exist(self, sibling_name):
+        if self.has_key:
+            entry = IDelimitedHierarchyEntry(self.key)
+            return entry.does_sibling_entry_exist(sibling_name)
+
+
+@interface.implementer(IRenderableContentPackage,
+                       IDelimitedHierarchyEditableContentPackage)
 class RenderableContentPackage(RenderableContentUnit,
                                PersistentContentPackage):
     """

@@ -1038,6 +1038,7 @@ class IS3ContentUnit(dub_interfaces.IDCTimes, IDelimitedHierarchyContentUnit):
 
     key = Object(IS3Key,
                  title="The key identifying the unit of content this belongs to.")
+
     # @deprecated: Prefer IDCTimes
     lastModified = Number(title="Time since the epoch this unit was last modified.",
                           readonly=True)
@@ -1087,7 +1088,8 @@ class IFilesystemEntry(interface.Interface,
                           readonly=True)
 
 
-class IFilesystemContentUnit(IDelimitedHierarchyContentUnit, IFilesystemEntry):
+class IFilesystemContentUnit(IDelimitedHierarchyContentUnit, 
+                             IFilesystemEntry):
     """
     A content unit backed by a file on disk.
 
@@ -1108,13 +1110,13 @@ class IFilesystemContentPackage(IDelimitedHierarchyContentPackage,
     """
 
 
-class IPersistentFilesystemContentUnit(
-        IPersistentContentUnit, IFilesystemContentUnit):
+class IPersistentFilesystemContentUnit(IPersistentContentUnit,
+                                       IFilesystemContentUnit):
     pass
 
 
-class IPersistentFilesystemContentPackage(
-        IPersistentContentPackage, IFilesystemContentPackage):
+class IPersistentFilesystemContentPackage(IPersistentContentPackage, 
+                                          IFilesystemContentPackage):
     pass
 
 
