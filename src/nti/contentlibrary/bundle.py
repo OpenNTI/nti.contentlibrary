@@ -406,7 +406,7 @@ def synchronize_bundle(data_source, bundle,
     # ^ In the past, we used interface.providedBy(bundle), but that
     # could let anything be set
     meta = _meta or _ContentBundleMetaInfo(data_source, 
-										   content_library,
+                                           content_library,
                                            require_ntiid='ntiid' not in excluded_keys)
     fields_to_update = (  set(meta.__dict__)
                         - set(excluded_keys)
@@ -487,8 +487,8 @@ class _ContentPackageBundleLibrarySynchronizer(object):
         self.context = context
 
     def syncFromBucket(self, bucket):
-        content_library = component.getSiteManager(
-            self.context).getUtility(IContentPackageLibrary)
+        sm = component.getSiteManager(self.context)
+        content_library = sm.getUtility(IContentPackageLibrary)
         _readCurrent(content_library)
         _readCurrent(self.context)
 
@@ -513,7 +513,7 @@ class _ContentPackageBundleLibrarySynchronizer(object):
         # (a special 'archive' subcontainer?)
         if not bundle_meta_keys and self.context:
             logger.info("Removing all bundles from library %s: %s", 
-						self.context, list(self.context))
+                        self.context, list(self.context))
             need_event = True
             for k in list(self.context):
                 del self.context[k]  # fires bunches of events

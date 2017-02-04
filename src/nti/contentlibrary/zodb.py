@@ -29,6 +29,7 @@ from nti.contentlibrary.contentunit import ContentUnit
 from nti.contentlibrary.contentunit import ContentPackage
 
 from nti.contentlibrary.interfaces import INoAutoSync
+from nti.contentlibrary.interfaces import IContentRendered 
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IPersistentContentUnit
 from nti.contentlibrary.interfaces import IRenderableContentUnit
@@ -100,15 +101,20 @@ class PersistentHierarchyBucket(TimesMixin,
 _marker = object()
 
 
-@interface.implementer(IPersistentContentUnit, IEditableContentUnit, INoPublishLink)
-class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, ContentUnit):
+@interface.implementer(IPersistentContentUnit,
+                       IEditableContentUnit,
+                       INoPublishLink)
+class PersistentContentUnit(RecordableMixin,
+                            PublishableMixin,
+                            TimesMixin,
+                            ContentUnit):
     """
     A persistent version of a content unit.
     """
     mime_type = mimeType = u'application/vnd.nextthought.persistentcontentunit'
 
     _key_type = PersistentHierarchyKey
-    
+
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)
         self.contents_key = self._key_type(name="contents")
@@ -140,7 +146,9 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
     contentType = property(get_content_type, set_content_type)
 
     def read_contents_of_sibling_entry(self, name):
-        pass
+        # For persistent content unit we return none, since it's not
+        # supported
+        return None
 
     def __repr__(self):
         try:
@@ -149,7 +157,9 @@ class PersistentContentUnit(RecordableMixin, PublishableMixin, TimesMixin, Conte
             return object.__repr__(self)
 
 
-@interface.implementer(IPersistentContentPackage, IEditableContentPackage, INoAutoSync)
+@interface.implementer(IPersistentContentPackage,
+                       IEditableContentPackage, 
+                       INoAutoSync)
 class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     """
     A persistent content package.
@@ -167,8 +177,15 @@ class RenderableContentUnit(PersistentContentUnit):
 
     mime_type = mimeType = u'application/vnd.nextthought.renderablecontentunit'
 
+    def read_contents_of_sibling_entry(self, name):
+        # check it has been rendered
+        if IContentRendered.providedBy(self) and self.key:
+            pass
+        return None
+
 @interface.implementer(IRenderableContentPackage)
-class RenderableContentPackage(RenderableContentUnit, PersistentContentPackage):
+class RenderableContentPackage(RenderableContentUnit,
+                               PersistentContentPackage):
     """
     A renderable content package.
     """

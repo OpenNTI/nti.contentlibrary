@@ -116,8 +116,8 @@ class ContentUnitAnnotations(Annotations):
             # (XXX: what's the loop?)
             next_utility = None
         else:
-            next_utility = queryNextUtility(
-                self.__parent__, IContentUnitAnnotationUtility)
+            next_utility = queryNextUtility(self.__parent__, 
+                                            IContentUnitAnnotationUtility)
 
         if next_utility is not None:
             parent = next_utility.getAnnotationsById(self.principalId)
