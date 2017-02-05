@@ -19,6 +19,8 @@ from zope.dublincore.interfaces import IDCTimes
 
 from ZODB.POSException import ConnectionStateError
 
+from persistent.list import PersistentList
+
 from nti.coremetadata.mixins import RecordableMixin
 from nti.coremetadata.mixins import PublishableMixin
 
@@ -117,7 +119,9 @@ class PersistentContentUnit(RecordableMixin,
     mime_type = mimeType = u'application/vnd.nextthought.persistentcontentunit'
 
     _key_type = PersistentHierarchyKey
-
+    
+    children_iterable_factory = PersistentList
+    
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)
         self.contents_key = self._key_type(name="contents")

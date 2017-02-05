@@ -51,6 +51,7 @@ class ContentUnit(PermissiveSchemaConfigured,
 
     createdTime = -1
     lastModified = -1
+    children_iterable_factory = list
 
     createFieldProperties(IContentUnit)
 

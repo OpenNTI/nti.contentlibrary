@@ -112,7 +112,7 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
             setattr(tocItem, str(i), 
                     toc_entry.make_sibling_key(_href_for_sibling_key(val)))
 
-    children = []
+    children = tocItem.children_iterable_factory()
     for ordinal, child in enumerate(node.iterchildren(tag='topic'), 1):
         child = _tocItem(child, 
                          toc_entry, 
