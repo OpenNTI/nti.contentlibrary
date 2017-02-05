@@ -114,8 +114,10 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
 
     children = []
     for ordinal, child in enumerate(node.iterchildren(tag='topic'), 1):
-        child = _tocItem(
-            child, toc_entry, factory=child_factory, child_factory=child_factory)
+        child = _tocItem(child, 
+                         toc_entry, 
+                         factory=child_factory, 
+                         child_factory=child_factory)
         child.__parent__ = tocItem
         child.ordinal = ordinal
         child._v_toc_node = child  # for testing and secret stuff
@@ -130,9 +132,9 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
             continue
 
         if not is_valid_ntiid_string(ntiid):
-            # logger.log( TRACE,
-            #             "Ignoring ill-formed object NTIID (%s); please fix the rendering for %s",
-            #             ntiid, tocItem)
+            # logger.log(TRACE,
+            #            "Ignoring ill-formed object NTIID (%s); please fix the rendering for %s",
+            #            ntiid, tocItem)
             continue
 
         if ntiid not in embeddedContainerNTIIDs:
@@ -168,9 +170,9 @@ def EclipseContentPackage(toc_entry,
             assumptions about the hierarchy this tree came from, notably that it is only one level
             deep (or rather, it is at least two levels deep and we will be able to access it
             given just the parent entry). (TODO: That property should probably become an IDelimitedHierarchyEntry)
-    :param package_factory: A callable of no arguments that produces an :class:`nti.contentlibrary.interfaces.IContentPackage`
+    :param package_factory: A callable of no arguments that produces an :class:`.interfaces.IContentPackage`
     :param unit_factory: A callable of no arguments that cooperates with the `package_factory` and produces
-            :class:`nti.contentlibrary.interfaces.IContentUnit` objects that can be part of the content package.
+            :class:`.interfaces.IContentUnit` objects that can be part of the content package.
     """
 
     try:
@@ -191,8 +193,9 @@ def EclipseContentPackage(toc_entry,
     content_package.root = toc_entry.get_parent_key()
     content_package.index = toc_entry.key
     content_package.index_last_modified = toc_last_modified
-    content_package.index_jsonp = toc_entry.does_sibling_entry_exist(
-        TOC_FILENAME + '.jsonp')
+    
+    toc_jsonp = TOC_FILENAME + '.jsonp'
+    content_package.index_jsonp = toc_entry.does_sibling_entry_exist(toc_jsonp)
 
     renderVersion = root.get('renderVersion')
     if renderVersion:
@@ -201,19 +204,21 @@ def EclipseContentPackage(toc_entry,
     isCourse = root.get('isCourse')
     if isCourse is not None:
         as_str = str(isCourse).lower()
-        isCourse = False if not isCourse else as_str in (
-            '1', 'true', 'yes', 'y', 't')
+        if not isCourse:
+            isCourse = False
+        else:
+            isCourse = as_str in ('1', 'true', 'yes', 'y', 't')
     if isCourse:
-        interface.alsoProvides(
-            content_package, ILegacyCourseConflatedContentPackage)
+        interface.alsoProvides(content_package, 
+                               ILegacyCourseConflatedContentPackage)
         content_package.isCourse = isCourse
         courses = root.xpath('/toc/course')
         if not courses or len(courses) != 1:
             raise ValueError(
                 "Invalid course: 'isCourse' is true, but wrong 'course' node")
         course = courses[0]
-        courseName = _node_get(course, 'courseName')
         courseTitle = _node_get(course, 'label')
+        courseName = _node_get(course, 'courseName')
 
         content_package.courseName = courseName
         content_package.courseTitle = courseTitle
@@ -224,7 +229,7 @@ def EclipseContentPackage(toc_entry,
         # practice is also always the value of info[@src].
         # Take whatever we can get.
         info = course.xpath('info')
-        if info:  # sigh
+        if info: # sigh
             content_package.courseInfoSrc = _node_get(info[0], 'src')
         elif content_package.does_sibling_entry_exist('course_info.json'):
             content_package.courseInfoSrc = 'course_info.json'
@@ -232,9 +237,10 @@ def EclipseContentPackage(toc_entry,
     if content_package.does_sibling_entry_exist(ARCHIVE_FILENAME):
         content_package.archive = ARCHIVE_FILENAME
         content_package.installable = True
-        content_package.archive_unit = unit_factory(key=content_package.make_sibling_key(ARCHIVE_FILENAME),
-                                                    href=ARCHIVE_FILENAME,
-                                                    title='Content Archive')
+        content_package.archive_unit = \
+                        unit_factory(key=content_package.make_sibling_key(ARCHIVE_FILENAME),
+                                     href=ARCHIVE_FILENAME,
+                                     title='Content Archive')
         content_package.archive_unit.__parent__ = content_package
 
     read_dublincore_from_named_key(content_package, content_package.root)
