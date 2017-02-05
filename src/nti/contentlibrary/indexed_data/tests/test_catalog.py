@@ -23,13 +23,13 @@ class TestCatalog(ContentlibraryLayerTest):
 
         catalog.container_index.do_index_doc(1, ('a', 'b'))
         assert_that(list(catalog.get_references(container_ntiids='a')), 
-					is_([1]))
+                    is_([1]))
 
         catalog.unindex_doc(1)
         assert_that(list(catalog.get_references(container_ntiids='b')), 
-					is_([]))
+                    is_([]))
         assert_that(list(catalog.get_references(container_ntiids='a')),
-					is_([]))
+                    is_([]))
 
         catalog.container_index.do_index_doc(1, ('x', 'y'))
         assert_that(catalog.get_containers(1), has_length(2))

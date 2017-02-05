@@ -195,7 +195,7 @@ def main():
         print(usage())
 
     xmlconfig.file(package=nti.contentfragments,
-				   name="configure.zcml")
+                   name="configure.zcml")
 
     path = os.path.expanduser(args[0])
     path = os.path.expandvars(path)

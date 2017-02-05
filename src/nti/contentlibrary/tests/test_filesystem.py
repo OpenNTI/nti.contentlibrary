@@ -334,4 +334,4 @@ class TestGlobalFilesystemLibrary(ContentlibraryLayerTest):
         new_content_package = new_site_lib[0]
         assert_that(new_content_package,
                     has_property('absolute_path', 
-								 '/DNE/Hah/sites/localsite/TestFilesystem/index.html'))
+                                 '/DNE/Hah/sites/localsite/TestFilesystem/index.html'))

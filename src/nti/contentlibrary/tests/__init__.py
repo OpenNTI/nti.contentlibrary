@@ -23,38 +23,38 @@ from nti.testing.layers import ZopeComponentLayer
 from nti.testing.layers import ConfiguringLayerMixin
 
 class ContentlibraryTestLayer(ZopeComponentLayer,
-							  ConfiguringLayerMixin):
+                              ConfiguringLayerMixin):
 
-	set_up_packages = (	'nti.containers', 
-						'nti.contentlibrary', 
-						'nti.externalization', 
-						'nti.contenttypes.presentation')
+    set_up_packages = ( 'nti.containers', 
+                        'nti.contentlibrary', 
+                        'nti.externalization', 
+                        'nti.contenttypes.presentation')
 
-	@classmethod
-	def setUp(cls):
-		setHooks() # in case something already tore this down
-		cls.setUpPackages()
-		cls.old_data_dir = os.getenv('DATASERVER_DATA_DIR')
-		cls.new_data_dir = tempfile.mkdtemp(dir="/tmp")
-		os.environ['DATASERVER_DATA_DIR'] = cls.new_data_dir
+    @classmethod
+    def setUp(cls):
+        setHooks() # in case something already tore this down
+        cls.setUpPackages()
+        cls.old_data_dir = os.getenv('DATASERVER_DATA_DIR')
+        cls.new_data_dir = tempfile.mkdtemp(dir="/tmp")
+        os.environ['DATASERVER_DATA_DIR'] = cls.new_data_dir
 
-	@classmethod
-	def tearDown(cls):
-		cls.tearDownPackages()
-		zope.testing.cleanup.cleanUp()
+    @classmethod
+    def tearDown(cls):
+        cls.tearDownPackages()
+        zope.testing.cleanup.cleanUp()
 
-	@classmethod
-	def testSetUp(cls, test=None):
-		# If we installed any annotations, clear them, since
-		# they are tracked by NTIID and would otherwise persist
-		annotations = component.getUtility(IContentUnitAnnotationUtility)
-		annotations.annotations.clear()
-		shutil.rmtree(cls.new_data_dir, True)
-		os.environ['DATASERVER_DATA_DIR'] = cls.old_data_dir or '/tmp'
+    @classmethod
+    def testSetUp(cls, test=None):
+        # If we installed any annotations, clear them, since
+        # they are tracked by NTIID and would otherwise persist
+        annotations = component.getUtility(IContentUnitAnnotationUtility)
+        annotations.annotations.clear()
+        shutil.rmtree(cls.new_data_dir, True)
+        os.environ['DATASERVER_DATA_DIR'] = cls.old_data_dir or '/tmp'
 
-	@classmethod
-	def testTearDown(cls):
-		pass
+    @classmethod
+    def testTearDown(cls):
+        pass
 
 import unittest
 
@@ -62,6 +62,6 @@ from nti.testing.base import AbstractTestBase
 
 class ContentlibraryLayerTest(unittest.TestCase):
 
-	layer = ContentlibraryTestLayer
+    layer = ContentlibraryTestLayer
 
-	get_configuration_package = AbstractTestBase.get_configuration_package.__func__
+    get_configuration_package = AbstractTestBase.get_configuration_package.__func__

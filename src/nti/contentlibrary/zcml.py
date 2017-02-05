@@ -50,15 +50,15 @@ class IFilesystemLibrary(interface.Interface):
     prefix = ValidTextLine(
         title="The URL prefix for the content items",
         description="""If you do not give this, then the content items are assumed to be directly
-			accessible from the root of the URL space. This is most commonly needed
-			when setting up multiple libraries for different sub-sites; in that case each
-			such library must use a different prefix.
+            accessible from the root of the URL space. This is most commonly needed
+            when setting up multiple libraries for different sub-sites; in that case each
+            such library must use a different prefix.
 
-			If Pyramid will be serving the content files (NOT for production usage), then the prefix
-			is arbitrary. If Apache/nginx will be serving the content files, then the prefix
-			must match what they will be serving the content files at; often this will be the name
-			of the directory.
-			""",
+            If Pyramid will be serving the content files (NOT for production usage), then the prefix
+            is arbitrary. If Apache/nginx will be serving the content files, then the prefix
+            must match what they will be serving the content files at; often this will be the name
+            of the directory.
+            """,
         required=False,
         default="")
 
@@ -74,8 +74,8 @@ def registerFilesystemLibrary(_context, directory=None, prefix=""):
         prefix = prefix + '/'
 
     factory = functools.partial(GlobalFilesystemContentPackageLibrary,
-							    root=directory, 
-							    prefix=prefix)
+                                root=directory, 
+                                prefix=prefix)
     utility(_context, factory=factory, provides=IContentPackageLibrary)
 register_filesystem_library = registerFilesystemLibrary
 
@@ -107,8 +107,8 @@ def registerS3Library(_context, bucket, cdn_name=None):
         boto_bucket = conn.get_bucket(bucket)
         library = BotoS3BucketContentLibrary(boto_bucket)
         getSiteManager().registerUtility(library,
-										 provided=IContentPackageLibrary, 
-										 info=info)
+                                         provided=IContentPackageLibrary, 
+                                         info=info)
 
     # Use the same discriminator as normally registering a utility
     # does. That way, we properly conflict with a filesystem library
