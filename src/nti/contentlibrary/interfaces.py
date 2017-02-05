@@ -914,7 +914,7 @@ class ContentPackageReplacedEvent(ObjectModifiedEvent):
     original = None
     replacement = alias('object')
 
-    def __init__(self, replacement, original, 
+    def __init__(self, replacement, original,
                  params=None, results=None, *descriptions):
         ObjectModifiedEvent.__init__(self, replacement, *descriptions)
         self.original = original
@@ -964,7 +964,7 @@ class ILegacyCourseConflatedContentPackage(IPotentialLegacyCourseConflatedConten
     isCourse = Bool(title="If this package is for a course",
                     default=False,
                     required=True)
-    
+
     courseName = TextLine(title="Course name",
                           required=True)
 
@@ -984,7 +984,7 @@ class IDelimitedHierarchyContentUnit(IContentUnit, IDelimitedHierarchyEntry):
     """
 
 
-class IDelimitedHierarchyEditableContentUnit(IEditableContentUnit, 
+class IDelimitedHierarchyEditableContentUnit(IEditableContentUnit,
                                              IDelimitedHierarchyContentUnit):
     """
     The unification of :class:`IEditableContentUnit` and :class:`IDelimitedHierarchyEntry`, to make writing adapters
@@ -992,7 +992,7 @@ class IDelimitedHierarchyEditableContentUnit(IEditableContentUnit,
     """
 
 
-class IDelimitedHierarchyContentPackage(IContentPackage, 
+class IDelimitedHierarchyContentPackage(IContentPackage,
                                         IDelimitedHierarchyContentUnit):
     """
     The unification of :class:`IContentPackage` and :class:`IDelimitedHierarchyEntry`, to make writing adapters
@@ -1071,8 +1071,8 @@ class IFilesystemKey(IDelimitedHierarchyKey):
     absolute_path = TextLine(title="The absolute path on disk for this key.")
 
 
-class IFilesystemEntry(interface.Interface, 
-                       dub_interfaces.IDCTimes, 
+class IFilesystemEntry(interface.Interface,
+                       dub_interfaces.IDCTimes,
                        IDelimitedHierarchyEntry):
     """
     A mixin interface for things that are backed by items on the filesystem.
@@ -1088,7 +1088,7 @@ class IFilesystemEntry(interface.Interface,
                           readonly=True)
 
 
-class IFilesystemContentUnit(IDelimitedHierarchyContentUnit, 
+class IFilesystemContentUnit(IDelimitedHierarchyContentUnit,
                              IFilesystemEntry):
     """
     A content unit backed by a file on disk.
@@ -1115,7 +1115,7 @@ class IPersistentFilesystemContentUnit(IPersistentContentUnit,
     pass
 
 
-class IPersistentFilesystemContentPackage(IPersistentContentPackage, 
+class IPersistentFilesystemContentPackage(IPersistentContentPackage,
                                           IFilesystemContentPackage):
     pass
 
@@ -1276,12 +1276,12 @@ class IContentPackageLibraryModifiedOnSyncEvent(IObjectModifiedEvent):
                             required=False)
 
     removed = IndexedIterable(title="Content package removed",
-                            value_type=Object(IContentPackage),
-                            required=False)
-    
+                              value_type=Object(IContentPackage),
+                              required=False)
+
     changed = IndexedIterable(title="Content package modified",
-                            value_type=Object(IContentPackage),
-                            required=False)
+                              value_type=Object(IContentPackage),
+                              required=False)
 
     params = Object(ISynchronizationParams,
                     title="Synchronization parameters",
@@ -1302,9 +1302,9 @@ class ContentPackageLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
     Content package library synced event.
     """
 
-    def __init__(self, obj, added=None, changed=None, removed=None, 
+    def __init__(self, obj, added=None, changed=None, removed=None,
                  params=None, results=None, descriptions=()):
-        super(ContentPackageLibraryModifiedOnSyncEvent, self).__init__(obj, descriptions)
+        super(ContentPackageLibraryModifiedOnSyncEvent,self).__init__(obj, descriptions)
         # packages
         self.added = added
         self.changed = changed
@@ -1312,6 +1312,7 @@ class ContentPackageLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
         # results
         self.params = params
         self.results = results
+
 
 class IContentUnitHrefMapper(interface.Interface):
     """
@@ -1408,8 +1409,24 @@ class IContentUnitAssociations(interface.Interface):
 
 def resolve_content_unit_associations(context):
     result = set()
-    subscribers = component.subscribers((context,), 
+    subscribers = component.subscribers((context,),
                                         IContentUnitAssociations)
     for resolver in subscribers:
         result.update(resolver.associations(context))
     return list(result)
+
+
+class IEclipseContentPackageFactory(interface.Interface):
+    """
+    Interface for a utility or adapter to get a new instance
+    of a content package from a rendered content
+    """
+
+    def newInstance(item, package_factory, unit_factory):
+        """
+        :param item: The :class:`IDelimitedHierarchyItem` to read from.
+        :param package_factory: The :class:`IContentPackage` type to return
+        :param unit_factory: The :class:`IContentUnit` type to return
+
+        :return a new instance of a :class:`IContentPackage`
+        """

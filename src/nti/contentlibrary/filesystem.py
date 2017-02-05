@@ -34,10 +34,11 @@ from nti.contentlibrary.interfaces import IFilesystemContentUnit
 from nti.contentlibrary.interfaces import IDelimitedHierarchyEntry
 from nti.contentlibrary.interfaces import IFilesystemContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackageLibrary
+from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 from nti.contentlibrary.interfaces import IFilesystemContentPackageLibrary
-from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 from nti.contentlibrary.interfaces import IPersistentFilesystemContentUnit
 from nti.contentlibrary.interfaces import IPersistentFilesystemContentPackage
+from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 from nti.contentlibrary.interfaces import IGlobalFilesystemContentPackageLibrary
 from nti.contentlibrary.interfaces import IPersistentFilesystemContentPackageLibrary
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
@@ -51,7 +52,9 @@ def _TOCPath(path):
 
 
 def _hasTOC(path):
-    """ Does the given path point to a directory containing a TOC file?"""
+    """ 
+    Does the given path point to a directory containing a TOC file?
+    """
     return os.path.exists(_TOCPath(path))
 
 
@@ -59,18 +62,20 @@ def _isTOC(path):
     return os.path.basename(path) == eclipse.TOC_FILENAME
 
 
-def package_factory(bucket, _package_factory=None, _unit_factory=None):
+def newInstance(item, _package_factory=None, _unit_factory=None):
     """
-    Given a FilesystemBucket, return a package if it is suitable.
+    Given a Filesystem item, return a package if it is suitable.
     """
+    bucket = item
+    if IFilesystemKey.providedBy(item):
+        bucket = item.bucket
 
     directory = bucket.absolute_path
-
     if not _hasTOC(directory):
         return None
 
-    _package_factory = _package_factory or FilesystemContentPackage
     _unit_factory = _unit_factory or FilesystemContentUnit
+    _package_factory = _package_factory or FilesystemContentPackage
 
     key = FilesystemKey(bucket=bucket, name=eclipse.TOC_FILENAME)
 
@@ -86,7 +91,8 @@ def package_factory(bucket, _package_factory=None, _unit_factory=None):
     assert package is not temp_entry
 
     return package
-_package_factory = package_factory
+package_factory = _package_factory = newInstance
+interface.moduleProvides(IEclipseContentPackageFactory)
 
 
 class _FilesystemTime(object):
@@ -122,7 +128,7 @@ class _FilesystemTime(object):
         except (OSError, TypeError):
             return self.default_time
         else:
-            if        self._name not in inst.__dict__ \
+            if     self._name not in inst.__dict__ \
                 or inst.__dict__[self._name] != val:
                 # Store only if we've changed.
                 inst.__dict__[self._name] = val
@@ -159,7 +165,8 @@ class _AbsolutePathMixin(object):
 class _FilesystemTimesMixin(object):
 
     lastModified = _FilesystemTime('lastModified', 
-                                   os.path.stat.ST_MTIME, 'absolute_path',
+                                   os.path.stat.ST_MTIME, 
+                                   'absolute_path',
                                    cache=False)
     createdTime = _FilesystemTime('createdTime',
                                   os.path.stat.ST_CTIME, 

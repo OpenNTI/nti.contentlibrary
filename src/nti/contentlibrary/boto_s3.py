@@ -39,6 +39,7 @@ from nti.contentlibrary.interfaces import IS3Bucket
 from nti.contentlibrary.interfaces import IS3ContentUnit
 from nti.contentlibrary.interfaces import IS3ContentPackage
 from nti.contentlibrary.interfaces import IDelimitedHierarchyEntry
+from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
 # We mark all of the classes declared here as
 # non-pickalable, because we don't have their persistence
@@ -279,20 +280,25 @@ class BotoS3ContentPackage(ContentPackage, BotoS3ContentUnit):
     # the filesystem version
 
 
-def _package_factory(key):
+def newInstance(key, _package_factory=None, _unit_factory=None):
+
+    _unit_factory = _unit_factory or BotoS3ContentUnit
+    _package_factory = _package_factory or BotoS3ContentPackage
+    
     toc_key = key.bucket.get_key((key.name + '/' +
                                   eclipse.TOC_FILENAME).replace('//', '/'))
 
     if toc_key:
         temp_entry = BotoS3ContentUnit(key=toc_key)
         return eclipse.EclipseContentPackage(temp_entry,
-                                             BotoS3ContentPackage,
-                                             BotoS3ContentUnit)
+                                             _package_factory,
+                                             _unit_factory)
+package_factory = _package_factory = newInstance
+interface.moduleProvides(IEclipseContentPackageFactory)
 
 
 @NoPickle
-class _BotoS3BucketContentLibraryEnumeration(
-        library.AbstractContentPackageEnumeration):
+class _BotoS3BucketContentLibraryEnumeration(library.AbstractContentPackageEnumeration):
 
     def __init__(self, bucket):
         """
