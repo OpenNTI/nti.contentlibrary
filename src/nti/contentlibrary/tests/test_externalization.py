@@ -60,8 +60,10 @@ class TestExternalization(ContentlibraryLayerTest):
                     has_entry('icon', '/prealgebra/icons/The%20Icon.png'))
 
     def _do_test_escape_if_needed(self, factory, key,
-                                  index='eclipse-toc.xml', archive_unit=None,
-                                  prefix='', installable=True):
+                                  index='eclipse-toc.xml', 
+                                  archive_unit=None,
+                                  prefix='', 
+                                  installable=True):
         if isinstance(key, basestring):
 
             parts = key.split('/')
@@ -120,10 +122,8 @@ class TestExternalization(ContentlibraryLayerTest):
                                 'Last Modified', greater_than_or_equal_to(-1),
                                 'index', prefix +
                                 '/prealgebra/eclipse-toc.xml',
-                                'root', prefix +
-                                '/prealgebra/',
-                                'archive', prefix +
-                                '/prealgebra/archive.zip',
+                                'root', prefix + '/prealgebra/',
+                                'archive', prefix + '/prealgebra/archive.zip',
                                 'version', '1.0',
                                 'installable', installable))
         return unit
