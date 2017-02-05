@@ -66,6 +66,18 @@
 	<adapter factory=".boto_s3._KeyDelimitedHierarchyEntry" />
 	<adapter factory=".filesystem._KeyDelimitedHierarchyEntry" />
 			 
+	<adapter factory=".boto_s3._EclipseContentPackageFactory"
+			 for=".interfaces.IS3Key"
+			 provides=".interfaces.IEclipseContentPackageFactory"/>
+
+	<adapter factory=".filesystem._EclipseContentPackageFactory"
+			 for=".interfaces.IFilesystemKey"
+			 provides=".interfaces.IEclipseContentPackageFactory"/>
+
+	<adapter factory=".filesystem._EclipseContentPackageFactory"
+			 for=".interfaces.IFilesystemBucket"
+			 provides=".interfaces.IEclipseContentPackageFactory"/>
+
 	<!-- Event listeners -->
 	<subscriber handler=".subscribers.install_site_content_library"
 				for="nti.site.interfaces.IHostPolicySiteManager

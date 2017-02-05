@@ -1418,11 +1418,11 @@ def resolve_content_unit_associations(context):
 
 class IEclipseContentPackageFactory(interface.Interface):
     """
-    Interface for a utility or adapter to get a new instance
+    Interface for an adapter to get a new instance
     of a content package from a rendered content
     """
 
-    def newInstance(item, package_factory, unit_factory):
+    def new_instance(item, package_factory, unit_factory):
         """
         :param item: The :class:`IDelimitedHierarchyItem` to read from.
         :param package_factory: The :class:`IContentPackage` type to return

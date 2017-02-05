@@ -85,8 +85,8 @@ class NameEqualityKey(boto.s3.key.Key):
 
     def __eq__(self, other):
         try:
-            return self is other or (
-                self.name == other.name and self.bucket == other.bucket)
+            return self is other \
+                or (self.name == other.name and self.bucket == other.bucket)
         except AttributeError:  # pragma: no cover
             return NotImplemented
 
@@ -280,7 +280,7 @@ class BotoS3ContentPackage(ContentPackage, BotoS3ContentUnit):
     # the filesystem version
 
 
-def newInstance(key, _package_factory=None, _unit_factory=None):
+def package_factory(key, _package_factory=None, _unit_factory=None):
 
     _unit_factory = _unit_factory or BotoS3ContentUnit
     _package_factory = _package_factory or BotoS3ContentPackage
@@ -293,8 +293,19 @@ def newInstance(key, _package_factory=None, _unit_factory=None):
         return eclipse.EclipseContentPackage(temp_entry,
                                              _package_factory,
                                              _unit_factory)
-package_factory = _package_factory = newInstance
-interface.moduleProvides(IEclipseContentPackageFactory)
+_package_factory = package_factory
+
+
+@interface.implementer(IEclipseContentPackageFactory)
+class _EclipseContentPackageFactory(object):
+
+    __slots__ = ()
+
+    def __init__(self, *args):
+        pass
+
+    def new_instance(self, item, package_factory=None, unit_factory=None):
+        return package_factory(item, package_factory, unit_factory)
 
 
 @NoPickle

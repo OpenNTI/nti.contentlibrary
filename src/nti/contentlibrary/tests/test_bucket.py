@@ -17,22 +17,23 @@ import unittest
 
 from nti.contentlibrary.bucket import AbstractKey
 
+
 class TestBucketPickle(unittest.TestCase):
 
-	def test_no_volatile_attrs(self):
-		key = AbstractKey()
-		key._v_test = 1
-		key.a = 42
+    def test_no_volatile_attrs(self):
+        key = AbstractKey()
+        key._v_test = 1
+        key.a = 42
 
-		s = cPickle.dumps(key)
+        s = cPickle.dumps(key)
 
-		key2 = cPickle.loads(s)
+        key2 = cPickle.loads(s)
 
-		assert_that( key2.__dict__,
-					 does_not( has_key('_v_test' )) )
-		assert_that( key2, has_property('a', 42))
+        assert_that(key2.__dict__,
+                    does_not(has_key('_v_test')))
+        assert_that(key2, has_property('a', 42))
 
-		key2.__setstate__( {'_v_test': 1} )
+        key2.__setstate__({'_v_test': 1})
 
-		assert_that( key2.__dict__,
-					 does_not( has_key('_v_test' )) )
+        assert_that(key2.__dict__,
+                    does_not(has_key('_v_test')))

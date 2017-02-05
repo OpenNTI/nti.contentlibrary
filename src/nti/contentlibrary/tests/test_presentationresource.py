@@ -26,38 +26,42 @@ from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResour
 
 from nti.testing.matchers import validly_provides
 
+
 class TestPresentationResource(unittest.TestCase):
 
-	def test_discovery(self):
-		absolute_path = os.path.join( os.path.dirname( __file__ ), 'TestFilesystem' )
-		bucket = filesystem.FilesystemBucket(name='TestFilesystem')
-		bucket.absolute_path = absolute_path
-		
-		package = presentationresource.DisplayableContentMixin()
-		package.root = bucket
-		assert_that( package, has_property('PlatformPresentationResources', has_length(3)))
+    def test_discovery(self):
+        absolute_path = os.path.join(os.path.dirname(__file__),
+                                     'TestFilesystem')
+        bucket = filesystem.FilesystemBucket(name='TestFilesystem')
+        bucket.absolute_path = absolute_path
 
-		for i in package.PlatformPresentationResources:
-			assert_that(i, validly_provides(IDisplayablePlatformPresentationResources))
-			assert_that(i, is_(i) )
+        package = presentationresource.DisplayableContentMixin()
+        package.root = bucket
+        assert_that(package,
+                    has_property('PlatformPresentationResources', has_length(3)))
 
-		# cache works
-		v1 = package._v_PlatformPresentationResources
-		assert_that( v1, has_length(3))
-		v2 = package._v_PlatformPresentationResources
-		assert_that( v2, has_length(3))
-		assert_that( v2, same_instance(v1))
-		
-		# create a fake bucket w/ the same name and last modified 
-		fakebucket = _AbstractDelimitedHierarchyObject(name='TestFilesystem')
-		fakebucket.lastModified = bucket.lastModified
-		package.root = fakebucket
-		
-		# cache works
-		v2 = package._v_PlatformPresentationResources
-		assert_that( v2, same_instance(v1))
-		
-		# change last modifid
-		fakebucket.lastModified = 1
-		v2 = package._v_PlatformPresentationResources
-		assert_that( v2, is_not(same_instance(v1)))
+        for i in package.PlatformPresentationResources:
+            assert_that(i,
+                        validly_provides(IDisplayablePlatformPresentationResources))
+            assert_that(i, is_(i))
+
+        # cache works
+        v1 = package._v_PlatformPresentationResources
+        assert_that(v1, has_length(3))
+        v2 = package._v_PlatformPresentationResources
+        assert_that(v2, has_length(3))
+        assert_that(v2, same_instance(v1))
+
+        # create a fake bucket w/ the same name and last modified
+        fakebucket = _AbstractDelimitedHierarchyObject(name='TestFilesystem')
+        fakebucket.lastModified = bucket.lastModified
+        package.root = fakebucket
+
+        # cache works
+        v2 = package._v_PlatformPresentationResources
+        assert_that(v2, same_instance(v1))
+
+        # change last modifid
+        fakebucket.lastModified = 1
+        v2 = package._v_PlatformPresentationResources
+        assert_that(v2, is_not(same_instance(v1)))

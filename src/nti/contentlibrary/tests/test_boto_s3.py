@@ -71,6 +71,23 @@ class TestBotoS3(ContentlibraryLayerTest):
 
 		assert_that( unit, validly_provides( interfaces.IS3ContentUnit ) )
 
+	def test_adapters(self):
+		@interface.implementer(interfaces.IS3Key)
+		class Key(object):
+			bucket = None
+			name = None
+		factory = interfaces.IEclipseContentPackageFactory(Key(), None)
+		assert_that(factory, is_not(none()))
+
+		@interface.implementer(interfaces.IS3Bucket)
+		class Bucket(object):
+			name = __name__ = 'bucket'
+			def get_key( self, k ):
+				return object()
+		
+		factory = interfaces.IEclipseContentPackageFactory(Bucket(), None)
+		assert_that(factory, is_(none()))
+
 	def test_does_exist_cached(self):
 		@interface.implementer(interfaces.IS3Bucket)
 		class Bucket(object):

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals, absolute_import, division
+from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -9,6 +10,7 @@ __docformat__ = "restructuredtext en"
 
 from hamcrest import is_
 from hamcrest import none
+from hamcrest import is_not
 from hamcrest import has_key
 from hamcrest import contains
 from hamcrest import has_entry
@@ -56,6 +58,15 @@ class TestFilesystem(ContentlibraryLayerTest):
 		)
 
 		assert_that( unit, verifiably_provides( interfaces.IFilesystemContentPackage ) )
+
+	def test_adapters(self):
+		bucket = filesystem.FilesystemBucket(name='TestFilesystem')
+		factory = IEclipseContentPackageFactory(bucket, None)
+		assert_that(factory, is_not(none()))
+		
+		key = filesystem.FilesystemKey(name='TestFilesystem')
+		factory = IEclipseContentPackageFactory(key, None)
+		assert_that(factory, is_not(none()))
 
 	def test_read_contents(self):
 		absolute_path = os.path.join( os.path.dirname( __file__ ),
@@ -264,8 +275,11 @@ class TestGlobalFilesystemLibrary(ContentlibraryLayerTest):
 		site_lib.syncContentPackages()
 
 		content_package = site_lib[0]
-		assert_that( content_package, has_property('absolute_path',
-												   os.path.join(site_path, 'TestFilesystem', 'index.html')) )
+		assert_that( content_package,
+					 has_property('absolute_path',
+								  os.path.join(site_path, 
+											   'TestFilesystem', 
+											   'index.html')) )
 
 		sites = pickle.dumps(site_lib)
 
@@ -281,4 +295,5 @@ class TestGlobalFilesystemLibrary(ContentlibraryLayerTest):
 		assert_that( new_enum, has_property('absolute_path', '/DNE/Hah/sites/localsite'))
 
 		new_content_package = new_site_lib[0]
-		assert_that( new_content_package, has_property('absolute_path', '/DNE/Hah/sites/localsite/TestFilesystem/index.html'))
+		assert_that( new_content_package,
+					 has_property('absolute_path', '/DNE/Hah/sites/localsite/TestFilesystem/index.html'))
