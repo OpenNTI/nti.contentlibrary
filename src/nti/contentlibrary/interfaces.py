@@ -1389,9 +1389,10 @@ class IContentValidator(interface.Interface):
     Marker interface for a content validator utility
     """
 
-    def validate(content):
+    def validate(content, contex):
         """
         :param content: The content to validate
+        :param context: :class:`IContentUnit` object
         """
 
 
