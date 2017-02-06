@@ -48,6 +48,8 @@ from nti.coremetadata.interfaces import INoPublishLink
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
+from nti.externalization.oids import to_external_ntiid_oid
+
 from nti.property.property import alias
 
 from nti.schema.fieldproperty import createDirectFieldProperties
@@ -119,9 +121,9 @@ class PersistentContentUnit(RecordableMixin,
     mime_type = mimeType = u'application/vnd.nextthought.persistentcontentunit'
 
     _key_type = PersistentHierarchyKey
-    
+
     children_iterable_factory = PersistentList
-    
+
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)
         self.contents_key = self._key_type(name="contents")
@@ -179,6 +181,10 @@ class RenderableContentUnit(PersistentContentUnit):
     createDirectFieldProperties(IRenderableContentUnit)
 
     mime_type = mimeType = u'application/vnd.nextthought.renderablecontentunit'
+
+    @readproperty
+    def ntiid(self):
+        return to_external_ntiid_oid(self)
 
     @property
     def has_key(self):
