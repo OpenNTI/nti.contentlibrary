@@ -100,6 +100,7 @@ import os
 import sys
 import gzip
 import getopt
+import logging
 from six import StringIO
 
 import boto
@@ -108,7 +109,19 @@ import mimetypes
 
 from zope.configuration import xmlconfig
 
-import nti.contentfragments
+from zope.exceptions.log import Formatter
+
+#: Content types we will gzip on upload
+GZIP_TYPES = ('text/csv', 'text/css', 'text/html', 'text/xml', 'application/xml',
+              'application/json', 'application/javascript')
+
+#: Anything we explicitly want to exclude from gzipping, like .json
+#: data
+NOT_GZIP_EXT = ()
+
+#: Unix dotfiles we will always ignore
+IGNORED_DOTFILES = ('.svn', '.git', '.DS_Store', '.coverage', '.noseids',
+                    '.dir_locals.el', '.installed.cfg')
 
 
 def usage():
@@ -117,9 +130,8 @@ def usage():
 
 
 def submit_cb(bytes_so_far, total_bytes):
-    print(
-        '%d bytes transferred / %d bytes total' %
-        (bytes_so_far, total_bytes))
+    print('%d bytes transferred / %d bytes total' %
+          (bytes_so_far, total_bytes))
 
 
 def get_key_name(fullpath, prefix):
@@ -127,6 +139,66 @@ def get_key_name(fullpath, prefix):
     l = key_name.split(os.sep)
     return '/'.join(l)
 
+
+def set_log_formatter():
+    ei = '%(asctime)s %(levelname)-5.5s [%(name)s][%(thread)d][%(threadName)s] %(message)s'
+    logging.root.handlers[0].setFormatter(Formatter(ei))
+
+
+def s3_upload_file(key, fullpath, cb=None, num_cb=None, policy=None,
+                   reduced_redundancy=None, headers=None):
+    """
+    Upload a file to s3
+    
+    :param key - S3 key
+    :param fullpath - file to upload
+    :param cb - callback
+    :param: num_cb - The number of progress callbacks to display.
+    :param: policy - A canned ACL policy that will be granted on each file
+                     transferred to S3. 
+                     private|public-read|public-read-write|authenticated-read
+    :param: reduced_redundancy - Use Reduced Redundancy storage
+    :param: headers - Transfer file headers
+    """
+
+    if headers is not None:
+        headers = dict(headers)
+    else:
+        headers = {}
+
+    mt = mimetypes.guess_type(fullpath)
+    if mt and mt[0]:
+        headers['Content-Type'] = mt[0]
+
+    if      headers.get('Content-Type') in GZIP_TYPES \
+        and not os.path.splitext(fullpath)[-1] in NOT_GZIP_EXT:
+        mtime = os.stat(fullpath).st_mtime
+        filename = os.path.basename(fullpath)
+        strio = StringIO()
+        with gzip.GzipFile(fileobj=strio,
+                           mode='wb',
+                           filename=filename,
+                           mtime=mtime) as gzipped:
+            with open(fullpath, 'rb') as f:
+                gzipped.write(f.read())
+        data = strio.getvalue()
+        headers['Content-Encoding'] = 'gzip'
+        key.set_contents_from_string(data,
+                                     cb=cb,
+                                     num_cb=num_cb,
+                                     policy=policy,
+                                     reduced_redundancy=reduced_redundancy,
+                                     headers=headers)
+    else:
+        key.set_contents_from_filename(fullpath,
+                                       cb=cb,
+                                       num_cb=num_cb,
+                                       policy=policy,
+                                       reduced_redundancy=reduced_redundancy,
+                                       headers=headers)
+
+    return headers
+_upload_file = s3_upload_file
 
 def main():
     try:
@@ -139,21 +211,22 @@ def main():
     except:
         usage()
 
-    ignore_dirs = []
-    aws_access_key_id = None
-    aws_secret_access_key = None
-    bucket_name = ''
-    total = 0
-    debug = 0
     cb = None
+    debug = 0
+    total = 0
     num_cb = 0
-    quiet = False
-    no_op = False
+    headers = {}
     prefix = '/'
     grant = None
-    no_overwrite = False
+    quiet = False
+    no_op = False
     reduced = False
-    headers = {}
+    ignore_dirs = []
+    bucket_name = ''
+    no_overwrite = False
+    aws_access_key_id = None
+    aws_secret_access_key = None
+
     for o, a in opts:
         if o in ('-h', '--help'):
             usage()
@@ -194,6 +267,7 @@ def main():
     if len(args) != 1:
         print(usage())
 
+    import nti.contentfragments
     xmlconfig.file(package=nti.contentfragments,
                    name="configure.zcml")
 
@@ -236,10 +310,11 @@ def main():
                         if not no_op:
                             k = b.new_key(key_name)
                             file_headers = _upload_file(k, fullpath,
-                                                        cb=cb, num_cb=num_cb,
-                                                        policy=grant, 
-                                                        reduced_redundancy=reduced,
-                                                        headers=headers)
+                                                        cb=cb, 
+                                                        policy=grant,
+                                                        num_cb=num_cb,
+                                                        headers=headers,
+                                                        reduced_redundancy=reduced)
                             if not quiet:
                                 print('Copied %s to %s/%s as type %s encoding %s'
                                       % (filename, bucket_name, key_name,
@@ -249,10 +324,10 @@ def main():
                                           file_headers.get('Content-Encoding', 'identity')))
                     total += 1
         elif os.path.isfile(path):
-            key_name = get_key_name(path, prefix)
             copy_file = True
+            key_name = get_key_name(path, prefix)
             if no_overwrite:
-                if b.get_key(key_name):
+                if b.get_key(key_name): # FIXME: maybe none
                     copy_file = False
                     if not quiet:
                         print('Skipping %s as it exists in s3' % path)
@@ -264,52 +339,6 @@ def main():
     else:
         print(usage())
 
-#: Content types we will gzip on upload
-GZIP_TYPES = ('text/csv', 'text/css', 'text/html', 'text/xml', 'application/xml',
-              'application/json', 'application/javascript')
-
-#: Anything we explicitly want to exclude from gzipping, like .json
-#: data
-NOT_GZIP_EXT = ()
-
-#: Unix dotfiles we will always ignore
-IGNORED_DOTFILES = ('.svn', '.git', '.DS_Store', '.coverage', '.noseids',
-                    '.dir_locals.el', '.installed.cfg')
-
-
-def _upload_file(key, fullpath, cb=None, num_cb=None, policy=None,
-                 reduced_redundancy=None, headers=None):
-    if headers is not None:
-        headers = dict(headers)
-    else:
-        headers = {}
-
-    mt = mimetypes.guess_type(fullpath)
-    if mt and mt[0]:
-        headers['Content-Type'] = mt[0]
-
-    if      headers.get('Content-Type') in GZIP_TYPES \
-        and not os.path.splitext(fullpath)[-1] in NOT_GZIP_EXT:
-        mtime = os.stat(fullpath).st_mtime
-        filename = os.path.basename(fullpath)
-        strio = StringIO()
-        with gzip.GzipFile(fileobj=strio,
-                           mode='wb', 
-                           filename=filename,
-                           mtime=mtime) as gzipped:
-            with open(fullpath, 'rb') as f:
-                gzipped.write(f.read())
-        data = strio.getvalue()
-        headers['Content-Encoding'] = 'gzip'
-        key.set_contents_from_string(data, cb=cb, num_cb=num_cb,
-                                     policy=policy, reduced_redundancy=reduced_redundancy,
-                                     headers=headers)
-    else:
-        key.set_contents_from_filename(fullpath, cb=cb, num_cb=num_cb,
-                                       policy=policy, reduced_redundancy=reduced_redundancy,
-                                       headers=headers)
-
-    return headers
 
 if __name__ == "__main__":
     main()
