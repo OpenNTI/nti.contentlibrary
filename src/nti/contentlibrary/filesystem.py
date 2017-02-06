@@ -62,7 +62,7 @@ def _isTOC(path):
     return os.path.basename(path) == eclipse.TOC_FILENAME
 
 
-def package_factory(item, _package_factory=None, _unit_factory=None):
+def _package_factory(item, _package_factory=None, _unit_factory=None):
     """
     Given a Filesystem item, return a package if it is suitable.
     """
@@ -91,7 +91,6 @@ def package_factory(item, _package_factory=None, _unit_factory=None):
     assert package is not temp_entry
 
     return package
-_package_factory = package_factory
 
 
 @interface.implementer(IEclipseContentPackageFactory)
@@ -103,7 +102,7 @@ class _EclipseContentPackageFactory(object):
         pass
 
     def new_instance(self, item, package_factory=None, unit_factory=None):
-        return package_factory(item, package_factory, unit_factory)
+        return _package_factory(item, package_factory, unit_factory)
 
 
 class _FilesystemTime(object):
