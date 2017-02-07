@@ -47,7 +47,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
         for name in list(parsed.keys()):
             if name not in self.ALLOWED_KEYS:
                 parsed.pop(name, None)
-        if not 'ntiid' in parsed:
+        if not 'ntiid' in parsed and NTIID in parsed:
             parsed['ntiid'] = parsed.get(NTIID)
         return parsed
 
