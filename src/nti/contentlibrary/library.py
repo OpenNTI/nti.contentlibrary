@@ -287,15 +287,16 @@ class AbstractContentPackageLibrary(object):
             if event:
                 notify(ContentPackageAddedEvent(new, params, results))
 
-    def _do_removeContentPackages(self, removed, event=True,
+    def _do_removeContentPackages(self, removed, event=True, unregister=True,
                                   lib_sync_results=None, params=None, results=None):
         for old in removed or ():
-            self._contentPackages.pop(old.ntiid, None)
             self._unrecord_units_by_ntiid(old)
+            self._contentPackages.pop(old.ntiid, None)
             if event:
                 notify(ContentPackageRemovedEvent(old, params, results))
-            old.__parent__ = None  # ground
-            unregister_content_units(old)  # remove intids
+            if unregister:
+                old.__parent__ = None  # ground
+                unregister_content_units(old)  # remove intids
             if lib_sync_results is not None:
                 lib_sync_results.removed(old.ntiid)
 
@@ -304,9 +305,11 @@ class AbstractContentPackageLibrary(object):
         self._do_addContentPackages((package,), event=event)
     append = add
 
-    def remove(self, package, event=True):
+    def remove(self, package, event=True, unregister=True):
         self._last_modified = time.time()
-        self._do_removeContentPackages((package,), event=event)
+        self._do_removeContentPackages((package,), 
+                                       event=event,
+                                       unregister=unregister)
 
     def _do_updateContentPackages(self, changed, lib_sync_results=None, 
                                   params=None, results=None):

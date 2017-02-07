@@ -583,9 +583,14 @@ class IEditableContentPackageLibrary(ISyncableContentPackageLibrary):
         """
     append = add
 
-    def remove(package, event=True):
+    def remove(package, event=True, unregister=True):
         """
         Remove a `IContentPackage`
+        
+        @paran package - class `IContentPackage` to remove
+        @param event - notify package removal
+        @param unregister - unregister from intid facility
+        
         :return True if the item was removed.
         """
 
