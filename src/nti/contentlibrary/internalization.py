@@ -55,7 +55,6 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
         parsed = self._clean_input(parsed)
         result = super(_EditableContentUnitUpdater,
                        self).updateFromExternalObject(parsed, *args, **kwargs)
-        assert self._ext_self.ntiid, 'must provide a valid NTIID'
         if 'contents' in parsed:
             self.contents = zlib.decompress(base64.b64decode(parsed['contents']))
         if 'contentType' in parsed:
