@@ -277,11 +277,13 @@ class AbstractContentPackageLibrary(object):
     def _do_addContentPackages(self, added, event=True,
                                lib_sync_results=None, params=None, results=None):
         for new in added:
-            lifecycleevent.created(new)
+            if event:
+                lifecycleevent.created(new)
             self._contentPackages[new.ntiid] = new
             self._record_units_by_ntiid(new)
             new.__parent__ = self  # ownership
-            register_content_units(self, new)  # get intids
+            # get intids
+            register_content_units(self, new)  
             if lib_sync_results is not None:
                 lib_sync_results.added(new.ntiid)
             if event:
