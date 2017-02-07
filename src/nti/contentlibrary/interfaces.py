@@ -43,6 +43,7 @@ from nti.base.interfaces import ILastModified
 
 from nti.coremetadata.interfaces import IRecordable
 from nti.coremetadata.interfaces import IPublishable
+from nti.coremetadata.interfaces import INoPublishLink
 from nti.coremetadata.interfaces import IShouldHaveTraversablePath
 
 from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
@@ -845,7 +846,7 @@ class IRenderableContentUnit(IEditableContentUnit):
     contents_key.setTaggedValue('_ext_excluded_out', True)
 
 
-class IRenderableContentPackage(IEditableContentPackage):
+class IRenderableContentPackage(IEditableContentPackage, INoPublishLink):
     """
     A :class:`IContentPackage` that can be rendered.
     """
