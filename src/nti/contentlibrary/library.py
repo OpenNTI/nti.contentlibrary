@@ -277,28 +277,36 @@ class AbstractContentPackageLibrary(object):
     def _do_addContentPackages(self, added, event=True,
                                lib_sync_results=None, params=None, results=None):
         for new in added:
+            # add to maps
+            self._record_units_by_ntiid(new)
+            self._contentPackages[new.ntiid] = new
+            # take ownership
+            new.__parent__ = self
+            # get intids
+            register_content_units(self, new)
+            # notify
             if event:
                 lifecycleevent.created(new)
-            self._contentPackages[new.ntiid] = new
-            self._record_units_by_ntiid(new)
-            new.__parent__ = self  # ownership
-            # get intids
-            register_content_units(self, new)  
+                notify(ContentPackageAddedEvent(new, params, results))
+            # add to sync results
             if lib_sync_results is not None:
                 lib_sync_results.added(new.ntiid)
-            if event:
-                notify(ContentPackageAddedEvent(new, params, results))
 
     def _do_removeContentPackages(self, removed, event=True, unregister=True,
                                   lib_sync_results=None, params=None, results=None):
         for old in removed or ():
+            # remove from maps
             self._unrecord_units_by_ntiid(old)
             self._contentPackages.pop(old.ntiid, None)
+            # notify removal (intids are kept)
             if event:
                 notify(ContentPackageRemovedEvent(old, params, results))
+            # ground
+            old.__parent__ = None
+            # remove from intid facility
             if unregister:
-                old.__parent__ = None  # ground
-                unregister_content_units(old)  # remove intids
+                unregister_content_units(old)
+            # record in sync results
             if lib_sync_results is not None:
                 lib_sync_results.removed(old.ntiid)
 
@@ -309,11 +317,11 @@ class AbstractContentPackageLibrary(object):
 
     def remove(self, package, event=True, unregister=True):
         self._last_modified = time.time()
-        self._do_removeContentPackages((package,), 
+        self._do_removeContentPackages((package,),
                                        event=event,
                                        unregister=unregister)
 
-    def _do_updateContentPackages(self, changed, lib_sync_results=None, 
+    def _do_updateContentPackages(self, changed, lib_sync_results=None,
                                   params=None, results=None):
         result = []
         for new, old in changed:
