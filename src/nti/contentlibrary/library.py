@@ -169,7 +169,7 @@ def register_content_units(context, content_unit):
     _register(content_unit)
 
 
-def unregister_content_units(context, main=True):
+def unregister_content_units(context):
     """
     Recursively unregister content units.
     """
@@ -182,8 +182,7 @@ def unregister_content_units(context, main=True):
             _unregister(child)
         if is_indexable(obj):
             intid = intids.queryId(obj)
-            if      intid is not None \
-                and (main or obj is not context):
+            if intid is not None:
                 removeIntId(obj)
 
     _unregister(context)
