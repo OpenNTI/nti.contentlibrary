@@ -261,6 +261,20 @@ from nti.ntiids.schema import ValidNTIID
 
 from nti.schema.field import IndexedIterable
 
+def get_package_for_bundle(package, library=None):
+    """
+    Returns a package suitable for storing in a :class:`IContentPackageBundle`
+    given the package itself or it's ntiid.
+    """
+    library = library if library is not None else component.getUtility(IContentPackageLibrary)
+    package_ntiid = getattr(package, 'ntiid', package)
+    cp = library.get(package_ntiid)
+    if cp:
+        result = IWeakRef(cp)
+    else:
+        result = contentunit_wref_to_missing_ntiid(package_ntiid)
+    return result
+
 
 class IContentBundleMetaInfo(IContentPackageBundle):
 
@@ -331,11 +345,7 @@ class ContentBundleMetaInfo(object):
         """
         result = OOSet()
         for ntiid in self.ContentPackages or ():
-            cp = library.get(ntiid)
-            if cp:
-                result.add(IWeakRef(cp))
-            else:
-                result.add(contentunit_wref_to_missing_ntiid(ntiid))
+            result.add( get_package_for_bundle( ntiid, library ) )
         return result
 _ContentBundleMetaInfo = ContentBundleMetaInfo  # alias
 
@@ -405,7 +415,7 @@ def synchronize_bundle(data_source, bundle,
     bundle_iface = IContentPackageBundle
     # ^ In the past, we used interface.providedBy(bundle), but that
     # could let anything be set
-    meta = _meta or _ContentBundleMetaInfo(data_source, 
+    meta = _meta or _ContentBundleMetaInfo(data_source,
                                            content_library,
                                            require_ntiid='ntiid' not in excluded_keys)
     fields_to_update = (  set(meta.__dict__)
@@ -424,7 +434,7 @@ def synchronize_bundle(data_source, bundle,
             # weak references; if everything was *missing*, the ContentPackages
             # could come back as empty both places
             try:
-                needs_copy = not _are_package_refs_equal(bundle._ContentPackages_wrefs, 
+                needs_copy = not _are_package_refs_equal(bundle._ContentPackages_wrefs,
                                                          meta._ContentPackages_wrefs)
             except AttributeError:
                 needs_copy = getattr(bundle, k, None) != getattr(meta, k)
@@ -512,13 +522,13 @@ class _ContentPackageBundleLibrarySynchronizer(object):
         # Ideally we want to "archive" the objects somewhere probably
         # (a special 'archive' subcontainer?)
         if not bundle_meta_keys and self.context:
-            logger.info("Removing all bundles from library %s: %s", 
+            logger.info("Removing all bundles from library %s: %s",
                         self.context, list(self.context))
             need_event = True
             for k in list(self.context):
                 del self.context[k]  # fires bunches of events
         else:
-            bundle_metas = {_ContentBundleMetaInfo(k, content_library) 
+            bundle_metas = {_ContentBundleMetaInfo(k, content_library)
                             for k in bundle_meta_keys}
             all_ntiids = {x.ntiid for x in bundle_metas}
             # Now determine what to add/update/remove.
