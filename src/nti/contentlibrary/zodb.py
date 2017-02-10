@@ -74,6 +74,8 @@ class PersistentHierarchyKey(TimesMixin, AbstractKey):
     read_contents = readContents
 
     def writeContents(self, data):
+        if not isinstance( data, bytes ):
+            data = data.encode('utf-8')
         self.data = data
     write_contents = writeContents
 

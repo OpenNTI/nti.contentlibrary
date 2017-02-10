@@ -432,7 +432,7 @@ class _S3KeyHrefMapper(object):
             self.href = 'http://' + sites[0] + '/' + key.key
         else:
             if request_sites is None:
-                quoted_key = _path_maybe_quote(key.key) 
+                quoted_key = _path_maybe_quote(key.key)
             else:
                 quoted_key = key.key
             self.href = 'http://' + key.bucket.name + '/' + quoted_key
