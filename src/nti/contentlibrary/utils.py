@@ -37,6 +37,8 @@ def get_content_packages(sites=(), mime_types=(CONTENT_PACKAGE_MIME_TYPE,)):
     result = dict()
     intids = component.getUtility(IIntIds)
     catalog = get_contentlibrary_catalog()
+    if catalog is None: # tests
+        return ()
     for site in sites:
         query = {
             IX_SITE: {'any_of': (site,)},
