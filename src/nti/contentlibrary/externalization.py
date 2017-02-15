@@ -40,6 +40,7 @@ from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
 
 from nti.externalization.interfaces import IExternalObject
+from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
 
 from nti.externalization.datastructures import InterfaceObjectIO
@@ -56,10 +57,10 @@ class _ContentPackageLibraryExternal(object):
         self.library = library
 
     def toExternalObject(self):
-        return {
+        return LocatedExternalDict({
             'title': "Library",
             'titles': [toExternalObject(x) for x in self.library.contentPackages or ()]
-        }
+        })
 
 
 def _path_maybe_quote(path):
