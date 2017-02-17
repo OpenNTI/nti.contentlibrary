@@ -144,4 +144,9 @@
 	<!-- Presentation assets -->			
 	<include package=".indexed_data" />
 
+	<!-- Validators -->
+    <ext:registerAutoPackageIO
+        root_interfaces=".interfaces.IContentValidationError"
+        modules=".validators" />
+
 </configure>

@@ -586,11 +586,11 @@ class IEditableContentPackageLibrary(ISyncableContentPackageLibrary):
     def remove(package, event=True, unregister=True):
         """
         Remove a `IContentPackage`
-        
+
         @paran package - class `IContentPackage` to remove
         @param event - notify package removal
         @param unregister - unregister from intid facility
-        
+
         :return True if the item was removed.
         """
 
@@ -957,7 +957,8 @@ class IPotentialLegacyCourseConflatedContentPackage(IContentPackage):
                     required=True)
 
 
-class ILegacyCourseConflatedContentPackage(IPotentialLegacyCourseConflatedContentPackage):
+class ILegacyCourseConflatedContentPackage(
+        IPotentialLegacyCourseConflatedContentPackage):
     """
     Legacy properties from when we treated courses as simply a set
     of attributes on content.
@@ -1310,7 +1311,11 @@ class ContentPackageLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
 
     def __init__(self, obj, added=None, changed=None, removed=None,
                  params=None, results=None, descriptions=()):
-        super(ContentPackageLibraryModifiedOnSyncEvent,self).__init__(obj, descriptions)
+        super(
+            ContentPackageLibraryModifiedOnSyncEvent,
+            self).__init__(
+            obj,
+            descriptions)
         # packages
         self.added = added
         self.changed = changed
@@ -1390,6 +1395,10 @@ class IContentRendered(interface.Interface):
     """
 
 
+class IContentValidationError(interface.Interface):
+    Error = ValidTextLine(title="The error message.")
+
+
 class IContentValidator(interface.Interface):
     """
     Marker interface for a content validator utility
@@ -1399,6 +1408,7 @@ class IContentValidator(interface.Interface):
         """
         :param content: The content to validate
         :param context: :class:`IContentUnit` object
+        :raises a :class:`IContentValidationError` object
         """
 
 
