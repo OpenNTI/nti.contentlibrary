@@ -146,7 +146,8 @@ def set_log_formatter():
 
 
 def s3_upload_file(key, fullpath, cb=None, num_cb=None, policy=None,
-                   reduced_redundancy=None, headers=None):
+                   reduced_redundancy=None, headers=None, 
+                   gzip_types=GZIP_TYPES, gz_ext_exclude=NOT_GZIP_EXT):
     """
     Upload a file to s3
     
@@ -159,6 +160,8 @@ def s3_upload_file(key, fullpath, cb=None, num_cb=None, policy=None,
                      private|public-read|public-read-write|authenticated-read
     :param: reduced_redundancy - Use Reduced Redundancy storage
     :param: headers - Transfer file headers
+    :param: gzip_types - Mime types to upload as gzip
+    :param: gz_ext_exclude - exclude exts files from gzipping
     """
 
     if headers is not None:
@@ -170,8 +173,8 @@ def s3_upload_file(key, fullpath, cb=None, num_cb=None, policy=None,
     if mt and mt[0]:
         headers['Content-Type'] = mt[0]
 
-    if      headers.get('Content-Type') in GZIP_TYPES \
-        and not os.path.splitext(fullpath)[-1] in NOT_GZIP_EXT:
+    if      headers.get('Content-Type') in gzip_types \
+        and not os.path.splitext(fullpath)[-1] in gz_ext_exclude:
         mtime = os.stat(fullpath).st_mtime
         filename = os.path.basename(fullpath)
         strio = StringIO()
