@@ -1396,7 +1396,7 @@ class IContentRendered(interface.Interface):
 
 
 class IContentValidationError(interface.Interface):
-    Error = ValidTextLine(title="The error message.")
+    message = ValidTextLine(title="The error message.")
 
 
 class IContentValidator(interface.Interface):

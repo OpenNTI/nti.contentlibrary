@@ -15,8 +15,6 @@ from nti.contentlibrary import MessageFactory as _
 
 from nti.contentlibrary.interfaces import IContentValidationError
 
-from nti.property.property import alias
-
 
 @interface.implementer(IContentValidationError)
 class ContentValidationError(Exception):
@@ -25,11 +23,10 @@ class ContentValidationError(Exception):
 
     mime_type = mimeType = u'application/vnd.nextthought.content.validationerror'
 
-    error = alias('Error')
-
-    def __init__(self, error, *args, **kwargs):
+    def __init__(self, message, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
-        self.Error = error
+        self.message = message
+
 
 class EmptyContentError(ContentValidationError):
 
