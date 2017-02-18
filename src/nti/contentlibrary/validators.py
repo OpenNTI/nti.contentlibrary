@@ -27,10 +27,9 @@ class ContentValidationError(Exception):
 
     error = alias('Error')
 
-    def __init__(self, message, *args, **kwargs):
-        self.Error = message
-        ContentValidationError.__init__(self, *args, **kwargs)
-
+    def __init__(self, error, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
+        self.Error = error
 
 class EmptyContentError(ContentValidationError):
 
