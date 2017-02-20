@@ -41,6 +41,7 @@ from persistent.interfaces import IPersistent
 from nti.base.interfaces import ICreated
 from nti.base.interfaces import ILastModified
 
+from nti.coremetadata.interfaces import IVersioned
 from nti.coremetadata.interfaces import IRecordable
 from nti.coremetadata.interfaces import IPublishable
 from nti.coremetadata.interfaces import INoPublishLink
@@ -752,7 +753,11 @@ class IContentUnit(IZContained,
         default=())
 
 
-class IEditableContentUnit(IContentUnit, IPublishable, IRecordable, ICreated):
+class IEditableContentUnit(IContentUnit,
+                           IPublishable,
+                           IRecordable,
+                           ICreated,
+                           IVersioned):
     """
     A :class:`IContentUnit` that can be edited.
     """
@@ -777,6 +782,10 @@ class IEditableContentUnit(IContentUnit, IPublishable, IRecordable, ICreated):
 
         :param bytes data: The data to write
         """
+
+    ContentsLastModified = Number(title="Time since the epoch the contents were last modified.",
+                                  readonly=True,
+                                  default=0)
 
 
 class IContentPackage(IContentUnit,
@@ -838,9 +847,6 @@ class IEditableContentPackage(IEditableContentUnit, IContentPackage):
     """
     A :class:`IContentPackage` that can be edited.
     """
-    ContentsLastModified = Number(title="Time since the epoch the contents were last modified.",
-                                  readonly=True,
-                                  default=0)
 
 
 class IRenderableContentUnit(IEditableContentUnit):

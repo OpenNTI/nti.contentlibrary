@@ -162,6 +162,14 @@ class PersistentContentUnit(RecordableMixin,
 
     contentType = property(get_content_type, set_content_type)
 
+    def update_version(self, *args, **kawrgs):
+        # Nothing needed since we rely on ContentsLastModified
+        pass
+
+    @readproperty
+    def version(self):
+        return unicode(self.ContentsLastModified)
+
     def __repr__(self):
         try:
             return super(PersistentContentUnit, self).__repr__()
