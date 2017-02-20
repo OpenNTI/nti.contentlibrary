@@ -50,6 +50,7 @@ from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
 from nti.externalization.oids import to_external_ntiid_oid
 
+from nti.property.property import Lazy
 from nti.property.property import alias
 
 from nti.schema.fieldproperty import createDirectFieldProperties
@@ -157,6 +158,10 @@ class PersistentContentUnit(RecordableMixin,
     setContentType = set_content_type
 
     contentType = property(get_content_type, set_content_type)
+
+    @Lazy
+    def ContentsLastModified(self):
+        return self.createdTime
 
     def __repr__(self):
         try:
