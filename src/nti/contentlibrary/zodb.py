@@ -23,6 +23,8 @@ from ZODB.POSException import ConnectionStateError
 
 from persistent.list import PersistentList
 
+from nti.base._compat import unicode_
+
 from nti.coremetadata.mixins import RecordableMixin
 from nti.coremetadata.mixins import PublishableMixin
 
@@ -76,7 +78,7 @@ class PersistentHierarchyKey(TimesMixin, AbstractKey):
     read_contents = readContents
 
     def writeContents(self, data):
-        if not isinstance( data, bytes ):
+        if not isinstance(data, bytes):
             data = data.encode('utf-8')
         self.data = data
     write_contents = writeContents
@@ -168,7 +170,7 @@ class PersistentContentUnit(RecordableMixin,
 
     @readproperty
     def version(self):
-        return unicode(self.ContentsLastModified)
+        return unicode_(str(self.ContentsLastModified))
 
     def __repr__(self):
         try:
@@ -241,4 +243,3 @@ class RenderableContentPackage(RenderableContentUnit,
     createDirectFieldProperties(IRenderableContentPackage)
 
     mime_type = mimeType = u'application/vnd.nextthought.renderablecontentpackage'
-
