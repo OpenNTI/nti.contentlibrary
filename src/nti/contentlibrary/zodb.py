@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import time
+
 from zope import interface
 
 from zope.cachedescriptors.property import readproperty
@@ -50,7 +52,6 @@ from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
 from nti.externalization.oids import to_external_ntiid_oid
 
-from nti.property.property import Lazy
 from nti.property.property import alias
 
 from nti.schema.fieldproperty import createDirectFieldProperties
@@ -127,6 +128,7 @@ class PersistentContentUnit(RecordableMixin,
 
     children_iterable_factory = PersistentList
 
+    ContentsLastModified = 0
     contents_last_modified = alias("ContentsLastModified")
 
     def __init__(self, *args, **kwargs):
@@ -142,6 +144,7 @@ class PersistentContentUnit(RecordableMixin,
     readContents = read_contents
 
     def write_contents(self, data=None, contentType=_marker):
+        self.contents_last_modified = time.time()
         self.contents_key.write_contents(data)
         if contentType is not _marker:
             self.contentType = contentType
@@ -158,10 +161,6 @@ class PersistentContentUnit(RecordableMixin,
     setContentType = set_content_type
 
     contentType = property(get_content_type, set_content_type)
-
-    @Lazy
-    def ContentsLastModified(self):
-        return self.createdTime
 
     def __repr__(self):
         try:
