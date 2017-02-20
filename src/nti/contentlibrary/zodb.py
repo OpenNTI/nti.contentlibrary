@@ -126,6 +126,8 @@ class PersistentContentUnit(RecordableMixin,
 
     children_iterable_factory = PersistentList
 
+    contents_last_modified = alias("ContentsLastModified")
+
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)
         self.contents_key = self._key_type(name="contents")
@@ -227,3 +229,4 @@ class RenderableContentPackage(RenderableContentUnit,
     createDirectFieldProperties(IRenderableContentPackage)
 
     mime_type = mimeType = u'application/vnd.nextthought.renderablecontentpackage'
+

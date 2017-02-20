@@ -838,6 +838,9 @@ class IEditableContentPackage(IEditableContentUnit, IContentPackage):
     """
     A :class:`IContentPackage` that can be edited.
     """
+    ContentsLastModified = Number(title="Time since the epoch the contents were last modified.",
+                                  readonly=True,
+                                  default=0)
 
 
 class IRenderableContentUnit(IEditableContentUnit):
