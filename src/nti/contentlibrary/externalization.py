@@ -161,9 +161,6 @@ class _ContentPackageExternal(object):
         result['index_jsonp'] = IContentUnitHrefMapper(
             jsonp).href if jsonp else None
 
-        # This field was never defined. What does it mean?  I think we were
-        # thinking of generations
-        result['version'] = '1.0'
         result['renderVersion'] = self.package.renderVersion
         result[StandardExternalFields.NTIID] = self.package.ntiid
 
@@ -246,6 +243,7 @@ class _EditableContentPackageExternal(_ContentPackageExternal):
             self._remove_empty(result)
         # add locking/publishing
         result['isPublished'] = is_published
+        result['version'] = self.package.version
         result['isLocked'] = self.package.is_locked()
         result['description'] = self.package.description
         result['publishLastModified'] = self.package.publishLastModified
