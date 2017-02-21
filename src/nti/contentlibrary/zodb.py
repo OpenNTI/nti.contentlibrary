@@ -172,6 +172,10 @@ class PersistentContentUnit(RecordableMixin,
     def version(self):
         return unicode_(str(self.ContentsLastModified))
 
+    def publish(self, *args, **kwargs):
+        # Override our mixin to allow continuous publishes.
+        self.do_publish(*args, **kwargs)
+
     def __repr__(self):
         try:
             return super(PersistentContentUnit, self).__repr__()
