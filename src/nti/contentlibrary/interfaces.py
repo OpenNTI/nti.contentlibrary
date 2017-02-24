@@ -58,6 +58,7 @@ from nti.schema.field import Bool
 from nti.schema.field import List
 from nti.schema.field import Number
 from nti.schema.field import Object
+from nti.schema.field import Variant
 from nti.schema.field import Iterable
 from nti.schema.field import ValidTextLine
 from nti.schema.field import UniqueIterable
@@ -761,6 +762,12 @@ class IEditableContentUnit(IContentUnit,
     """
     A :class:`IContentUnit` that can be edited.
     """
+
+    icon = Variant((Object(IDelimitedHierarchyKey),
+                    TextLine(title="the URI")),
+                    title="URI for an image for this item, typically specially designed",
+                    required=False,
+                    default=None)
 
     contents = interface.Attribute("Unit content")
     contents.setTaggedValue('_ext_excluded_out', True)
