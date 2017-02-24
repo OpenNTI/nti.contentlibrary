@@ -39,7 +39,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
     ALLOWED_KEYS =  tuple(IPublishable.names()) + \
                     tuple(IDCExtended.names())  + \
                     tuple(IDCDescriptiveProperties.names()) + \
-                    ('contentType', 'contents', 'ntiid', NTIID, MIME_TYPE)
+                    ('icon', 'contentType', 'contents', 'ntiid', NTIID, MIME_TYPE)
 
     _ext_iface_upper_bound = IEditableContentUnit
 
