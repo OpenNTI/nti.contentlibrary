@@ -53,8 +53,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
 
     def updateFromExternalObject(self, parsed, *args, **kwargs):
         parsed = self._clean_input(parsed)
-        result = super(_EditableContentUnitUpdater,
-                       self).updateFromExternalObject(parsed, *args, **kwargs)
+        result = super(_EditableContentUnitUpdater, self).updateFromExternalObject(parsed, *args, **kwargs)
         if 'contents' in parsed:
             self.contents = zlib.decompress(base64.b64decode(parsed['contents']))
         if 'contentType' in parsed:

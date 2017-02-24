@@ -33,6 +33,7 @@ from nti.contentlibrary.interfaces import IRequestSiteNames
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentUnitHrefMapper
+from nti.contentlibrary.interfaces import IDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IFilesystemContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
@@ -140,7 +141,10 @@ class _ContentPackageExternal(object):
         result._root_url = root_url
 
         icon = self.package.icon
-        result['icon'] = IContentUnitHrefMapper(icon).href if icon else None
+        if IDelimitedHierarchyKey.providedBy(icon):
+            result['icon'] = IContentUnitHrefMapper(icon).href
+        elif isinstance(icon, six.string_types):
+            result['icon'] = icon
 
         mapper = IContentUnitHrefMapper(self.package.key, None)
         result['href'] = mapper.href if mapper else None
@@ -150,16 +154,20 @@ class _ContentPackageExternal(object):
 
         index_dc = ''
         if      self.package.index_last_modified \
-                and self.package.index_last_modified > 0:
+            and self.package.index_last_modified > 0:
             index_dc = '?dc=' + str(self.package.index_last_modified)
 
         index = self.package.index
-        result['index'] = IContentUnitHrefMapper(
-            index).href + index_dc if index else None
+        if index:
+            result['index'] = IContentUnitHrefMapper(index).href + index_dc 
+        else:
+            result['index'] = None
 
         jsonp = self.package.index_jsonp
-        result['index_jsonp'] = IContentUnitHrefMapper(
-            jsonp).href if jsonp else None
+        if jsonp:
+            result['index_jsonp'] = IContentUnitHrefMapper(jsonp).href 
+        else:
+            result['index_jsonp'] = None
 
         result['renderVersion'] = self.package.renderVersion
         result[StandardExternalFields.NTIID] = self.package.ntiid
@@ -217,8 +225,7 @@ class _ContentPackageExternal(object):
 class _LegacyCourseConflatedContentPackageExternal(_ContentPackageExternal):
 
     def toExternalObject(self, **kwargs):
-        result = super(_LegacyCourseConflatedContentPackageExternal,
-                       self).toExternalObject(**kwargs)
+        result = super(_LegacyCourseConflatedContentPackageExternal, self).toExternalObject(**kwargs)
         result['isCourse'] = self.package.isCourse
         result['courseName'] = self.package.courseName
         result['courseTitle'] = self.package.courseTitle
