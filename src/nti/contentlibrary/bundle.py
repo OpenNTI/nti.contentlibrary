@@ -156,7 +156,7 @@ class PersistentContentPackageBundle(ContentPackageBundle,
         if not isinstance(self._ContentPackages_wrefs, OOSet):
             self._ContentPackages_wrefs = OOSet(self._ContentPackages_wrefs)
         try:
-            self._ContentPackages_wrefs.add(IWeakRef(context))
+            self._ContentPackages_wrefs.remove(IWeakRef(context))
             return True
         except KeyError:
             return False
