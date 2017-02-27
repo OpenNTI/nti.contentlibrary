@@ -49,6 +49,8 @@ from nti.externalization.datastructures import InterfaceObjectIO
 from nti.externalization.externalization import toExternalObject
 from nti.externalization.externalization import to_standard_external_dictionary
 
+LAST_MODIFIED = StandardExternalFields.LAST_MODIFIED
+
 
 @interface.implementer(IExternalObject)
 @component.adapter(IContentPackageLibrary)
@@ -159,13 +161,13 @@ class _ContentPackageExternal(object):
 
         index = self.package.index
         if index:
-            result['index'] = IContentUnitHrefMapper(index).href + index_dc 
+            result['index'] = IContentUnitHrefMapper(index).href + index_dc
         else:
             result['index'] = None
 
         jsonp = self.package.index_jsonp
         if jsonp:
-            result['index_jsonp'] = IContentUnitHrefMapper(jsonp).href 
+            result['index_jsonp'] = IContentUnitHrefMapper(jsonp).href
         else:
             result['index_jsonp'] = None
 
@@ -261,10 +263,23 @@ class _EditableContentPackageExternal(_ContentPackageExternal):
 class _EditableContentPackageExporter(_EditableContentPackageExternal):
 
     def toExternalObject(self, **kwargs):
-        result = super(_EditableContentPackageExporter, self).toExternalObject(**kwargs)
+        result = super( _EditableContentPackageExporter, self).toExternalObject(**kwargs)
+        # export data as b64 gzip
         data = base64.b64encode(zlib.compress(self.package.contents or b''))
         result['contents'] = data
         result['contentType'] = self.package.contentType
+        # remove unrequired
+        result.pop('href', None)
+        result.pop('root', None)
+        result.pop('index', None)
+        result.pop('archive', None)
+        result.pop('index_jsonp', None)
+        result.pop('installable', None)
+        result.pop('renderVersion', None)
+        result.pop('PresentationProperties', None)
+        result.pop('PlatformPresentationResources', None)
+        # set last modified
+        result[LAST_MODIFIED] = self.package.lastModified
         return result
 
 
@@ -366,7 +381,7 @@ class _FilesystemBucketHrefMapper(object):
                 break
 
             if      hasattr(p, 'parent_enumeration') \
-                    and p.parent_enumeration is not None:
+                and p.parent_enumeration is not None:
                 # XXX: Tight coupling. We're passing here into
                 # the layers of libraries and how they are set up.
                 # We expect a relationship like this:
