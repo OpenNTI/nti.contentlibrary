@@ -251,6 +251,7 @@ from zope.schema.fieldproperty import FieldProperty
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IDelimitedHierarchyKey
+from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 from nti.contentlibrary.interfaces import ISyncableContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import ContentPackageBundleLibraryModifiedOnSyncEvent
@@ -358,20 +359,6 @@ from nti.externalization.internalization import validate_named_field_value
 from nti.zodb import readCurrent as _readCurrent
 
 
-def _validate_package_refs(bundle, meta):
-    try:
-        if      len(bundle._ContentPackages_wrefs) == len(meta._ContentPackages_wrefs) \
-            and len([x for x in meta._ContentPackages_wrefs if x() is not None]) == 0:
-            # Wrefs are the same size, but nothing is resolvable (e.g. not in
-            # the library).
-            raise MissingContentPacakgeReferenceException(
-                'A package reference no longer exists in the library. Content issue? (refs=%s)' %
-                [getattr(x, '_ntiid', None) for x in meta._ContentPackages_wrefs])
-    except AttributeError:
-        # Not sure we can do anything here.
-        pass
-
-
 def _are_package_refs_equal(a, b):
     if isinstance(a, OOSet) and isinstance(b, OOSet):
         return not bool(ooset_difference(a,b))
@@ -379,6 +366,30 @@ def _are_package_refs_equal(a, b):
         return a == b
     else:
         return set(a) == set(b)
+
+
+def _set_bundle_packages(bundle, meta):
+    """
+    We need to be careful and not wipe any packages (IEditableContentPackages) that
+    did not come through the sync process.
+    """
+    def cannot_remove(package):
+        return IEditableContentPackage.providedBy(package)
+
+    new_wrefs = list(meta._ContentPackages_wrefs)
+    try:
+        for package_ref in bundle._ContentPackages_wrefs or ():
+            package = package_ref()
+            if cannot_remove(package):
+                new_wrefs.append(package_ref)
+    except AttributeError:
+        packages = list(meta.ContentPackages)
+        for package in bundle.ContentPackages or ():
+            if cannot_remove(package):
+                packages.append(package)
+        bundle.ContentPackages = packages
+    else:
+        bundle._ContentPackages_wrefs = new_wrefs
 
 
 def synchronize_bundle(data_source, bundle,
@@ -440,14 +451,9 @@ def synchronize_bundle(data_source, bundle,
                 needs_copy = getattr(bundle, k, None) != getattr(meta, k)
             if needs_copy:
                 # Our ContentPackages actually may bypass the interface by already
-                # being weakly referenced if missing, hence avoiding
-                # the validation step
+                # being weakly referenced if missing, hence avoiding the validation step
                 modified = True
-                bundle.ContentPackages = meta.ContentPackages
-
-            # We may not have had changes to our wrefs, but we should still validate
-            # that something weird did not occur with our packages.
-            _validate_package_refs(bundle, meta)
+                _set_bundle_packages(bundle, meta)
         elif getattr(bundle, k, None) != getattr(meta, k):
             modified = True
             validate_named_field_value(

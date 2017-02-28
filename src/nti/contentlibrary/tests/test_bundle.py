@@ -7,8 +7,6 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
-from hamcrest import raises
-from hamcrest import calling
 from hamcrest import assert_that
 from hamcrest import greater_than
 from hamcrest import has_property
@@ -23,8 +21,6 @@ from nti.contentlibrary.filesystem import GlobalFilesystemContentPackageLibrary
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackageBundle
-
-from nti.contentlibrary import MissingContentPacakgeReferenceException
 
 from nti.contentlibrary.bundle import _ContentBundleMetaInfo
 from nti.contentlibrary.bundle import sync_bundle_from_json_key
@@ -52,7 +48,7 @@ class TestBundle(ContentlibraryLayerTest):
     def test_bundle(self):
         bundle = PersistentContentPackageBundle()
         assert_that(bundle, verifiably_provides(IEditableContentPackageBundle))
-    
+
     @time_monotonically_increases
     def test_sync_bundle_from_meta(self):
         bucket = FilesystemBucket()
@@ -77,8 +73,10 @@ class TestBundle(ContentlibraryLayerTest):
         assert_that(bundle, has_property('lastModified', lm))
 
         # removing packages
-        del meta._ContentPackages_wrefs
-        sync_bundle_from_json_key(key, bundle, self.global_library, _meta=meta)
+        empty_meta = _ContentBundleMetaInfo(key, self.global_library)
+        empty_meta.lastModified = -1
+        del empty_meta._ContentPackages_wrefs
+        sync_bundle_from_json_key(key, bundle, self.global_library, _meta=empty_meta)
         assert_that(bundle, has_property('lastModified', greater_than(lm)))
         lm = bundle.lastModified
 
@@ -104,12 +102,3 @@ class TestBundle(ContentlibraryLayerTest):
 
         sync_bundle_from_json_key(key, bundle, self.global_library, _meta=meta)
 
-        # Empty our library
-        self.global_library._contentPackages = {}
-        self.global_library._contentPackagesByNtiid = {}
-        # We will raise if the package is missing
-        assert_that(calling(sync_bundle_from_json_key).with_args(key, 
-                                                                 bundle,
-                                                                 self.global_library, 
-                                                                 _meta=meta),
-                    raises(MissingContentPacakgeReferenceException))
