@@ -246,4 +246,6 @@ class RenderableContentPackage(RenderableContentUnit,
     """
     createDirectFieldProperties(IRenderableContentPackage)
 
+    index_last_modified = -1
+
     mime_type = mimeType = u'application/vnd.nextthought.renderablecontentpackage'

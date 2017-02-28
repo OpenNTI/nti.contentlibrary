@@ -58,11 +58,10 @@ class _WithId(object):
     def __init__(self, unit):
         # Because for various included items, the content units NTIID
         # can actually wind up the same, we also have to include
-        # the ordinal...and even the path at which we reached the
-        # ntiid
+        # the ordinal...and even the path at which we reached the ntiid
         self.id = unit.ntiid
         if self.id is None:
-            raise ValueError("ContentUnit with no NTIID cannot be annotated", 
+            raise ValueError("ContentUnit with no NTIID cannot be annotated",
                              unit)
         self.id = self.id + ':ordinal %s' % unit.ordinal
         try:
@@ -116,7 +115,7 @@ class ContentUnitAnnotations(Annotations):
             # (XXX: what's the loop?)
             next_utility = None
         else:
-            next_utility = queryNextUtility(self.__parent__, 
+            next_utility = queryNextUtility(self.__parent__,
                                             IContentUnitAnnotationUtility)
 
         if next_utility is not None:

@@ -856,6 +856,10 @@ class IEditableContentPackage(IEditableContentUnit,
     A :class:`IContentPackage` that can be edited.
     """
 
+    index_last_modified = Number(title="Time since the epoch the index for this package was last modified.",
+                                 description="This is currently the best indication of when this package as a whole may have changed.",
+                                 default=-1)
+
 
 class IRenderableContentUnit(IEditableContentUnit):
     """
