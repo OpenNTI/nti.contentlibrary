@@ -549,6 +549,18 @@ class ContentPackageRemovedEvent(ObjectRemovedEvent):
         self.results = results
 
 
+class IContentPackageRenderedEvent(IObjectEvent):
+    """
+    Fired when a content package has been rendered
+    """
+
+@interface.implementer(IContentPackageRenderedEvent)
+class ContentPackageRenderedEvent(ObjectEvent):
+
+    def __init__(self, obj):
+        super(ContentPackageRenderedEvent, self).__init__(obj)
+
+
 class IGlobalContentPackageLibrary(ISyncableContentPackageLibrary):
     """
     A non-persistent content library that needs to be synchronized
