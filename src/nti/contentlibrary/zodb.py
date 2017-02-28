@@ -190,8 +190,10 @@ class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     """
     A persistent content package.
     """
-
     mime_type = mimeType = u'application/vnd.nextthought.persistentcontentpackage'
+
+    index_last_modified = -1
+    indexLastModified = alias("index_last_modified")
 
 
 @interface.implementer(IRenderableContentUnit,
@@ -245,7 +247,5 @@ class RenderableContentPackage(RenderableContentUnit,
     A renderable content package.
     """
     createDirectFieldProperties(IRenderableContentPackage)
-
-    index_last_modified = -1
 
     mime_type = mimeType = u'application/vnd.nextthought.renderablecontentpackage'

@@ -855,7 +855,12 @@ class IEditableContentPackage(IEditableContentUnit,
     """
     A :class:`IContentPackage` that can be edited.
     """
-
+    
+    root = Object(IDelimitedHierarchyItem,
+                  title="Path portion of a uri for this object.",
+                  default=None,
+                  required=False)
+        
     index_last_modified = Number(title="Time since the epoch the index for this package was last modified.",
                                  description="This is currently the best indication of when this package as a whole may have changed.",
                                  default=-1)

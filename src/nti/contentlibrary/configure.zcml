@@ -133,8 +133,16 @@
 			 for=".interfaces.IEditableContentUnit"
 			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
 
+	<adapter factory=".internalization._EditableContentPackageUpdater"
+			 for=".interfaces.IEditableContentPackage"
+			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
+
 	<adapter factory=".internalization._RenderableContentUnitUpdater"
 			 for=".interfaces.IRenderableContentUnit"
+			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
+
+	<adapter factory=".internalization._RenderableContentPackageUpdater"
+			 for=".interfaces.IRenderableContentPackage"
 			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
 
 	<!-- Publishing -->

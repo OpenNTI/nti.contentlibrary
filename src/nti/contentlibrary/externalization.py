@@ -255,6 +255,7 @@ class _EditableContentPackageExternal(_ContentPackageExternal):
         result['version'] = self.package.version
         result['isLocked'] = self.package.is_locked()
         result['description'] = self.package.description
+        result['indexLastModified'] = self.package.index_last_modified
         result['publishLastModified'] = self.package.publishLastModified
         return result
 

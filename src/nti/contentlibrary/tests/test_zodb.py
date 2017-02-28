@@ -32,14 +32,18 @@ class TestZODB(ContentlibraryLayerTest):
         package.title = u'Cohen vs California'
         package.description = u'Cohen vs California'
         package.contentType = b'text/x-rst'
+        package.contents = b'Cohen vs California'
         package.publishLastModified = 10000
+        package.index_last_modified = 80000
         ext_obj = to_external_object(package, name='exporter')
         assert_that(ext_obj,
                     has_entries(u'isPublished', is_(False),
                                 u'publishLastModified', is_(10000),
+                                u'indexLastModified', is_(80000),
                                 u'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
                                 u'NTIID', u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.',
-                                u'title', is_(u'Cohen vs California')))
+                                u'title', is_(u'Cohen vs California'),
+                                u'contents', 'eJxzzs9IzVMoK1ZwTszJTMsvystMBABEIAcP'))
 
         factory = find_factory_for(ext_obj)
         assert_that(factory, is_not(none()))
@@ -55,7 +59,13 @@ class TestZODB(ContentlibraryLayerTest):
         assert_that(new_package,
                     has_property('publishLastModified', is_(10000)))
         assert_that(new_package,
+                    has_property('index_last_modified', is_(80000)))
+        assert_that(new_package,
                     has_property('contents_key', is_not(none())))
+        assert_that(new_package,
+                    has_property('contents', is_('Cohen vs California')))
+        assert_that(new_package,
+                    has_property('contentType', is_('text/x-rst')))
 
     def test_renderable_contents(self):
         package = RenderableContentPackage()
