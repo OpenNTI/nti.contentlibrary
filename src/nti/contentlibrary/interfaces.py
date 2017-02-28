@@ -850,7 +850,7 @@ class IContentPackage(IContentUnit,
                         min=1)
 
 
-class IEditableContentPackage(IEditableContentUnit, 
+class IEditableContentPackage(IEditableContentUnit,
                               IContentPackage): # order matters
     """
     A :class:`IContentPackage` that can be edited.
