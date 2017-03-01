@@ -34,7 +34,6 @@ from BTrees.OOBTree import difference as ooset_difference
 from nti.containers.containers import CheckingLastModifiedBTreeContainer
 
 from nti.contentlibrary import MissingContentBundleNTIIDException
-from nti.contentlibrary import MissingContentPacakgeReferenceException
 
 from nti.contentlibrary.interfaces import IDisplayableContent
 from nti.contentlibrary.interfaces import IContentPackageBundle
@@ -113,7 +112,7 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
         if ours:
             return ours
 
-        for package in self.ContentPackages:
+        for package in self.ContentPackages or ():
             theirs = package.PlatformPresentationResources
             if theirs:
                 return theirs
@@ -211,7 +210,6 @@ class ContentPackageBundleLibrary(CheckingLastModifiedBTreeContainer):
             parent_lib = self._parent_lib
             if parent_lib is not None:
                 obj = parent_lib.get(key, default)
-
         return obj
 
     def __getitem__(self, key):
@@ -262,12 +260,14 @@ from nti.ntiids.schema import ValidNTIID
 
 from nti.schema.field import IndexedIterable
 
+
 def get_package_for_bundle(package, library=None):
     """
     Returns a package suitable for storing in a :class:`IContentPackageBundle`
     given the package itself or it's ntiid.
     """
-    library = library if library is not None else component.getUtility(IContentPackageLibrary)
+    if library is None:
+        library = component.getUtility(IContentPackageLibrary)
     package_ntiid = getattr(package, 'ntiid', package)
     cp = library.get(package_ntiid)
     if cp:
@@ -280,10 +280,10 @@ def get_package_for_bundle(package, library=None):
 class IContentBundleMetaInfo(IContentPackageBundle):
 
     ContentPackages = IndexedIterable(
-                            title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
-                            value_type=ValidNTIID(title="The embedded NTIID"),
-                            unique=True,
-                            default=())
+            title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
+            value_type=ValidNTIID(title="The embedded NTIID"),
+            unique=True,
+            default=())
 _IContentBundleMetaInfo = IContentBundleMetaInfo  # alias
 
 
@@ -346,7 +346,7 @@ class ContentBundleMetaInfo(object):
         """
         result = OOSet()
         for ntiid in self.ContentPackages or ():
-            result.add( get_package_for_bundle( ntiid, library ) )
+            result.add(get_package_for_bundle(ntiid, library))
         return result
 _ContentBundleMetaInfo = ContentBundleMetaInfo  # alias
 
@@ -361,8 +361,8 @@ from nti.zodb import readCurrent as _readCurrent
 
 def _are_package_refs_equal(a, b):
     if isinstance(a, OOSet) and isinstance(b, OOSet):
-        return not bool(ooset_difference(a,b))
-    elif isinstance(a, (set,tuple)) and isinstance(b, (set,tuple)):
+        return not bool(ooset_difference(a, b))
+    elif isinstance(a, (set, tuple)) and isinstance(b, (set, tuple)):
         return a == b
     else:
         return set(a) == set(b)
@@ -399,8 +399,8 @@ def synchronize_bundle(data_source, bundle,
                        update_bundle=True):
     """
     Given either a :class:`IDelimitedHierarchyKey` whose contents are a JSON
-    or a JSON source, and an object representing a :class:`IContentPackageBundle`, synchronize
-    the bundle fields (those declared in the interface) to match
+    or a JSON source, and an object representing a :class:`IContentPackageBundle`,
+    synchronize the bundle fields (those declared in the interface) to match
     the JSON values.
 
     This is different from normal externalization/internalization in that
@@ -429,7 +429,7 @@ def synchronize_bundle(data_source, bundle,
     meta = _meta or _ContentBundleMetaInfo(data_source,
                                            content_library,
                                            require_ntiid='ntiid' not in excluded_keys)
-    fields_to_update = (  set(meta.__dict__)
+    fields_to_update = (set(meta.__dict__)
                         - set(excluded_keys)
                         - {'lastModified', 'createdTime', 'modified', 'created'})
 
@@ -451,7 +451,8 @@ def synchronize_bundle(data_source, bundle,
                 needs_copy = getattr(bundle, k, None) != getattr(meta, k)
             if needs_copy:
                 # Our ContentPackages actually may bypass the interface by already
-                # being weakly referenced if missing, hence avoiding the validation step
+                # being weakly referenced if missing, hence avoiding the
+                # validation step
                 modified = True
                 _set_bundle_packages(bundle, meta)
         elif getattr(bundle, k, None) != getattr(meta, k):
@@ -518,7 +519,6 @@ class _ContentPackageBundleLibrarySynchronizer(object):
             if not IDelimitedHierarchyKey.providedBy(bundle_meta_key):
                 # Not a readable file
                 continue
-
             bundle_meta_keys.append(bundle_meta_key)
 
         need_event = False
@@ -546,7 +546,9 @@ class _ContentPackageBundleLibrarySynchronizer(object):
             # be accessing an item local in our context, not from parent,
             # even though __getitem__ is recursive.
 
-            things_to_add = {x for x in bundle_metas if x.ntiid not in self.context}
+            things_to_add = {
+                x for x in bundle_metas if x.ntiid not in self.context
+            }
             # Take those out
             bundle_metas = bundle_metas - things_to_add
 
@@ -606,4 +608,5 @@ class _ContentPackageBundleLibrarySynchronizer(object):
             event.bucket = bucket
             notify(event)
         else:
-            logger.info("Nothing to do to sync library %s", self.context)
+            logger.info("Nothing to do to sync library %s",
+                        self.context)
