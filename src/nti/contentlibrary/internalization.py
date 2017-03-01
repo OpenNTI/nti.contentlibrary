@@ -9,11 +9,10 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import zlib
-import base64
-
 from zope import component
 from zope import interface
+
+from nti.base._compat import bytes_
 
 from zope.dublincore.interfaces import IDCExtended
 from zope.dublincore.interfaces import IDCDescriptiveProperties
@@ -60,8 +59,8 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
             raise ValueError("Cannot set icon to a hierarchy item")
         result = super(_EditableContentUnitUpdater, self).updateFromExternalObject(parsed,*args, **kwargs)
         if 'contents' in parsed:
-            decoded = base64.b64decode(parsed['contents'])
-            self._ext_self.contents = zlib.decompress(decoded)
+            decoded = bytes_(parsed['contents'])
+            self._ext_self.contents = decoded
         if 'contentType' in parsed:
             self._ext_self.contentType = str(parsed['contentType'])
         return result

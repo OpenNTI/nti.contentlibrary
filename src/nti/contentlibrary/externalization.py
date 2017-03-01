@@ -12,8 +12,6 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
-import zlib
-import base64
 import urllib
 import numbers
 import collections
@@ -265,9 +263,7 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
 
     def toExternalObject(self, **kwargs):
         result = super( _EditableContentPackageExporter, self).toExternalObject(**kwargs)
-        # export data as b64 gzip
-        data = base64.b64encode(zlib.compress(self.package.contents or b''))
-        result['contents'] = data
+        result['contents'] = self.package.contents or b''
         result['contentType'] = self.package.contentType
         # remove unrequired
         result.pop('href', None)
