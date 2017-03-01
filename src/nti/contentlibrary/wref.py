@@ -56,6 +56,9 @@ class ContentUnitWeakRef(object):
         assert state[0] == 1
         self._ntiid = state[1]
 
+    def __str__(self):
+        return self._ntiid
+
 
 def contentunit_wref_to_missing_ntiid(ntiid):
     """

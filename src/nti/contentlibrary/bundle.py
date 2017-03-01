@@ -378,6 +378,7 @@ def _set_bundle_packages(bundle, meta):
 
     new_wrefs = list(meta._ContentPackages_wrefs)
     try:
+        old_wrefs = set(bundle._ContentPackages_wrefs)
         for package_ref in bundle._ContentPackages_wrefs or ():
             package = package_ref()
             if cannot_remove(package):
@@ -390,6 +391,11 @@ def _set_bundle_packages(bundle, meta):
         bundle.ContentPackages = packages
     else:
         bundle._ContentPackages_wrefs = new_wrefs
+        new_wrefs = set(new_wrefs)
+        added = new_wrefs - old_wrefs
+        removed = old_wrefs - new_wrefs
+        logger.info('Modifying bundle packages (added=%s) (removed=%s)',
+                    added, removed)
 
 
 def synchronize_bundle(data_source, bundle,
@@ -451,8 +457,7 @@ def synchronize_bundle(data_source, bundle,
                 needs_copy = getattr(bundle, k, None) != getattr(meta, k)
             if needs_copy:
                 # Our ContentPackages actually may bypass the interface by already
-                # being weakly referenced if missing, hence avoiding the
-                # validation step
+                # being weakly referenced if missing, hence avoiding validation
                 modified = True
                 _set_bundle_packages(bundle, meta)
         elif getattr(bundle, k, None) != getattr(meta, k):
