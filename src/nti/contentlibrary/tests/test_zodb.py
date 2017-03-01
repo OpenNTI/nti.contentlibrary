@@ -14,6 +14,8 @@ from hamcrest import assert_that
 from hamcrest import has_entries
 from hamcrest import has_property
 
+from nti.contentlibrary.bucket import AbstractKey
+
 from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.externalization.externalization import to_external_object
@@ -74,3 +76,8 @@ class TestZODB(ContentlibraryLayerTest):
                     has_property('contents', is_(b'foo')))
         assert_that(package,
                     has_property('contentType', is_('text/x-rst')))
+        
+    def test_icon(self):
+        package = RenderableContentPackage()
+        package.icon = 'foo'
+        package.icon = AbstractKey(name='ichigo')
