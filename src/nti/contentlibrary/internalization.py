@@ -12,8 +12,6 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
-from nti.base._compat import bytes_
-
 from zope.dublincore.interfaces import IDCExtended
 from zope.dublincore.interfaces import IDCDescriptiveProperties
 
@@ -59,7 +57,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
             raise ValueError("Cannot set icon to a hierarchy item")
         result = super(_EditableContentUnitUpdater, self).updateFromExternalObject(parsed,*args, **kwargs)
         if 'contents' in parsed:
-            decoded = bytes_(parsed['contents'])
+            decoded = str(parsed['contents'])
             self._ext_self.contents = decoded
         if 'contentType' in parsed:
             self._ext_self.contentType = str(parsed['contentType'])
