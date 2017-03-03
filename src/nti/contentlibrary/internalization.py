@@ -15,6 +15,8 @@ from zope import interface
 from zope.dublincore.interfaces import IDCExtended
 from zope.dublincore.interfaces import IDCDescriptiveProperties
 
+from nti.base._compat import bytes_
+
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IRenderableContentUnit
@@ -57,10 +59,10 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
             raise ValueError("Cannot set icon to a hierarchy item")
         result = super(_EditableContentUnitUpdater, self).updateFromExternalObject(parsed,*args, **kwargs)
         if 'contents' in parsed:
-            decoded = str(parsed['contents'])
+            decoded = bytes_(parsed['contents'])
             self._ext_self.contents = decoded
         if 'contentType' in parsed:
-            self._ext_self.contentType = str(parsed['contentType'])
+            self._ext_self.contentType = bytes_(parsed['contentType'])
         return result
 
 
