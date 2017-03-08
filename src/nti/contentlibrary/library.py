@@ -406,22 +406,18 @@ class AbstractContentPackageLibrary(object):
         # a consistent view to any listeners that will be watching.
         removed = []
         changed = []
+        unmodified = []
         if not packages:  # no filter
-            unmodified = []
             added = [package
                      for ntiid, package in new_content_packages.items()
                      if ntiid not in old_content_packages]
         else:
             # Choosing this path WILL NOT add any new packages
             added = ()
-            # Make sure we get current references for our filtered
-            # package_ntiids.
-            unmodified = [package
-                          for package_ntiid, package in old_content_packages.items()
-                          if package_ntiid not in old_content_packages]
 
         for old_key, old_package in old_content_packages.items():
             if not self._is_syncable(old_package):
+                unmodified.append(old_package)
                 continue
             new_package = new_content_packages.get(old_key)
             if new_package is None:
