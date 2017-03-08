@@ -19,9 +19,6 @@ from zope.location import locate
 
 import BTrees
 
-from nti.base.interfaces import ICreatedTime
-from nti.base.interfaces import ILastModified
-
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IEditableContentUnit
 
@@ -128,7 +125,7 @@ class CreatedTimeRawIndex(RawIntegerValueIndex):
 
 def CreatedTimeIndex(family=None):
     return NormalizationWrapper(field_name='createdTime',
-                                interface=ICreatedTime,
+                                interface=IContentUnit,
                                 index=CreatedTimeRawIndex(family=family),
                                 normalizer=TimestampToNormalized64BitIntNormalizer())
 
@@ -139,7 +136,7 @@ class LastModifiedRawIndex(RawIntegerValueIndex):
 
 def LastModifiedIndex(family=None):
     return NormalizationWrapper(field_name='lastModified',
-                                interface=ILastModified,
+                                interface=IContentUnit,
                                 index=LastModifiedRawIndex(family=family),
                                 normalizer=TimestampToNormalized64BitIntNormalizer())
 
