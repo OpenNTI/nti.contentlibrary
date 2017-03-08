@@ -235,19 +235,11 @@ class AbstractContentPackageLibrary(object):
         if prefix:
             self.url_prefix = prefix
 
-    def _filter_packages(self, contentPackages=(), package_ntiids=None):
+    def _is_syncable(self, package):
         """
-        Filter to relevent packages (by `package_ntiids` if given), and
-        return a dict of package-ntiid -> package.
+        Determine if the give package is syncable.
         """
-        result = dict()
-        for package in contentPackages or ():
-            if not INoAutoSync.providedBy(package):
-                if not package_ntiids or package.ntiid in package_ntiids:
-                    result[package.ntiid] = package
-        if package_ntiids and not result:
-            raise Exception("No package to update was found")
-        return result
+        return not INoAutoSync.providedBy(package)
 
     @property
     def _root_name(self):
@@ -400,13 +392,12 @@ class AbstractContentPackageLibrary(object):
             never_synced = True
             self._contentPackages = OOBTree()
             self._contentUnitsByNTIID = OOBTree()
-        current_packages = self._get_current_packages()
-        old_content_packages = self._filter_packages(current_packages,
-                                                     packages)
+        old_content_packages = self._get_current_packages()
+        old_content_packages = {x.ntiid:x for x in old_content_packages}
 
         # Make sure we get ALL packages
-        contentPackages = self._enumeration.enumerateContentPackages()
-        new_content_packages = self._filter_packages(contentPackages)
+        new_content_packages = self._enumeration.enumerateContentPackages()
+        new_content_packages = {x.ntiid:x for x in new_content_packages}
 
         enumeration = self._enumeration
         enumeration_last_modified = getattr(enumeration, 'lastModified', 0)
@@ -423,14 +414,15 @@ class AbstractContentPackageLibrary(object):
         else:
             # Choosing this path WILL NOT add any new packages
             added = ()
-            current_packages = self._filter_packages(current_packages)
             # Make sure we get current references for our filtered
             # package_ntiids.
             unmodified = [package
-                          for package_ntiid, package in current_packages.items()
+                          for package_ntiid, package in old_content_packages.items()
                           if package_ntiid not in old_content_packages]
 
         for old_key, old_package in old_content_packages.items():
+            if not self._is_syncable(old_package):
+                continue
             new_package = new_content_packages.get(old_key)
             if new_package is None:
                 removed.append(old_package)
