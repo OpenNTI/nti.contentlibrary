@@ -27,10 +27,12 @@ from zope.interface.interfaces import ObjectEvent
 from zope.interface.interfaces import IObjectEvent
 
 from zope.lifecycleevent import ObjectAddedEvent
+from zope.lifecycleevent import ObjectMovedEvent
 from zope.lifecycleevent import ObjectRemovedEvent
 from zope.lifecycleevent import ObjectModifiedEvent
 
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
+from zope.lifecycleevent.interfaces import IObjectMovedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 
@@ -995,8 +997,7 @@ class IPotentialLegacyCourseConflatedContentPackage(IContentPackage):
                     required=True)
 
 
-class ILegacyCourseConflatedContentPackage(
-        IPotentialLegacyCourseConflatedContentPackage):
+class ILegacyCourseConflatedContentPackage(IPotentialLegacyCourseConflatedContentPackage):
     """
     Legacy properties from when we treated courses as simply a set
     of attributes on content.
@@ -1349,11 +1350,7 @@ class ContentPackageLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
 
     def __init__(self, obj, added=None, changed=None, removed=None,
                  params=None, results=None, descriptions=()):
-        super(
-            ContentPackageLibraryModifiedOnSyncEvent,
-            self).__init__(
-            obj,
-            descriptions)
+        super(ContentPackageLibraryModifiedOnSyncEvent, self).__init__(obj, descriptions)
         # packages
         self.added = added
         self.changed = changed
@@ -1372,8 +1369,7 @@ class IContentUnitHrefMapper(interface.Interface):
     be combined somehow with ILink, and/or made more specific. You may
     want to register these as multi-adapters depending on the current request.
     """
-    href = interface.Attribute(
-        "The best HREF, something a client can resolve.")
+    href = interface.Attribute("The best HREF, something a client can resolve.")
 
 
 class IAbsoluteContentUnitHrefMapper(IContentUnitHrefMapper):
@@ -1448,6 +1444,30 @@ class IContentValidator(interface.Interface):
         :param context: :class:`IContentUnit` object
         :raises a :class:`IContentValidationError` object
         """
+
+
+class IContentPackageLocationChanged(IObjectMovedEvent):
+    """
+    An event fired when the location of a content package has changed
+    """
+    
+    old_root = Object(IDelimitedHierarchyItem,
+                      title="old location")
+
+    new_root = Object(IDelimitedHierarchyItem,
+                      title="new location")
+    
+    
+class ContentPackageLocationChanged(ObjectMovedEvent):
+    
+    package = alias('object')
+    old_root = alias('oldParent')
+    new_root = alias('self.newParent')
+
+    def __init__(self, package, old_root, new_root):
+        ObjectMovedEvent.__init__(self, package, 
+                                  old_root, old_root.name, 
+                                  new_root, new_root.name)
 
 
 class IContentUnitAssociations(interface.Interface):
