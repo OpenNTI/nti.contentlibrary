@@ -59,6 +59,10 @@ class ContentUnitWeakRef(object):
     def __str__(self):
         return self._ntiid
 
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__,
+                           self._ntiid)
+
 
 def contentunit_wref_to_missing_ntiid(ntiid):
     """
