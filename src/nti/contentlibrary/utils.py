@@ -11,6 +11,8 @@ logger = __import__('logging').getLogger(__name__)
 
 import six
 
+from datetime import datetime
+
 from zope import component
 
 from zope.intid.interfaces import IIntIds
@@ -22,6 +24,12 @@ from nti.contentlibrary.index import IX_MIMETYPE
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
 from nti.contentlibrary.interfaces import IContentPackage
+
+from nti.recorder.interfaces import TRX_TYPE_UPDATE
+
+from nti.recorder.interfaces import ITransactionRecordHistory
+
+from nti.recorder.utils import decompress
 
 from nti.site.site import get_component_hierarchy_names
 
@@ -51,3 +59,44 @@ def get_content_packages(sites=(), mime_types=(CONTENT_PACKAGE_MIME_TYPE,)):
                 result[context.ntiid] = context
 
     return tuple(result.values())
+
+
+def _include_record(record, publish_time):
+    # Only want records before our timestamp and that
+    # changed the package contents.
+    return  record.created <= publish_time \
+        and record.attributes \
+        and 'contents' in record.attributes
+
+
+def _get_publish_record(records, publish_time):
+    records = [x for x in records if _include_record(x, publish_time)]
+    result = None
+    if records:
+        sorted_txs = sorted(records, key=lambda x: x.created)
+        result = sorted_txs[-1]
+    return result
+
+
+def get_snapshot_contents(package, timestamp):
+    """
+    For a given content package, return the package `contents` as-of
+    the given timestamp.
+    """
+    result = None
+    history = ITransactionRecordHistory(package, None)
+    if history is not None:
+        records = history.query(record_type=TRX_TYPE_UPDATE)
+        if records:
+            # Sort and fetch the closest update to our time
+            timestamp = datetime.utcfromtimestamp(timestamp)
+            publish_record = _get_publish_record( records, timestamp )
+            if publish_record is not None:
+                publish_attrs = decompress( publish_record.external_value )
+                try:
+                    result = publish_attrs['contents']
+                except KeyError:
+                    logger.warn('No contents found (%s) (external_value=%s)',
+                                 package.ntiid,
+                                 publish_attrs)
+    return result
