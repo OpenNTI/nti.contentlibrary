@@ -47,7 +47,7 @@ def get_content_packages(sites=(), mime_types=(CONTENT_PACKAGE_MIME_TYPE,)):
         for doc_id in catalog.apply(query) or ():
             context = intids.queryObject(doc_id)
             if      IContentPackage.providedBy(context) \
-                    and context.ntiid not in result:
+                and context.ntiid not in result:
                 result[context.ntiid] = context
 
     return tuple(result.values())
