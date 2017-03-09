@@ -1458,6 +1458,7 @@ class IContentPackageLocationChanged(IObjectMovedEvent):
                       title="new location")
     
     
+@interface.implementer(IContentPackageLocationChanged)
 class ContentPackageLocationChanged(ObjectMovedEvent):
     
     package = alias('object')
