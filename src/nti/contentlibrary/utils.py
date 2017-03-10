@@ -24,6 +24,7 @@ from nti.contentlibrary.index import IX_MIMETYPE
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IEditableContentPackage
 
 from nti.recorder.interfaces import TRX_TYPE_UPDATE
 
@@ -84,6 +85,8 @@ def get_snapshot_contents(package, timestamp):
     the given timestamp.
     """
     result = None
+    if not timestamp:
+        return result
     history = ITransactionRecordHistory(package, None)
     if history is not None:
         records = history.query(record_type=TRX_TYPE_UPDATE)
@@ -100,3 +103,14 @@ def get_snapshot_contents(package, timestamp):
                                  package.ntiid,
                                  publish_attrs)
     return result
+
+
+def get_published_contents(package):
+    """
+    For a given publishable content package, return the package `contents` as-of
+    the publish time.
+    """
+    assert IEditableContentPackage.providedBy(package)
+    publish_time = package.publishLastModified
+    contents = get_snapshot_contents(package, publish_time)
+    return contents
