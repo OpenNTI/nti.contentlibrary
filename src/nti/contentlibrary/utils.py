@@ -59,7 +59,7 @@ def get_content_packages(sites=(), mime_types=(CONTENT_PACKAGE_MIME_TYPE,)):
                 and context.ntiid not in result:
                 result[context.ntiid] = context
 
-    return tuple(result.values())
+    return list(result.values())
 
 
 def _include_record(record, publish_time):
