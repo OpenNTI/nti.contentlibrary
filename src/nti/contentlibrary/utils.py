@@ -10,8 +10,8 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
-
 from datetime import datetime
+from collections import namedtuple
 
 from zope import component
 
@@ -46,7 +46,7 @@ def get_content_packages(sites=(), mime_types=(CONTENT_PACKAGE_MIME_TYPE,)):
     result = dict()
     intids = component.getUtility(IIntIds)
     catalog = get_contentlibrary_catalog()
-    if catalog is None: # tests
+    if catalog is None:  # tests
         return ()
     for site in sites:
         query = {
@@ -56,7 +56,7 @@ def get_content_packages(sites=(), mime_types=(CONTENT_PACKAGE_MIME_TYPE,)):
         for doc_id in catalog.apply(query) or ():
             context = intids.queryObject(doc_id)
             if      IContentPackage.providedBy(context) \
-                and context.ntiid not in result:
+                    and context.ntiid not in result:
                 result[context.ntiid] = context
 
     return list(result.values())
@@ -70,39 +70,63 @@ def _include_record(record, publish_time):
         and 'contents' in record.attributes
 
 
-def _get_publish_record(records, publish_time):
-    records = [x for x in records if _include_record(x, publish_time)]
+def get_publish_record(records, publish_time):
+    records = (x for x in records if _include_record(x, publish_time))
     result = None
     if records:
         sorted_txs = sorted(records, key=lambda x: x.created)
         result = sorted_txs[-1]
     return result
 
+Snapshot = namedtuple('Snapshot', 'contents version')
 
-def get_snapshot_contents(package, timestamp):
+
+def get_snapshot_data(package, timestamp=None):
     """
-    For a given content package, return the package `contents` as-of
-    the given timestamp.
+    For a given content package, return the package `contents` and version 
+    as-of the given timestamp.
     """
     result = None
-    if not timestamp:
-        return result
     history = ITransactionRecordHistory(package, None)
-    if history is not None:
+    if not timestamp or history is None:
+        return result
+    else:
         records = history.query(record_type=TRX_TYPE_UPDATE)
         if records:
             # Sort and fetch the closest update to our time
             timestamp = datetime.utcfromtimestamp(timestamp)
-            publish_record = _get_publish_record( records, timestamp )
+            publish_record = get_publish_record(records, timestamp)
             if publish_record is not None:
-                publish_attrs = decompress( publish_record.external_value )
+                publish_attrs = decompress(publish_record.external_value)
                 try:
-                    result = publish_attrs['contents']
+                    result = Snapshot(publish_attrs['contents'],
+                                      publish_attrs.get('version'))
                 except KeyError:
                     logger.warn('No contents found (%s) (external_value=%s)',
-                                 package.ntiid,
-                                 publish_attrs)
+                                package.ntiid,
+                                publish_attrs)
     return result
+
+
+def get_snapshot_contents(package, timestamp=None):
+    """
+    For a given content package, return the package `contents` as-of
+    the given timestamp.
+    """
+    snapshot = get_snapshot_contents(package, timestamp)
+    if snapshot is not None:
+        return snapshot.contents
+    return None
+
+
+def get_published_data(package):
+    """
+    For a given content package, return the package `contents` and version 
+    as-of the given timestamp.
+    """
+    assert IEditableContentPackage.providedBy(package)
+    publish_time = package.publishLastModified
+    return get_snapshot_data(package, publish_time)
 
 
 def get_published_contents(package):
@@ -110,7 +134,5 @@ def get_published_contents(package):
     For a given publishable content package, return the package `contents` as-of
     the publish time.
     """
-    assert IEditableContentPackage.providedBy(package)
-    publish_time = package.publishLastModified
-    contents = get_snapshot_contents(package, publish_time)
-    return contents
+    snapshot = get_published_data(package)
+    return snapshot.contents if snapshot is not None else None
