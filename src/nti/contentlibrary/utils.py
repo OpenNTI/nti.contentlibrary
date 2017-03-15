@@ -81,7 +81,7 @@ def get_publish_record(records, publish_time):
 Snapshot = namedtuple('Snapshot', 'contents version')
 
 
-def get_snapshot_data(package, timestamp=None):
+def get_package_snapshot(package, timestamp=None):
     """
     For a given content package, return the package `contents` and version 
     as-of the given timestamp.
@@ -119,14 +119,14 @@ def get_snapshot_contents(package, timestamp=None):
     return None
 
 
-def get_published_data(package):
+def get_published_snapshot(package):
     """
     For a given content package, return the package `contents` and version 
     as-of the given timestamp.
     """
     assert IEditableContentPackage.providedBy(package)
     publish_time = package.publishLastModified
-    return get_snapshot_data(package, publish_time)
+    return get_package_snapshot(package, publish_time)
 
 
 def get_published_contents(package):
@@ -134,5 +134,5 @@ def get_published_contents(package):
     For a given publishable content package, return the package `contents` as-of
     the publish time.
     """
-    snapshot = get_published_data(package)
+    snapshot = get_published_snapshot(package)
     return snapshot.contents if snapshot is not None else None
