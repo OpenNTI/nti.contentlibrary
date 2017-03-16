@@ -47,6 +47,8 @@ from nti.contentlibrary.interfaces import IPersistentContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IWritableDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
+from nti.contentlibrary.interfaces import IDelimitedHierarchyEditableContentUnit
+from nti.contentlibrary.interfaces import IDelimitedHierarchyEditableContentPackage
 
 from nti.coremetadata.interfaces import INoPublishLink
 
@@ -198,7 +200,8 @@ class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     indexLastModified = alias("index_last_modified")
 
 
-@interface.implementer(IRenderableContentUnit)
+@interface.implementer(IRenderableContentUnit,
+                       IDelimitedHierarchyEditableContentUnit)
 class RenderableContentUnit(PersistentContentUnit):
     """
     A renderable content unit.
@@ -240,7 +243,8 @@ class RenderableContentUnit(PersistentContentUnit):
             return entry.does_sibling_entry_exist(sibling_name)
 
 
-@interface.implementer(IRenderableContentPackage)
+@interface.implementer(IRenderableContentPackage,
+                       IDelimitedHierarchyEditableContentPackage)
 class RenderableContentPackage(RenderableContentUnit,
                                PersistentContentPackage):
     """
