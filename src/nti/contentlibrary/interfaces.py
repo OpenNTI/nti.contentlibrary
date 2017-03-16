@@ -556,6 +556,7 @@ class IContentPackageRenderedEvent(IObjectEvent):
     Fired when a content package has been rendered
     """
 
+
 @interface.implementer(IContentPackageRenderedEvent)
 class ContentPackageRenderedEvent(ObjectEvent):
 
@@ -880,22 +881,6 @@ class IEditableContentPackage(IEditableContentUnit,
                                  default=-1)
 
 
-class IRenderableContentUnit(IEditableContentUnit):
-    """
-    A :class:`IContentUnit` that can be rendered.
-    """
-
-    contents_key = Object(IDelimitedHierarchyKey,
-                          title="Contents key.",
-                          default=None)
-    contents_key.setTaggedValue('_ext_excluded_out', True)
-
-
-class IRenderableContentPackage(IEditableContentPackage, INoPublishLink):
-    """
-    A :class:`IContentPackage` that can be rendered.
-    """
-
 
 class IContentPackageUnmodifiedEvent(IObjectEvent):
     """
@@ -1177,6 +1162,26 @@ class IPersistentFilesystemContentPackageLibrary(IPersistentContentPackageLibrar
     pass
 
 
+class IRenderableContentUnit(IPersistentContentUnit,
+                             IDelimitedHierarchyEditableContentUnit):
+    """
+    A :class:`IContentUnit` that can be rendered.
+    """
+
+    contents_key = Object(IDelimitedHierarchyKey,
+                          title="Contents key.",
+                          default=None)
+    contents_key.setTaggedValue('_ext_excluded_out', True)
+
+
+class IRenderableContentPackage(IPersistentContentPackage,
+                                IDelimitedHierarchyEditableContentPackage, 
+                                INoPublishLink):
+    """
+    A :class:`IContentPackage` that can be rendered.
+    """
+
+
 class IGlobalContentPackage(interface.Interface):
     """
     A marker interface for a package in the global library
@@ -1456,7 +1461,7 @@ class IContentPackageLocationChanged(IObjectMovedEvent):
 
     new_root = Object(IDelimitedHierarchyItem,
                       title="new location")
-    
+
     
 @interface.implementer(IContentPackageLocationChanged)
 class ContentPackageLocationChanged(ObjectMovedEvent):
