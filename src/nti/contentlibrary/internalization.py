@@ -41,7 +41,8 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
     ALLOWED_KEYS =  tuple(IPublishable.names()) + \
                     tuple(IDCExtended.names())  + \
                     tuple(IDCDescriptiveProperties.names()) + \
-                    ('icon', 'contentType', 'contents', 'ntiid', NTIID, MIME_TYPE)
+                    ('icon', 'contentType', 'contents', 'ntiid', 
+                     'version', NTIID, MIME_TYPE)
 
     _ext_iface_upper_bound = IEditableContentUnit
 
@@ -84,6 +85,7 @@ class _EditableContentPackageUpdater(_EditableContentUnitUpdater):
         if 'index_last_modified' in parsed:
             self._ext_self.index_last_modified = parsed['index_last_modified']
         return result
+
 
 @component.adapter(IRenderableContentUnit)
 @interface.implementer(IInternalObjectUpdater)
