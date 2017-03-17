@@ -130,6 +130,11 @@ class IDelimitedHierarchyKey(IDelimitedHierarchyItem):
                     default=None,
                     required=False)
 
+    def exists(self, *args, **kwargs):
+        """
+        Returns True if the key exists
+        """
+
     def readContents():
         """
         Return, as a byte-string, the contents of this leaf node.

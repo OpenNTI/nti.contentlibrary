@@ -170,6 +170,9 @@ class _AbsolutePathMixin(object):
                                 self.__name__)
         raise ValueError("Not yet", self.__parent__, pabspath, self.__name__)
 
+    def exists(self, *args, **kwargs):
+        return os.path.exists(self.absolute_path)
+
 
 @interface.implementer(IDCTimes)
 class _FilesystemTimesMixin(object):
