@@ -98,6 +98,11 @@ class IDelimitedHierarchyBucket(IDelimitedHierarchyItem):
     An item representing a container, like a folder.
     """
 
+    def exists(self, *args, **kwargs):
+        """
+        Returns True if the bucket exists
+        """
+
 
 class IEnumerableDelimitedHierarchyBucket(IDelimitedHierarchyBucket):
     """

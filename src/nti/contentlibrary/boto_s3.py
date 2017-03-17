@@ -61,7 +61,18 @@ interface.classImplements(boto.s3.bucket.Bucket, IS3Bucket)
 class _WithName:  # NOTE: Not new-style
     __name__ = alias('name')
 
-boto.s3.bucket.Bucket.__bases__ += _WithName,
+
+class _WithExists:  # NOTE: Not new-style
+
+    def exists(self, *args, **kwargs):
+        try:
+            # if we can list anything we exists
+            self.get_all_keys(max_keys=1)
+            return True
+        except Exception: # connection errors?
+            return False
+
+boto.s3.bucket.Bucket.__bases__ += (_WithName, _WithExists)
 boto.s3.bucket.Bucket.__parent__ = alias('connection')
 
 boto.s3.key.Key.__bases__ += _WithName,
@@ -284,7 +295,7 @@ def package_factory(key, _package_factory=None, _unit_factory=None):
 
     _unit_factory = _unit_factory or BotoS3ContentUnit
     _package_factory = _package_factory or BotoS3ContentPackage
-    
+
     toc_key = key.bucket.get_key((key.name + '/' +
                                   eclipse.TOC_FILENAME).replace('//', '/'))
 
