@@ -529,6 +529,23 @@ class AbstractContentPackageLibrary(object):
                 contentUnitsByNTIID[ntiid] = unit
         return contentUnitsByNTIID
 
+    def removeInvalid(self):
+        result = dict()
+        self._checkSync()
+        intids = component.getUtility(IIntIds)
+        for ntiid, unit in list(self._contentUnitsByNTIID.items()):
+            if intids.queryId(unit) is None:
+                result[ntiid] = unit
+                del self._contentUnitsByNTIID[ntiid]
+
+        parent = queryNextUtility(self, IContentPackageLibrary)
+        if parent is not None:
+            try:
+                result.update(parent.removeInvalid())
+            except AttributeError:
+                pass
+        return result
+
     def __delattr__(self, name):
         """
         As a nuclear option, you can delete the property `contentPackages`
