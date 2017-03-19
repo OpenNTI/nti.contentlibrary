@@ -765,6 +765,8 @@ class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
                 interface.alsoProvides(package, IGlobalContentPackage)
         return result
 
+    def removeInvalid(self):
+        return dict()
 
 class _EmptyEnumeration(AbstractContentPackageEnumeration):
 
