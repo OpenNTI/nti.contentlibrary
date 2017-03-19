@@ -529,7 +529,7 @@ class AbstractContentPackageLibrary(object):
                 contentUnitsByNTIID[ntiid] = unit
         return contentUnitsByNTIID
 
-    def removeInvalid(self):
+    def removeInvalidContentUnits(self):
         result = dict()
         self._checkSync()
         intids = component.getUtility(IIntIds)
@@ -541,10 +541,11 @@ class AbstractContentPackageLibrary(object):
         parent = queryNextUtility(self, IContentPackageLibrary)
         if parent is not None:
             try:
-                result.update(parent.removeInvalid())
+                result.update(parent.removeInvalidContentUnits())
             except AttributeError:
                 pass
         return result
+    removeInvalid = removeInvalidContentUnits
 
     def __delattr__(self, name):
         """
@@ -765,8 +766,9 @@ class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
                 interface.alsoProvides(package, IGlobalContentPackage)
         return result
 
-    def removeInvalid(self):
+    def removeInvalidContentUnits(self):
         return dict()
+    removeInvalid = removeInvalidContentUnits
 
 class _EmptyEnumeration(AbstractContentPackageEnumeration):
 
