@@ -65,7 +65,7 @@
 	<!-- Adapters -->
 	<adapter factory=".boto_s3._KeyDelimitedHierarchyEntry" />
 	<adapter factory=".filesystem._KeyDelimitedHierarchyEntry" />
-			 
+
 	<adapter factory=".boto_s3._EclipseContentPackageFactory"
 			 for=".interfaces.IS3Key"
 			 provides=".interfaces.IEclipseContentPackageFactory"/>
@@ -127,7 +127,7 @@
 	<adapter factory=".externalization._EditableContentPackageExporter"
 			 for=".interfaces.IEditableContentPackage"
 			 name="exporter" />
-			 
+
 	<!-- Internalization -->
 	<adapter factory=".internalization._EditableContentUnitUpdater"
 			 for=".interfaces.IEditableContentUnit"
@@ -145,11 +145,7 @@
 			 for=".interfaces.IRenderableContentPackage"
 			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
 
-	<!-- Publishing -->
-	<subscriber	factory=".predicates.RenderableContentUnitPublishablePredicate"
-				provides="nti.coremetadata.interfaces.IPublishablePredicate"/>
-	
-	<!-- Presentation assets -->			
+	<!-- Presentation assets -->
 	<include package=".indexed_data" />
 
 	<!-- Validators -->

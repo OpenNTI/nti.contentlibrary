@@ -131,8 +131,8 @@ def get_published_snapshot(package):
 
 def get_published_contents(package):
     """
-    For a given publishable content package, return the package `contents` as-of
-    the publish time.
+    For a given publishable content package, return the package `contents`
+    as-of the publish time or None if nothing available.
     """
     snapshot = get_published_snapshot(package)
     return snapshot.contents if snapshot is not None else None

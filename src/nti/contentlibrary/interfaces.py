@@ -879,12 +879,12 @@ class IEditableContentPackage(IEditableContentUnit,
     """
     A :class:`IContentPackage` that can be edited.
     """
-    
+
     root = Object(IDelimitedHierarchyItem,
                   title="Path portion of a uri for this object.",
                   default=None,
                   required=False)
-        
+
     index_last_modified = Number(title="Time since the epoch the index for this package was last modified.",
                                  description="This is currently the best indication of when this package as a whole may have changed.",
                                  default=-1)
@@ -1460,24 +1460,24 @@ class IContentPackageLocationChanged(IObjectMovedEvent):
     """
     An event fired when the location of a content package has changed
     """
-    
+
     old_root = Object(IDelimitedHierarchyItem,
                       title="old location")
 
     new_root = Object(IDelimitedHierarchyItem,
                       title="new location")
-    
-    
+
+
 @interface.implementer(IContentPackageLocationChanged)
 class ContentPackageLocationChanged(ObjectMovedEvent):
-    
+
     package = alias('object')
     old_root = alias('oldParent')
     new_root = alias('self.newParent')
 
     def __init__(self, package, old_root, new_root):
-        ObjectMovedEvent.__init__(self, package, 
-                                  old_root, old_root.name, 
+        ObjectMovedEvent.__init__(self, package,
+                                  old_root, old_root.name,
                                   new_root, new_root.name)
 
 
