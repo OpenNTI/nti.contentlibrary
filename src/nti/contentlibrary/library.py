@@ -37,6 +37,8 @@ from persistent import Persistent
 
 from BTrees.OOBTree import OOBTree
 
+from nti.contentlibrary import AUTHORED_PREFIX
+
 from nti.contentlibrary.interfaces import INoAutoSync
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackage
@@ -123,6 +125,10 @@ class AbstractDelimitedHiercharchyContentPackageEnumeration(AbstractContentPacka
 
     root = None
 
+    def _include(self, bucket):
+        # Exclude any authored content on disk from consideration
+        return not bucket.name.startswith(AUTHORED_PREFIX)
+
     def _possible_content_packages(self):
         """
         Returns the children of the root.
@@ -131,7 +137,8 @@ class AbstractDelimitedHiercharchyContentPackageEnumeration(AbstractContentPacka
         root = self.root
         if root is None:
             return ()
-        return root.enumerateChildren()
+        result = root.enumerateChildren()
+        return (x for x in result if self._include(x))
 
 
 def add_to_connection(context, obj):

@@ -15,6 +15,9 @@ logger = __import__('logging').getLogger(__name__)
 import zope.i18nmessageid
 MessageFactory = zope.i18nmessageid.MessageFactory('nti.dataserver')
 
+#: Named prefix to distinguish API created content
+AUTHORED_PREFIX = "_authored"
+
 CONTENT_UNIT_MIME_TYPE = u'application/vnd.nextthought.contentunit'
 CONTENT_PACKAGE_MIME_TYPE = u'application/vnd.nextthought.contentpackage'
 
