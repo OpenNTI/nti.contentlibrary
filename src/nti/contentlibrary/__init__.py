@@ -15,7 +15,6 @@ logger = __import__('logging').getLogger(__name__)
 import zope.i18nmessageid
 MessageFactory = zope.i18nmessageid.MessageFactory('nti.dataserver')
 
-
 CONTENT_UNIT_MIME_TYPE = u'application/vnd.nextthought.contentunit'
 CONTENT_PACKAGE_MIME_TYPE = u'application/vnd.nextthought.contentpackage'
 
@@ -37,6 +36,10 @@ ALL_CONTENT_MIMETYPES = (CONTENT_UNIT_MIME_TYPE,
                          RENDERABLE_CONTENT_PACKAGE_MIME_TYPE,
                          PERSISTENT_CONTENT_UNIT_MIME_TYPE,
                          PERSISTENT_CONTENT_PACKAGE_MIME_TYPE)
+
+ALL_CONTENT_PACKAGE_MIME_TYPES = (CONTENT_PACKAGE_MIME_TYPE,
+                                  PERSISTENT_CONTENT_PACKAGE_MIME_TYPE,
+                                  RENDERABLE_CONTENT_PACKAGE_MIME_TYPE)
 
 from nti.contentlibrary.index import get_contentlibrary_catalog
 

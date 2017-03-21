@@ -17,7 +17,7 @@ from zope import component
 
 from zope.intid.interfaces import IIntIds
 
-from nti.contentlibrary import CONTENT_PACKAGE_MIME_TYPE
+from nti.contentlibrary import ALL_CONTENT_PACKAGE_MIME_TYPES
 
 from nti.contentlibrary.index import IX_SITE
 from nti.contentlibrary.index import IX_MIMETYPE
@@ -35,13 +35,13 @@ from nti.recorder.utils import decompress
 from nti.site.site import get_component_hierarchy_names
 
 
-def get_content_packages(sites=(), mime_types=(CONTENT_PACKAGE_MIME_TYPE,)):
+def get_content_packages(sites=(), mime_types=None):
     if not sites:
         sites = get_component_hierarchy_names()
     elif isinstance(sites, six.string_types):
         sites = sites.split()
     if not mime_types:
-        mime_types = (CONTENT_PACKAGE_MIME_TYPE,)
+        mime_types = ALL_CONTENT_PACKAGE_MIME_TYPES
 
     result = dict()
     intids = component.getUtility(IIntIds)
@@ -83,7 +83,7 @@ Snapshot = namedtuple('Snapshot', 'contents version')
 
 def get_package_snapshot(package, timestamp=None):
     """
-    For a given content package, return the package `contents` and version 
+    For a given content package, return the package `contents` and version
     as-of the given timestamp.
     """
     result = None
@@ -121,7 +121,7 @@ def get_snapshot_contents(package, timestamp=None):
 
 def get_published_snapshot(package):
     """
-    For a given content package, return the package `contents` and version 
+    For a given content package, return the package `contents` and version
     as-of the given timestamp.
     """
     assert IEditableContentPackage.providedBy(package)
