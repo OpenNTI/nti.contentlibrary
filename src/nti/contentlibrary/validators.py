@@ -19,10 +19,6 @@ from nti.contentlibrary import MessageFactory as _
 from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IContentValidationError
 
-from nti.externalization.externalization import to_external_object
-
-from nti.externalization.interfaces import LocatedExternalDict
-
 
 @interface.implementer(IContentValidationError)
 class ContentValidationError(Exception):
@@ -55,12 +51,4 @@ def validate_content_package(package):
             validator.validate(contents)
         except Exception as e:
             exc_info = sys.exc_info()
-            data = LocatedExternalDict({
-                u'code': 'ContentValidationError',
-            })
-            if IContentValidationError.providedBy(e):
-                error = to_external_object(e, decorate=False)
-                data.update(error)
-            else:
-                data['message'] = str(e)
-            return data, exc_info
+            return e, exc_info
