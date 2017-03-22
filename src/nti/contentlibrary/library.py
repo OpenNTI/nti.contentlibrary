@@ -229,7 +229,7 @@ class AbstractContentPackageLibrary(object):
     # of the enumeration, if it provides it.
     _enumeration_last_modified = 0
 
-    # libray last modified timestamp
+    # library last modified timestamp
     _last_modified = 0
 
     __name__ = 'Library'
