@@ -37,7 +37,7 @@ class TestZODB(ContentlibraryLayerTest):
         package.contents = b'Cohen vs California'
         package.publishLastModified = 10000
         package.index_last_modified = 80000
-        ext_obj = to_external_object(package, name='exporter')
+        ext_obj = to_external_object(package, name='exporter', decorate=False)
         assert_that(ext_obj,
                     has_entries(u'isPublished', is_(False),
                                 u'publishLastModified', is_(10000),

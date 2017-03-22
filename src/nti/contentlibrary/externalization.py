@@ -49,6 +49,9 @@ from nti.externalization.datastructures import InterfaceObjectIO
 from nti.externalization.externalization import toExternalObject
 from nti.externalization.externalization import to_standard_external_dictionary
 
+from nti.mimetype.externalization import decorateMimeType
+
+MIMETYPE = StandardExternalFields.MIMETYPE
 LAST_MODIFIED = StandardExternalFields.LAST_MODIFIED
 
 
@@ -279,7 +282,8 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
         result.pop('renderVersion', None)
         result.pop('PresentationProperties', None)
         result.pop('PlatformPresentationResources', None)
-        # set last modified
+        # standard fields
+        result[MIMETYPE] = decorateMimeType(self.package, result)
         result[LAST_MODIFIED] = self.package.lastModified
         return result
 
