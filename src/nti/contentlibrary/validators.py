@@ -9,11 +9,19 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import sys
+
+from zope import component
 from zope import interface
 
 from nti.contentlibrary import MessageFactory as _
 
+from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IContentValidationError
+
+from nti.externalization.externalization import to_external_object
+
+from nti.externalization.interfaces import LocatedExternalDict
 
 
 @interface.implementer(IContentValidationError)
@@ -32,3 +40,27 @@ class EmptyContentError(ContentValidationError):
 
     def __init__(self):
         ContentValidationError.__init__(self, _("Empty content"))
+
+
+def validate_content_package(package):
+    """
+    Validate the contents of the specified package
+    """
+    content_type = package.contentType
+    validator = component.queryUtility(IContentValidator,
+                                       name=content_type)
+    if validator is not None:
+        try:
+            contents = package.contents
+            validator.validate(contents)
+        except Exception as e:
+            exc_info = sys.exc_info()
+            data = LocatedExternalDict({
+                u'code': 'ContentValidationError',
+            })
+            if IContentValidationError.providedBy(e):
+                error = to_external_object(e, decorate=False)
+                data.update(error)
+            else:
+                data['message'] = str(e)
+            return data, exc_info
