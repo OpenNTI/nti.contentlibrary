@@ -283,7 +283,8 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
         result.pop('PresentationProperties', None)
         result.pop('PlatformPresentationResources', None)
         # standard fields
-        result[MIMETYPE] = decorateMimeType(self.package, result)
+        if MIMETYPE not in result:
+            result[MIMETYPE] = decorateMimeType(self.package, result)
         result[LAST_MODIFIED] = self.package.lastModified
         return result
 
