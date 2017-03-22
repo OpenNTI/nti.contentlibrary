@@ -15,6 +15,9 @@ logger = __import__('logging').getLogger(__name__)
 import zope.i18nmessageid
 MessageFactory = zope.i18nmessageid.MessageFactory('nti.dataserver')
 
+#: Content package NTIID Type
+HTML = u'HTML'
+
 #: Named prefix to distinguish API created content
 AUTHORED_PREFIX = "_authored"
 

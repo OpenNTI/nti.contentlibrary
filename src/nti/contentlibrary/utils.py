@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
+import time
 from datetime import datetime
 from collections import namedtuple
 
@@ -17,6 +18,9 @@ from zope import component
 
 from zope.intid.interfaces import IIntIds
 
+from nti.coremetadata.interfaces import SYSTEM_USER_NAME
+
+from nti.contentlibrary import HTML
 from nti.contentlibrary import ALL_CONTENT_PACKAGE_MIME_TYPES
 
 from nti.contentlibrary.index import IX_SITE
@@ -25,6 +29,12 @@ from nti.contentlibrary.index import get_contentlibrary_catalog
 
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IEditableContentPackage
+from nti.contentlibrary.interfaces import IRenderableContentPackage
+
+from nti.ntiids.ntiids import make_ntiid
+from nti.ntiids.ntiids import get_provider
+from nti.ntiids.ntiids import get_specific
+from nti.ntiids.ntiids import make_specific_safe
 
 from nti.recorder.interfaces import TRX_TYPE_UPDATE
 
@@ -33,6 +43,8 @@ from nti.recorder.interfaces import ITransactionRecordHistory
 from nti.recorder.utils import decompress
 
 from nti.site.site import get_component_hierarchy_names
+
+from nti.zodb.containers import time_to_64bit_int
 
 
 def get_content_packages(sites=(), mime_types=None):
@@ -136,3 +148,41 @@ def get_published_contents(package):
     """
     snapshot = get_published_snapshot(package)
     return snapshot.contents if snapshot is not None else None
+
+
+def make_package_ntiid(provider='NTI', base=None, extra=None):
+    creator = SYSTEM_USER_NAME
+    current_time = time_to_64bit_int(time.time())
+    if not provider:
+        provider = (get_provider(base) or 'NTI') if base else 'NTI'
+
+    specific_base = get_specific(base) if base else None
+    if specific_base:
+        specific_base += '.%s.%s' % (creator, current_time)
+    else:
+        specific_base = '%s.%s' % (creator, current_time)
+
+    if extra:
+        specific_base = specific_base + ".%s" % extra
+    specific = make_specific_safe(specific_base)
+
+    ntiid = make_ntiid(nttype=HTML,
+                       base=base,
+                       provider=provider,
+                       specific=specific)
+    return ntiid
+
+
+def make_content_package_ntiid(package=None, provider='NTI', base=None, extra=None):
+    if IRenderableContentPackage.providedBy(package):
+        specific = get_specific(base) if base else None
+        if not specific:
+            intids = component.getUtility(IIntIds)
+            specific = '%s' % intids.getId(package)
+        elif extra:
+            specific += ".%s" % extra
+        return make_ntiid(nttype=HTML,
+                          provider=provider,
+                          specific=specific)
+    else:
+        return make_package_ntiid(provider, base, extra)
