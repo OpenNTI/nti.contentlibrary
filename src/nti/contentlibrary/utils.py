@@ -42,7 +42,11 @@ from nti.recorder.interfaces import ITransactionRecordHistory
 
 from nti.recorder.utils import decompress
 
+from nti.site.interfaces import IHostPolicyFolder
+
 from nti.site.site import get_component_hierarchy_names
+
+from nti.traversal.traversal import find_interface
 
 from nti.zodb.containers import time_to_64bit_int
 
@@ -68,7 +72,7 @@ def get_content_packages(sites=(), mime_types=None):
         for doc_id in catalog.apply(query) or ():
             context = intids.queryObject(doc_id)
             if      IContentPackage.providedBy(context) \
-                    and context.ntiid not in result:
+                and context.ntiid not in result:
                 result[context.ntiid] = context
 
     return list(result.values())
@@ -77,7 +81,7 @@ def get_content_packages(sites=(), mime_types=None):
 def _include_record(record, publish_time):
     # Only want records before our timestamp and that
     # changed the package contents.
-    return  record.created <= publish_time \
+    return record.created <= publish_time \
         and record.attributes \
         and 'contents' in record.attributes
 
@@ -89,6 +93,7 @@ def get_publish_record(records, publish_time):
         sorted_txs = sorted(records, key=lambda x: x.created)
         result = sorted_txs[-1]
     return result
+
 
 Snapshot = namedtuple('Snapshot', 'contents version')
 
@@ -186,3 +191,8 @@ def make_content_package_ntiid(package=None, provider='NTI', base=None, extra=No
                           specific=specific)
     else:
         return make_package_ntiid(provider, base, extra)
+
+
+def get_content_package_site(package):
+    folder = find_interface(package, IHostPolicyFolder, strict=False)
+    return folder.__name__ # folder name
