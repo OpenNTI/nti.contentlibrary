@@ -81,7 +81,7 @@ def get_content_packages(sites=(), mime_types=None):
 def _include_record(record, publish_time):
     # Only want records before our timestamp and that
     # changed the package contents.
-    return record.created <= publish_time \
+    return  record.created <= publish_time \
         and record.attributes \
         and 'contents' in record.attributes
 
@@ -193,6 +193,14 @@ def make_content_package_ntiid(package=None, provider='NTI', base=None, extra=No
         return make_package_ntiid(provider, base, extra)
 
 
-def get_content_package_site(package):
+def get_content_package_site(context):
+    package = IContentPackage(context, None)
     folder = find_interface(package, IHostPolicyFolder, strict=False)
-    return folder.__name__ # folder name
+    return folder.__name__  if folder is not None else None# folder name
+get_content_package_site_name = get_content_package_site
+
+
+def get_content_package_site_registry(context):
+    package = IContentPackage(context, None)
+    folder = find_interface(package, IHostPolicyFolder, strict=False)
+    return folder.getSiteManager() if folder is not None else None
