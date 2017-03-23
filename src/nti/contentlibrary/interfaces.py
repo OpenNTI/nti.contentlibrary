@@ -543,22 +543,33 @@ class ContentPackageAddedEvent(ObjectAddedEvent):
         self.results = results
 
 
-class IContentPackageRemovedEvent(IObjectRemovedEvent):
+class IContentUnitRemovedEvent(IObjectRemovedEvent):
     """
-    An event fired when a content package has been removed.
+    An event fired when a content unit has been removed.
     """
     params = Object(ISynchronizationParams,
                     title="Synchronization parameters",
                     required=False)
 
 
-@interface.implementer(IContentPackageRemovedEvent)
-class ContentPackageRemovedEvent(ObjectRemovedEvent):
+class IContentPackageRemovedEvent(IContentUnitRemovedEvent):
+    """
+    An event fired when a content package has been removed.
+    """
+
+
+@interface.implementer(IContentUnitRemovedEvent)
+class ContentUnitRemovedEvent(ObjectRemovedEvent):
 
     def __init__(self, obj, params=None, results=None):
-        super(ContentPackageRemovedEvent, self).__init__(obj)
+        super(ContentUnitRemovedEvent, self).__init__(obj)
         self.params = params
         self.results = results
+
+
+@interface.implementer(IContentPackageRemovedEvent)
+class ContentPackageRemovedEvent(ContentUnitRemovedEvent):
+    pass
 
 
 class IContentPackageRenderedEvent(IObjectEvent):
