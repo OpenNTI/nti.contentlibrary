@@ -25,6 +25,8 @@ from nti.externalization.internalization import update_from_external_object
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
 
+from nti.recorder.adapters import ITransactionRecordHistory
+
 
 class TestZODB(ContentlibraryLayerTest):
 
@@ -81,3 +83,9 @@ class TestZODB(ContentlibraryLayerTest):
         package = RenderableContentPackage()
         package.icon = 'foo'
         package.icon = AbstractKey(name='ichigo')
+        
+    def test_recorder(self):
+        package = RenderableContentPackage()
+        recorder = ITransactionRecordHistory(package, None)
+        assert_that(recorder, is_not(none()))
+        assert_that(package, has_property('_package_trx_record_history', is_(recorder)))
