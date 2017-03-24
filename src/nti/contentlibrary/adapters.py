@@ -11,11 +11,18 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import time
+
 from zope import component
 from zope import interface
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
+
+from nti.recorder.interfaces import ITransactionRecordHistory
+
+from nti.recorder.adapters import TransactionRecordContainer
 
 
 @component.adapter(IContentPackageLibrary)
@@ -32,3 +39,17 @@ def enumeration_from_library(library):
     e = library._enumeration  # pylint: disable=I0011,W0212
     assert IDelimitedHierarchyContentPackageEnumeration.providedBy(e)
     return e
+
+
+@component.adapter(IEditableContentPackage)
+@interface.implementer(ITransactionRecordHistory)
+def trx_recorder_history_factory(package):
+    try:
+        result = package._package_trx_record_history
+        return result
+    except AttributeError:
+        result = package._package_trx_record_history = TransactionRecordContainer()
+        result.createdTime = time.time()
+        result.__parent__ = package
+        result.__name__ = '_package_render_metadata'
+        return result

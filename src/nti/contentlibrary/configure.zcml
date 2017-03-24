@@ -34,6 +34,7 @@
 	<adapter factory=".filesystem.GlobalFilesystemSiteLibraryFactory" />
 
 	<adapter factory=".adapters.enumeration_from_library" />
+	<adapter factory=".adapters.trx_recorder_history_factory" />
 	<adapter factory=".bundle._ContentPackageBundleLibrarySynchronizer" />
 
 	<!-- annotations -->
