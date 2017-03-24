@@ -51,5 +51,5 @@ def trx_recorder_history_factory(package):
         result = package._package_trx_record_history = TransactionRecordContainer()
         result.createdTime = time.time()
         result.__parent__ = package
-        result.__name__ = '_package_render_metadata'
+        result.__name__ = '_package_trx_history'
         return result
