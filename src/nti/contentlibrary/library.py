@@ -85,7 +85,6 @@ class AbstractContentPackageEnumeration(object):
     __name__ = None
     __parent__ = None
 
-
     def _package_factory(self, possible_content_package):
         """
         A callable object that is passed each item from :attr:`possible_content_packages`
@@ -349,6 +348,10 @@ class AbstractContentPackageLibrary(object):
             result.append(new)
         return result
 
+    def replace(self, package):
+        old = self._contentPackages[package.ntiid]
+        return self._do_updateContentPackages([package, old])
+
     def _get_content_units_by_ntiid(self, packages):
         """
         Get our ntiid to content unit map.
@@ -376,9 +379,9 @@ class AbstractContentPackageLibrary(object):
     def _get_current_packages(self):
         site = getSite()
         site = site.__name__ if site is not None else 'dataserver2'
-        if     site == 'dataserver2' \
-            or component.queryUtility(IIntIds) is None \
-            or component.getGlobalSiteManager() == component.getSiteManager():
+        if site == 'dataserver2' \
+                or component.queryUtility(IIntIds) is None \
+                or component.getGlobalSiteManager() == component.getSiteManager():
             return self._contentPackages.values()
         else:
             return get_content_packages(sites=(site,))
@@ -781,6 +784,7 @@ class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
     def removeInvalidContentUnits(self):
         return dict()
     removeInvalid = removeInvalidContentUnits
+
 
 class _EmptyEnumeration(AbstractContentPackageEnumeration):
 

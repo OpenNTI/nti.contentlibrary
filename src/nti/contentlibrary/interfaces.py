@@ -636,6 +636,12 @@ class IEditableContentPackageLibrary(ISyncableContentPackageLibrary):
         :return True if the item was removed.
         """
 
+    def replace(package):
+        """
+        Replace a content package
+
+        @paran package - new class `IContentPackage` 
+        """
 
 class IDisplayablePlatformPresentationResources(interface.Interface):
     """
