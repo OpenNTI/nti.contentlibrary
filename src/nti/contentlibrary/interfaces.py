@@ -412,6 +412,10 @@ class ISyncableContentPackageLibrary(IContentPackageLibrary):
     value.
     """
 
+    enumeration = interface.Attribute(
+        "The enumeration we will use when asked to sync content packages")
+    enumeration.setTaggedValue('_ext_excluded_out', True)
+
     def syncContentPackages(params=None):
         """
         Do whatever is necessary to sync content packages.
@@ -576,6 +580,7 @@ class IContentPackageRenderedEvent(IObjectEvent):
     """
     Fired when a content package has been rendered
     """
+
 
 @interface.implementer(IContentPackageRenderedEvent)
 class ContentPackageRenderedEvent(ObjectEvent):
@@ -800,9 +805,9 @@ class IEditableContentUnit(IContentUnit,
 
     icon = Variant((Object(IDelimitedHierarchyKey),
                     TextLine(title="the URI")),
-                    title="URI for an image for this item, typically specially designed",
-                    required=False,
-                    default=None)
+                   title="URI for an image for this item, typically specially designed",
+                   required=False,
+                   default=None)
 
     contents = interface.Attribute("Unit content")
     contents.setTaggedValue('_ext_excluded_out', True)
@@ -886,7 +891,7 @@ class IContentPackage(IContentUnit,
 
 
 class IEditableContentPackage(IEditableContentUnit,
-                              IContentPackage): # order matters
+                              IContentPackage):  # order matters
     """
     A :class:`IContentPackage` that can be edited.
     """
@@ -1371,7 +1376,7 @@ class ContentPackageLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
 
     def __init__(self, obj, added=None, changed=None, removed=None,
                  params=None, results=None, descriptions=()):
-        super(ContentPackageLibraryModifiedOnSyncEvent, self).__init__(obj, descriptions)
+        ObjectModifiedEvent.__init__(self, obj, descriptions)
         # packages
         self.added = added
         self.changed = changed
@@ -1390,7 +1395,8 @@ class IContentUnitHrefMapper(interface.Interface):
     be combined somehow with ILink, and/or made more specific. You may
     want to register these as multi-adapters depending on the current request.
     """
-    href = interface.Attribute("The best HREF, something a client can resolve.")
+    href = interface.Attribute(
+        "The best HREF, something a client can resolve.")
 
 
 class IAbsoluteContentUnitHrefMapper(IContentUnitHrefMapper):

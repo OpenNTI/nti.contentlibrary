@@ -85,6 +85,7 @@ class AbstractContentPackageEnumeration(object):
     __name__ = None
     __parent__ = None
 
+
     def _package_factory(self, possible_content_package):
         """
         A callable object that is passed each item from :attr:`possible_content_packages`
@@ -596,6 +597,10 @@ class AbstractContentPackageLibrary(object):
 
         del self._contentUnitsByNTIID
         del self._contentPackages
+
+    @property
+    def enumeration(self):
+        return self._enumeration
 
     @property
     def createdTime(self):

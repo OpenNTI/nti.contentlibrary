@@ -350,5 +350,5 @@ class BotoS3BucketContentLibrary(library.GlobalContentPackageLibrary):
     """
 
     def __init__(self, bucket):
-        enum = _BotoS3BucketContentLibraryEnumeration(bucket)
-        library.GlobalContentPackageLibrary.__init__(self, enum)
+        library.GlobalContentPackageLibrary.__init__(
+            self, _BotoS3BucketContentLibraryEnumeration(bucket))
