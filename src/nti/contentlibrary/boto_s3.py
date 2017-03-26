@@ -291,7 +291,7 @@ class BotoS3ContentPackage(ContentPackage, BotoS3ContentUnit):
     # the filesystem version
 
 
-def package_factory(key, _package_factory=None, _unit_factory=None):
+def boto_s3_package_factory(key, _package_factory=None, _unit_factory=None):
 
     _unit_factory = _unit_factory or BotoS3ContentUnit
     _package_factory = _package_factory or BotoS3ContentPackage
@@ -304,7 +304,7 @@ def package_factory(key, _package_factory=None, _unit_factory=None):
         return eclipse.EclipseContentPackage(temp_entry,
                                              _package_factory,
                                              _unit_factory)
-_package_factory = package_factory
+package_factory = _package_factory = boto_s3_package_factory
 
 
 @interface.implementer(IEclipseContentPackageFactory)
@@ -316,11 +316,13 @@ class _EclipseContentPackageFactory(object):
         pass
 
     def new_instance(self, item, package_factory=None, unit_factory=None):
-        return package_factory(item, package_factory, unit_factory)
+        return boto_s3_package_factory(item, package_factory, unit_factory)
 
 
 @NoPickle
 class _BotoS3BucketContentLibraryEnumeration(library.AbstractContentPackageEnumeration):
+
+    bucket = alias('_bucket')
 
     def __init__(self, bucket):
         """
