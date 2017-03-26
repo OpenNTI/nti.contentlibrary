@@ -196,7 +196,7 @@ def make_content_package_ntiid(package=None, provider='NTI', base=None, extra=No
 def get_content_package_site(context):
     package = IContentPackage(context, None)
     folder = find_interface(package, IHostPolicyFolder, strict=False)
-    return folder.__name__  if folder is not None else None# folder name
+    return folder.__name__ if folder is not None else None  # folder name
 get_content_package_site_name = get_content_package_site
 
 
