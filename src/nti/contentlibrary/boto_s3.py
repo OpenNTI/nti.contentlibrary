@@ -189,8 +189,8 @@ class _KeyDelimitedHierarchyEntry(object):
     def get_parent_key(self):
         split = self.key.name.split('/')
         parent_part = split[0:-1]
-        new_key = type(self.key)(
-            bucket=self.key.bucket, name='/'.join(parent_part))
+        new_key = type(self.key)(bucket=self.key.bucket, 
+                                 name='/'.join(parent_part))
         return new_key
 
     def read_contents(self):
@@ -350,5 +350,5 @@ class BotoS3BucketContentLibrary(library.GlobalContentPackageLibrary):
     """
 
     def __init__(self, bucket):
-        library.GlobalContentPackageLibrary.__init__(
-            self, _BotoS3BucketContentLibraryEnumeration(bucket))
+        enum = _BotoS3BucketContentLibraryEnumeration(bucket)
+        library.GlobalContentPackageLibrary.__init__(self, enum)
