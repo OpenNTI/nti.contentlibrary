@@ -350,7 +350,7 @@ class AbstractContentPackageLibrary(object):
 
     def replace(self, package, results=None):
         old = self._contentPackages[package.ntiid]
-        return self._do_updateContentPackages([package, old], results=results)
+        return self._do_updateContentPackages(((package, old),), results=results)
 
     def _get_content_units_by_ntiid(self, packages):
         """
