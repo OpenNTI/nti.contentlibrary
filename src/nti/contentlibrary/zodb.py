@@ -27,7 +27,6 @@ from persistent.list import PersistentList
 
 from nti.base._compat import unicode_
 
-from nti.coremetadata.mixins import RecordableMixin
 from nti.coremetadata.mixins import PublishableMixin
 
 from nti.contentlibrary.bucket import AbstractKey
@@ -57,6 +56,8 @@ from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.property.property import alias
+
+from nti.recorder.mixins import RecordableMixin
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
