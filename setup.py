@@ -59,6 +59,7 @@ setup(
         'nti.mimetype',
         'nti.ntiids',
         'nti.property',
+        'nti.recorder',
         'nti.schema',
         'nti.site',
         'nti.traversal',
