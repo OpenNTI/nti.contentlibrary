@@ -52,6 +52,10 @@ from nti.zodb.containers import time_to_64bit_int
 
 
 def get_content_packages(sites=(), mime_types=None):
+    """
+    Return a list of :class:`.IContentPackage` objects
+    based on the sites and mime types
+    """
     if not sites:
         sites = get_component_hierarchy_names()
     elif isinstance(sites, six.string_types):
