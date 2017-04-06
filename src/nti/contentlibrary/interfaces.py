@@ -21,6 +21,8 @@ from zope.container.interfaces import IContentContainer
 
 from zope.dublincore import interfaces as dub_interfaces
 
+from zope.interface.common.mapping import IEnumerableMapping
+
 from zope.interface.common.sequence import IFiniteSequence
 
 from zope.interface.interfaces import ObjectEvent
@@ -1540,3 +1542,18 @@ class IEclipseContentPackageFactory(interface.Interface):
 
         :return a new instance of a :class:`IContentPackage`
         """
+
+
+class IContentPackageVendorInfo(IEnumerableMapping,
+                                ILastModified,
+                                IZContained):
+    """
+    Arbitrary package vendor-specific information associated with a
+    content package. Content packages should be adaptable to their vendor
+    info.
+
+    This is simply a dictionary and this module does not define
+    the structure of it. However, it is recommended that the top-level
+    keys be the vendor names and within them be the actual vendor specific
+    information.
+    """
