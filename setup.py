@@ -55,6 +55,7 @@ setup(
         'nti.contentfragments',
         'nti.contenttypes.presentation',
         'nti.coremetadata',
+        'nti.dublincore',
         'nti.externalization',
         'nti.mimetype',
         'nti.ntiids',
