@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 from hamcrest import assert_that
 from hamcrest import greater_than
 from hamcrest import has_property
+
 from nti.testing.matchers import verifiably_provides
 
 import os

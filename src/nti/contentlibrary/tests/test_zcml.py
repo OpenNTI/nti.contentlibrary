@@ -87,11 +87,9 @@ class TestZcml(ContentlibraryLayerTest):
         # Did the right prefix come in?
         assert_that(lib, has_property('url_prefix', '/SomePrefix/'))
         pack_ext = to_external_object(lib[0])
-        assert_that(
-            pack_ext,
-            has_entry(
-                'href',
-                '/SomePrefix/TestFilesystem/index.html'))
+        assert_that(pack_ext,
+                    has_entry('href',
+                              '/SomePrefix/TestFilesystem/index.html'))
         assert_that(pack_ext, has_entry('root', '/SomePrefix/TestFilesystem/'))
 
     @fudge.patch('boto.connect_s3')

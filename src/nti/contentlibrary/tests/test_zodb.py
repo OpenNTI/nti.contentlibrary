@@ -14,6 +14,9 @@ from hamcrest import assert_that
 from hamcrest import has_entries
 from hamcrest import has_property
 
+from nti.testing.matchers import validly_provides
+from nti.testing.matchers import verifiably_provides
+
 from nti.contentlibrary.bucket import AbstractKey
 
 from nti.contentlibrary.interfaces import IContentPackageVendorInfo
@@ -99,3 +102,5 @@ class TestZODB(ContentlibraryLayerTest):
         assert_that(info, is_not(none()))
         assert_that(package, 
                     has_property('_package_vendor_info', is_(info)))
+        assert_that(info, validly_provides(IContentPackageVendorInfo))
+        assert_that(info, verifiably_provides(IContentPackageVendorInfo))
