@@ -16,6 +16,8 @@ from hamcrest import has_property
 
 from nti.contentlibrary.bucket import AbstractKey
 
+from nti.contentlibrary.interfaces import IContentPackageVendorInfo
+
 from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.externalization.externalization import to_external_object
@@ -88,4 +90,12 @@ class TestZODB(ContentlibraryLayerTest):
         package = RenderableContentPackage()
         recorder = ITransactionRecordHistory(package, None)
         assert_that(recorder, is_not(none()))
-        assert_that(package, has_property('_package_trx_record_history', is_(recorder)))
+        assert_that(package, 
+                    has_property('_package_trx_record_history', is_(recorder)))
+    
+    def test_vendorinfo(self):
+        package = RenderableContentPackage()
+        info = IContentPackageVendorInfo(package, None)
+        assert_that(info, is_not(none()))
+        assert_that(package, 
+                    has_property('_package_vendor_info', is_(info)))
