@@ -379,9 +379,9 @@ class AbstractContentPackageLibrary(object):
     def _get_current_packages(self):
         site = getSite()
         site = site.__name__ if site is not None else 'dataserver2'
-        if site == 'dataserver2' \
-                or component.queryUtility(IIntIds) is None \
-                or component.getGlobalSiteManager() == component.getSiteManager():
+        if      site == 'dataserver2' \
+            or component.queryUtility(IIntIds) is None \
+            or component.getGlobalSiteManager() == component.getSiteManager():
             return self._contentPackages.values()
         else:
             return get_content_packages(sites=(site,))
