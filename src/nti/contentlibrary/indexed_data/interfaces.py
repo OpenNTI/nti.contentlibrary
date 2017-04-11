@@ -91,44 +91,20 @@ class IContainedObjectCatalog(interface.Interface):
     An index that maps contained objects to their containers.
     """
 
+# BWC Exports
 
-class IContainedTypeAdapter(interface.Interface):
-    """
-    Adapts contained objects to their str type.
-    """
-    type = interface.Attribute("type string")
+from nti.contenttypes.presentation.interfaces import ISiteAdapter
+from nti.contenttypes.presentation.interfaces import INTIIDAdapter
+from nti.contenttypes.presentation.interfaces import ITargetAdapter
+from nti.contenttypes.presentation.interfaces import INamespaceAdapter
+from nti.contenttypes.presentation.interfaces import ISlideDeckAdapter
+from nti.contenttypes.presentation.interfaces import IContainersAdapter
+from nti.contenttypes.presentation.interfaces import IContainedTypeAdapter
 
-
-class INamespaceAdapter(interface.Interface):
-    """
-    Adapts contained objects to their str namespace.
-    """
-    namespace = interface.Attribute("namespace string")
-
-
-class INTIIDAdapter(interface.Interface):
-    """
-    Adapts contained objects to their str NTIID.
-    """
-    ntiid = interface.Attribute("NTIID string")
-
-
-class IContainersAdapter(interface.Interface):
-    """
-    Adapts contained objects to their str containers NTIIDs.
-    """
-    containers = interface.Attribute("NTIID strings")
-
-
-class ISlideDeckAdapter(interface.Interface):
-    """
-    Adapts contained objects to their video NTIIDs
-    """
-    videos = interface.Attribute("NTIID strings")
-
-
-class ITargetAdapter(interface.Interface):
-    """
-    Adapts contained objects to their target type.
-    """
-    target = interface.Attribute("NTIID string")
+ISiteAdapter = ISiteAdapter
+INTIIDAdapter = INTIIDAdapter
+ITargetAdapter = ITargetAdapter
+INamespaceAdapter = INamespaceAdapter
+ISlideDeckAdapter = ISlideDeckAdapter
+IContainersAdapter = IContainersAdapter
+IContainedTypeAdapter = IContainedTypeAdapter
