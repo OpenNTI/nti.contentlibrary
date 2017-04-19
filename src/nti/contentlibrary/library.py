@@ -151,8 +151,8 @@ def add_to_connection(context, obj):
 
 def is_indexable(obj):
     try:
-        return  not IBroken.providedBy(obj) \
-            and IPersistentContentUnit.providedBy(obj)
+        return not IBroken.providedBy(obj) \
+           and IPersistentContentUnit.providedBy(obj)
     except (TypeError, POSError):  # Broken object
         return False
 
@@ -256,7 +256,6 @@ class AbstractContentPackageLibrary(object):
 
     def _get_content_units_for_package(self, package):
         result = []
-
         def _recur(unit):
             result.append(unit)
             for child in unit.children:
@@ -325,8 +324,8 @@ class AbstractContentPackageLibrary(object):
         for new, old in changed:
             # check ntiid changes
             if new.ntiid != old.ntiid:
-                raise UnmatchedRootNTIIDException(
-                    "Package NTIID changed from %s to %s" % (old.ntiid, new.ntiid))
+                msg = "Package NTIID changed from %s to %s"
+                raise UnmatchedRootNTIIDException(msg % (old.ntiid, new.ntiid))
             self._contentPackages[new.ntiid] = new
             self._unrecord_units_by_ntiid(old)
             self._record_units_by_ntiid(new)
@@ -379,12 +378,25 @@ class AbstractContentPackageLibrary(object):
     def _get_current_packages(self):
         site = getSite()
         site = site.__name__ if site is not None else 'dataserver2'
-        if      site == 'dataserver2' \
+        if     site == 'dataserver2' \
             or component.queryUtility(IIntIds) is None \
             or component.getGlobalSiteManager() == component.getSiteManager():
             return self._contentPackages.values()
         else:
             return get_content_packages(sites=(site,))
+
+    def _mappify(self, contentPackages=(), package_ntiids=None):
+        """
+        return a dict of package-ntiid -> package. uses
+        package_ntiids to filter specific pkgs
+        """
+        result = dict()
+        for package in contentPackages or ():
+            if not package_ntiids or package.ntiid in package_ntiids:
+                result[package.ntiid] = package
+        if package_ntiids and not result:
+            raise Exception("No packages to update were found")
+        return result
 
     def syncContentPackages(self, params=None, results=None):
         """
@@ -403,12 +415,12 @@ class AbstractContentPackageLibrary(object):
             never_synced = True
             self._contentPackages = OOBTree()
             self._contentUnitsByNTIID = OOBTree()
-        old_content_packages = self._get_current_packages()
-        old_content_packages = {x.ntiid:x for x in old_content_packages}
+        current_packages = self._get_current_packages()
+        old_content_packages = self._mappify(current_packages, packages)
 
         # Make sure we get ALL packages
         new_content_packages = self._enumeration.enumerateContentPackages()
-        new_content_packages = {x.ntiid:x for x in new_content_packages}
+        new_content_packages = {x.ntiid: x for x in new_content_packages}
 
         enumeration = self._enumeration
         enumeration_last_modified = getattr(enumeration, 'lastModified', 0)
@@ -417,14 +429,20 @@ class AbstractContentPackageLibrary(object):
         # a consistent view to any listeners that will be watching.
         removed = []
         changed = []
-        unmodified = []
         if not packages:  # no filter
+            unmodified = []
             added = [package
                      for ntiid, package in new_content_packages.items()
                      if ntiid not in old_content_packages]
         else:
             # Choosing this path WILL NOT add any new packages
             added = ()
+            current_packages = self._mappify(current_packages)
+            # Make sure we get current references for our filtered
+            # package_ntiids.
+            unmodified = [package
+                          for package_ntiid, package in current_packages.items()
+                          if package_ntiid not in old_content_packages]
 
         for old_key, old_package in old_content_packages.items():
             if not self._is_syncable(old_package):
