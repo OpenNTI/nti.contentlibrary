@@ -92,7 +92,7 @@ class IDelimitedHierarchyItem(IZContained):
     The __parent__ of the bucket should be the containing bucket;
     it *should* be aliased to the ``bucket`` property.
     """
-    name = TextLine(title="The name of this bucket;"
+    name = TextLine(title=u"The name of this bucket;"
                     " __name__ is an alias.")
 
 
@@ -133,7 +133,7 @@ class IDelimitedHierarchyKey(IDelimitedHierarchyItem):
     """
 
     bucket = Object(IDelimitedHierarchyBucket,
-                    title="The bucket to which this key is relative;"
+                    title=u"The bucket to which this key is relative;"
                     " __parent__ is an alias.",
                     default=None,
                     required=False)
@@ -242,7 +242,7 @@ class IDelimitedHierarchyContentPackageEnumeration(IContentPackageEnumeration):
     """
 
     root = Object(IEnumerableDelimitedHierarchyBucket,
-                  title="The bucket that will be introspected for content",
+                  title=u"The bucket that will be introspected for content",
                   default=None,
                   required=True)
 
@@ -329,13 +329,13 @@ class IContentPackageLibrary(ILastModified,
 
 class ISynchronizationParams(interface.Interface):
 
-    ntiids = IndexedIterable(title="An iterable of NTIIDs of 'things' to sync",
-                             value_type=TextLine(title="The NTIID"),
+    ntiids = IndexedIterable(title=u"An iterable of NTIIDs of 'things' to sync",
+                             value_type=TextLine(title=u"The NTIID"),
                              unique=True,
                              default=(),
                              required=False)
 
-    allowRemoval = Bool(title="Allow content drops/removal",
+    allowRemoval = Bool(title=u"Allow content drops/removal",
                         default=False,
                         required=False)
 
@@ -346,42 +346,42 @@ class IGenericSynchronizationResults(interface.Interface):
 
 class ILibrarySynchronizationResults(IGenericSynchronizationResults):
 
-    Name = TextLine(title="Libray name", required=False)
+    Name = TextLine(title=u"Libray name", required=False)
 
-    Added = List(title="An iterable NTIID of content package added",
-                 value_type=TextLine(title="The NTIID"),
+    Added = List(title=u"An iterable NTIID of content package added",
+                 value_type=TextLine(title=u"The NTIID"),
                  required=False)
 
-    Modified = List(title="An iterable NTIID of modified content package",
-                    value_type=TextLine(title="The NTIID"),
+    Modified = List(title=u"An iterable NTIID of modified content package",
+                    value_type=TextLine(title=u"The NTIID"),
                     required=False)
 
-    Removed = List(title="An iterable NTIID of content package dropped",
-                   value_type=TextLine(title="The NTIID"),
+    Removed = List(title=u"An iterable NTIID of content package dropped",
+                   value_type=TextLine(title=u"The NTIID"),
                    required=False)
 
 
 class IContentPackageSyncResults(IGenericSynchronizationResults):
 
-    Site = ValidTextLine(title="The site name", required=False)
+    Site = ValidTextLine(title=u"The site name", required=False)
 
-    ContentPackageNTIID = ValidTextLine(title="The ContentPackage NTIID",
+    ContentPackageNTIID = ValidTextLine(title=u"uThe ContentPackage NTIID",
                                         required=False)
 
-    AssessmentsUpdated = UniqueIterable(value_type=ValidTextLine(title="An asset NTIID"),
-                                        title="The updated assessment NTIIDs",
+    AssessmentsUpdated = UniqueIterable(value_type=ValidTextLine(title=u"An asset NTIID"),
+                                        title=u"The updated assessment NTIIDs",
                                         default=None, required=False)
 
-    AssessmentsSyncLocked = UniqueIterable(value_type=ValidTextLine(title="An asset NTIID"),
-                                           title="The locked assessment NTIIDs",
+    AssessmentsSyncLocked = UniqueIterable(value_type=ValidTextLine(title=u"An asset NTIID"),
+                                           title=u"The locked assessment NTIIDs",
                                            default=None, required=False)
 
-    AssetsUpdated = UniqueIterable(value_type=ValidTextLine(title="An asset NTIID"),
-                                   title="The updated asset NTIIDs",
+    AssetsUpdated = UniqueIterable(value_type=ValidTextLine(title=u"An asset NTIID"),
+                                   title=u"The updated asset NTIIDs",
                                    default=None, required=False)
 
-    AssetsSyncLocked = UniqueIterable(value_type=ValidTextLine(title="An asset NTIID"),
-                                      title="The locked asset NTIIDs",
+    AssetsSyncLocked = UniqueIterable(value_type=ValidTextLine(title=u"An asset NTIID"),
+                                      title=u"The locked asset NTIIDs",
                                       default=None, required=False)
 
     def add_assessment(item, locked=False):
@@ -397,7 +397,7 @@ class IContentPackageSyncResults(IGenericSynchronizationResults):
 
 class ISynchronizationResults(IFiniteSequence):
 
-    Items = IndexedIterable(title="An iterable of sync results",
+    Items = IndexedIterable(title=u"An iterable of sync results",
                             value_type=Object(IGenericSynchronizationResults),
                             required=False)
 
@@ -452,7 +452,7 @@ class IContentPackageLibraryWillSyncEvent(IObjectEvent):
     """
 
     params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
+                    title=u"Synchronization parameters",
                     required=False)
 
 
@@ -470,11 +470,11 @@ class IContentPackageLibraryDidSyncEvent(IObjectEvent):
     """
 
     params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
+                    title=u"Synchronization parameters",
                     required=False)
 
     results = Object(ISynchronizationResults,
-                     title="Synchronization results",
+                     title=u"Synchronization results",
                      required=False)
 
 
@@ -493,7 +493,7 @@ class IAllContentPackageLibrariesWillSyncEvent(interface.Interface):
     """
 
     params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
+                    title=u"Synchronization parameters",
                     required=False)
 
 
@@ -513,11 +513,11 @@ class IAllContentPackageLibrariesDidSyncEvent(interface.Interface):
     """
 
     params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
+                    title=u"Synchronization parameters",
                     required=False)
 
     results = Object(ISynchronizationResults,
-                     title="Synchronization results",
+                     title=u"Synchronization results",
                      required=False)
 
 
@@ -537,7 +537,7 @@ class IContentPackageAddedEvent(IObjectAddedEvent):
     An event fired when a content package has been added
     """
     params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
+                    title=u"Synchronization parameters",
                     required=False)
 
 
@@ -555,7 +555,7 @@ class IContentUnitRemovedEvent(IObjectRemovedEvent):
     An event fired when a content unit has been removed.
     """
     params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
+                    title=u"Synchronization parameters",
                     required=False)
 
 
@@ -652,18 +652,18 @@ class IDisplayablePlatformPresentationResources(interface.Interface):
     """
 
     PlatformName = TextLine(
-        title="The name of the platform this package is meant for.")
+        title=u"The name of the platform this package is meant for.")
 
-    InheritPlatformName = TextLine(title="A platform to inherit from",
-                                   description="If present, this object should merge missing resources "
+    InheritPlatformName = TextLine(title=u"A platform to inherit from",
+                                   description=u"If present, this object should merge missing resources "
                                    "from this named platform.",
                                    required=False)
 
-    Version = Int(title="The version of the layout of resources",
+    Version = Int(title=u"The version of the layout of resources",
                   default=1, min=1)
 
     root = Object(IDelimitedHierarchyBucket,
-                  title="The key designating this entry in the hierarchy.",
+                  title=u"The key designating this entry in the hierarchy.",
                   default=None)
     root.setTaggedValue('_ext_excluded_out', True)
 
@@ -681,7 +681,7 @@ class IDisplayableContent(IZContained,
     interfaces.
     """
 
-    PlatformPresentationResources = Iterable(title="Sequence of the presentations for this content.",
+    PlatformPresentationResources = Iterable(title=u"Sequence of the presentations for this content.",
                                              default=(),
                                              required=False)
 
@@ -703,7 +703,7 @@ class IDelimitedHierarchyEntry(interface.Interface, dub_interfaces.IDCTimes):
     """
 
     key = Object(IDelimitedHierarchyKey,
-                 title="The key designating this entry in the hierarchy.",
+                 title=u"The key designating this entry in the hierarchy.",
                  default=None)
 
     def get_parent_key():
@@ -766,39 +766,39 @@ class IContentUnit(IZContained,
     will ultimately be the :class:`IContentPackage`; the containing unit of the package
     will be the :class:`IContentPackageLibrary`. The ``__name__```` is fixed to be the ntiid.
     """
-    ordinal = Int(title="The number (starting at 1) representing which nth child of the parent I am.",
+    ordinal = Int(title=u"The number (starting at 1) representing which nth child of the parent I am.",
                   default=1, min=1)
 
-    href = TextLine(title="A relative path within the containing bucket",
-                    description="This may include URL fragments when the same key is re-used",
+    href = TextLine(title=u"A relative path within the containing bucket",
+                    description=u"This may include URL fragments when the same key is re-used",
                     default='')
 
     key = Object(IDelimitedHierarchyKey,
-                 title="Key that identifies where the contents for this unit are",
-                 description="Should have a bucket its relative to; will not have fragment"
+                 title=u"Key that identifies where the contents for this unit are",
+                 description=u"Should have a bucket its relative to; will not have fragment"
                  " identifiers, and thus may be reused within a hierarchy",
                  default=None)
 
-    ntiid = ValidNTIID(title="The NTIID for this item",
+    ntiid = ValidNTIID(title=u"The NTIID for this item",
                        default=None,
                        required=False)
 
     icon = Object(IDelimitedHierarchyKey,
-                  title="URI for an image for this item, typically specially designed",
+                  title=u"URI for an image for this item, typically specially designed",
                   required=False,
                   default=None)
 
     thumbnail = Object(IDelimitedHierarchyKey,
-                       title="URI for a thumbnail for this item, typically auto-generated",
+                       title=u"URI for a thumbnail for this item, typically auto-generated",
                        required=False,
                        default=None)
 
-    children = Iterable(title="Any :class:`IContentUnit` objects this item has.",
+    children = Iterable(title=u"Any :class:`IContentUnit` objects this item has.",
                         default=())
 
     embeddedContainerNTIIDs = IndexedIterable(
-        title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
-        value_type=ValidNTIID(title="The embedded NTIID"),
+        title=u"An iterable of NTIIDs of sub-containers embedded via reference in this content",
+        value_type=ValidNTIID(title=u"The embedded NTIID"),
         unique=True,
         default=())
 
@@ -813,8 +813,8 @@ class IEditableContentUnit(IContentUnit,
     """
 
     icon = Variant((Object(IDelimitedHierarchyKey),
-                    TextLine(title="the URI")),
-                   title="URI for an image for this item, typically specially designed",
+                    TextLine(title=u"the URI")),
+                   title=u"URI for an image for this item, typically specially designed",
                    required=False,
                    default=None)
 
@@ -839,7 +839,7 @@ class IEditableContentUnit(IContentUnit,
         :param bytes data: The data to write
         """
 
-    ContentsLastModified = Number(title="Time since the epoch the contents were last modified.",
+    ContentsLastModified = Number(title=u"Time since the epoch the contents were last modified.",
                                   readonly=True,
                                   default=0)
 
@@ -864,37 +864,37 @@ class IContentPackage(IContentUnit,
     """
 
     root = Object(IDelimitedHierarchyItem,
-                  title="Path portion of a uri for this object.",
+                  title=u"Path portion of a uri for this object.",
                   default=None)
 
     index = Object(IDelimitedHierarchyKey,
-                   title="Path portion to an XML file representing this content package",
+                   title=u"Path portion to an XML file representing this content package",
                    default=None,
                    required=False)
 
     index_jsonp = Object(IDelimitedHierarchyKey,
-                         title="Optional location of a JSONP version of the index.",
+                         title=u"Optional location of a JSONP version of the index.",
                          required=False,
                          default=None)
 
-    index_last_modified = Number(title="Time since the epoch the index for this package was last modified.",
-                                 description="This is currently the best indication of when this package as a whole may have changed.",
+    index_last_modified = Number(title=u"Time since the epoch the index for this package was last modified.",
+                                 description=u"This is currently the best indication of when this package as a whole may have changed.",
                                  readonly=True,
                                  default=-1)
 
-    installable = Bool(title="Whether or not this content package can be installed locally (offline)",
+    installable = Bool(title=u"Whether or not this content package can be installed locally (offline)",
                        default=False)
 
-    archive = TextLine(title="DEPRECATED. If this content is installable, this is the relative path to a ZIP archive of the content",
+    archive = TextLine(title=u"DEPRECATED. If this content is installable, this is the relative path to a ZIP archive of the content",
                        default=None,
                        required=False)
 
     archive_unit = Object(IContentUnit,
-                          title="A child object representing the ZIP archive.",
+                          title=u"A child object representing the ZIP archive.",
                           default=None,
                           required=False)
 
-    renderVersion = Int(title="Version of the rendering process that produced this package.",
+    renderVersion = Int(title=u"Version of the rendering process that produced this package.",
                         default=1,
                         min=1)
 
@@ -906,12 +906,12 @@ class IEditableContentPackage(IEditableContentUnit,
     """
 
     root = Object(IDelimitedHierarchyItem,
-                  title="Path portion of a uri for this object.",
+                  title=u"Path portion of a uri for this object.",
                   default=None,
                   required=False)
 
-    index_last_modified = Number(title="Time since the epoch the index for this package was last modified.",
-                                 description="This is currently the best indication of when this package as a whole may have changed.",
+    index_last_modified = Number(title=u"Time since the epoch the index for this package was last modified.",
+                                 description=u"This is currently the best indication of when this package as a whole may have changed.",
                                  default=-1)
 
 
@@ -921,7 +921,7 @@ class IRenderableContentUnit(IEditableContentUnit):
     """
 
     contents_key = Object(IDelimitedHierarchyKey,
-                          title="Contents key.",
+                          title=u"Contents key.",
                           default=None)
     contents_key.setTaggedValue('_ext_excluded_out', True)
 
@@ -939,11 +939,11 @@ class IContentPackageUnmodifiedEvent(IObjectEvent):
     """
 
     params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
+                    title=u"Synchronization parameters",
                     required=False)
 
     results = Object(ISynchronizationResults,
-                     title="Synchronization results",
+                     title=u"Synchronization results",
                      required=False)
 
 
@@ -975,17 +975,17 @@ class IContentPackageReplacedEvent(IObjectModifiedEvent):
     """
 
     replacement = Object(IContentPackage,
-                         title="The replacement object; same as .object")
+                         title=u"The replacement object; same as .object")
 
     original = Object(IContentPackage,
-                      title="The object being replaced")
+                      title=u"The object being replaced")
 
     params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
+                    title=u"Synchronization parameters",
                     required=False)
 
     results = Object(ISynchronizationResults,
-                     title="Synchronization results",
+                     title=u"Synchronization results",
                      required=False)
 
 
@@ -1027,7 +1027,7 @@ class IPotentialLegacyCourseConflatedContentPackage(IContentPackage):
     A legacy property that should be available on all content packages.
     """
 
-    isCourse = Bool(title="If this package is for a course",
+    isCourse = Bool(title=u"If this package is for a course",
                     default=False,
                     required=True)
 
@@ -1042,18 +1042,18 @@ class ILegacyCourseConflatedContentPackage(IPotentialLegacyCourseConflatedConten
 
     # Course support
     # ALL OF THIS IS DEPRECATED
-    isCourse = Bool(title="If this package is for a course",
+    isCourse = Bool(title=u"If this package is for a course",
                     default=False,
                     required=True)
 
-    courseName = TextLine(title="Course name",
+    courseName = TextLine(title=u"Course name",
                           required=True)
 
-    courseTitle = TextLine(title="Course title",
+    courseTitle = TextLine(title=u"Course title",
                            required=True)
 
-    courseInfoSrc = TextLine(title="The relative path to a JSON file",
-                             description="This should be a IDelimitedHierarchyKey, but isn't; Assume it is a sibling",
+    courseInfoSrc = TextLine(title=u"The relative path to a JSON file",
+                             description=u"This should be a IDelimitedHierarchyKey, but isn't; Assume it is a sibling",
                              required=True,
                              default='')
 
@@ -1098,7 +1098,7 @@ class IS3Bucket(IDelimitedHierarchyBucket):
     compatible with both :mod:`boto.s3.bucket` and :mod:`boto.file.bucket`.
     """
 
-    name = TextLine(title="The name of this bucket; globally unique")
+    name = TextLine(title=u"The name of this bucket; globally unique")
 
 
 class IS3Key(IDelimitedHierarchyKey):
@@ -1109,19 +1109,19 @@ class IS3Key(IDelimitedHierarchyKey):
             compatible with both :mod:`boto.s3.bucket` and :mod:`boto.file.bucket`.
     """
 
-    bucket = Object(IS3Bucket, title="The bucket to which this key belongs")
+    bucket = Object(IS3Bucket, title=u"The bucket to which this key belongs")
 
     name = TextLine(
-        title="The name of this key; unique within the bucket; `__name__` and `key` are aliases")
+        title=u"The name of this key; unique within the bucket; `__name__` and `key` are aliases")
 
 
 class IS3ContentUnit(dub_interfaces.IDCTimes, IDelimitedHierarchyContentUnit):
 
     key = Object(IS3Key,
-                 title="The key identifying the unit of content this belongs to.")
+                 title=u"The key identifying the unit of content this belongs to.")
 
     # @deprecated: Prefer IDCTimes
-    lastModified = Number(title="Time since the epoch this unit was last modified.",
+    lastModified = Number(title=u"Time since the epoch this unit was last modified.",
                           readonly=True)
 
 
@@ -1135,7 +1135,7 @@ class IFilesystemBucket(IEnumerableDelimitedHierarchyBucket):
     """
 
     absolute_path = TextLine(
-        title="The absolute path on disk of the directory")
+        title=u"The absolute path on disk of the directory")
 
 
 class IFilesystemKey(IDelimitedHierarchyKey):
@@ -1144,12 +1144,12 @@ class IFilesystemKey(IDelimitedHierarchyKey):
     """
 
     bucket = Object(IFilesystemBucket,
-                    title="The bucket to which this key belongs")
+                    title=u"The bucket to which this key belongs")
 
     name = TextLine(
-        title="The name of this key; unique within the bucket; `__name__` and `key` are aliases")
+        title=u"The name of this key; unique within the bucket; `__name__` and `key` are aliases")
 
-    absolute_path = TextLine(title="The absolute path on disk for this key.")
+    absolute_path = TextLine(title=u"The absolute path on disk for this key.")
 
 
 class IFilesystemEntry(interface.Interface,
@@ -1162,10 +1162,10 @@ class IFilesystemEntry(interface.Interface,
     e.g., the times for the content unit itself.
 
     """
-    filename = TextLine(title="The absolute path to the file")
+    filename = TextLine(title=u"The absolute path to the file")
 
     # @deprecated: Prefer IDCTimes
-    lastModified = Number(title="Time since the epoch this unit was last modified.",
+    lastModified = Number(title=u"Time since the epoch this unit was last modified.",
                           readonly=True)
 
 
@@ -1248,17 +1248,18 @@ class IContentPackageBundle(IDisplayableContent,
     # __parent__.required = False
 
     root = Object(IDelimitedHierarchyItem,
-                  title="The key giving the root of this content package",
-                  description="Will be externalized through the href mapper",
+                  title=u"The key giving the root of this content package",
+                  description=u"Will be externalized through the href mapper",
                   required=True)
     root.setTaggedValue('_ext_excluded_out', True)
 
-    ntiid = ValidNTIID(title="The NTIID for this item",
+    ntiid = ValidNTIID(title=u"The NTIID for this item",
                        default=None,
                        required=False)
 
-    ContentPackages = UniqueIterable(value_type=Object(IContentPackage, title="A content package"),
-                                     title="The referenced content packages",
+    ContentPackages = UniqueIterable(value_type=Object(IContentPackage, 
+                                                       title=u"A content package"),
+                                     title=u"The referenced content packages",
                                      default=())
 
 
@@ -1352,24 +1353,24 @@ class IContentPackageLibraryModifiedOnSyncEvent(IObjectModifiedEvent):
     after events for individual content package changes.
     """
 
-    added = IndexedIterable(title="Content package added",
+    added = IndexedIterable(title=u"Content package added",
                             value_type=Object(IContentPackage),
                             required=False)
 
-    removed = IndexedIterable(title="Content package removed",
+    removed = IndexedIterable(title=u"Content package removed",
                               value_type=Object(IContentPackage),
                               required=False)
 
-    changed = IndexedIterable(title="Content package modified",
+    changed = IndexedIterable(title=u"Content package modified",
                               value_type=Object(IContentPackage),
                               required=False)
 
     params = Object(ISynchronizationParams,
-                    title="Synchronization parameters",
+                    title=u"Synchronization parameters",
                     required=False)
 
     results = Object(ISynchronizationResults,
-                     title="Synchronization results",
+                     title=u"Synchronization results",
                      required=False)
     # JAM: Should this be a plain ObjectEvent, not
     # ObjectModifiedEvent (that way none of the indexing logic or
@@ -1466,7 +1467,7 @@ class IContentRendered(interface.Interface):
 
 
 class IContentValidationError(interface.Interface):
-    message = ValidTextLine(title="The error message.")
+    message = ValidTextLine(title=u"The error message.")
 
 
 class IContentValidator(interface.Interface):
@@ -1488,10 +1489,10 @@ class IContentPackageLocationChanged(IObjectMovedEvent):
     """
 
     old_root = Object(IDelimitedHierarchyItem,
-                      title="old location")
+                      title=u"old location")
 
     new_root = Object(IDelimitedHierarchyItem,
-                      title="new location")
+                      title=u"new location")
 
 
 @interface.implementer(IContentPackageLocationChanged)
