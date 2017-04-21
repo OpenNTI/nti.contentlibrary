@@ -38,7 +38,7 @@ from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
 
 from nti.zope_catalog.string import StringTokenNormalizer
 
-CATALOG_INDEX_NAME = '++etc++contentlibrary.catalog'
+CATALOG_INDEX_NAME = 'nti.dataserver.++etc++contentlibrary.catalog'
 
 IX_SITE = 'site'
 IX_NTIID = 'ntiid'
