@@ -24,8 +24,6 @@ from nti.contentlibrary.interfaces import IEditableContentUnit
 
 from nti.site.interfaces import IHostPolicyFolder
 
-from nti.traversal.traversal import find_interface
-
 from nti.zope_catalog.catalog import Catalog
 
 from nti.zope_catalog.datetime import TimestampToNormalized64BitIntNormalizer
@@ -35,6 +33,8 @@ from nti.zope_catalog.index import NormalizationWrapper
 from nti.zope_catalog.index import ValueIndex as RawValueIndex
 from nti.zope_catalog.index import AttributeValueIndex as ValueIndex
 from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
+
+from nti.zope_catalog.location import find_interface
 
 from nti.zope_catalog.string import StringTokenNormalizer
 
@@ -56,7 +56,7 @@ class ValidatingSiteName(object):
 
     def __init__(self, obj, default=None):
         if IContentUnit.providedBy(obj):
-            folder = find_interface(obj, IHostPolicyFolder, strict=False)
+            folder = find_interface(obj, IHostPolicyFolder)
             if folder is not None:
                 self.site = folder.__name__
 

@@ -63,7 +63,6 @@ setup(
         'nti.recorder',
         'nti.schema',
         'nti.site',
-        'nti.traversal',
         'nti.wref',
         'nti.zodb',
         'nti.zope_catalog',

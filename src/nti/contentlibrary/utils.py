@@ -46,9 +46,9 @@ from nti.site.interfaces import IHostPolicyFolder
 
 from nti.site.site import get_component_hierarchy_names
 
-from nti.traversal.traversal import find_interface
-
 from nti.zodb.containers import time_to_64bit_int
+
+from nti.zope_catalog.location import find_interface
 
 
 def get_content_packages(sites=(), mime_types=None):
