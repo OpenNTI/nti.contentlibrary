@@ -14,6 +14,8 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import Lazy
+
 from zope.intid.interfaces import IIntIds
 
 from nti.contentlibrary.indexed_data import get_library_catalog
@@ -32,8 +34,6 @@ from nti.contenttypes.presentation.interfaces import INTIVideo
 from nti.contenttypes.presentation.interfaces import INTITimeline
 from nti.contenttypes.presentation.interfaces import INTISlideDeck
 from nti.contenttypes.presentation.interfaces import INTIRelatedWorkRef
-
-from nti.property.property import Lazy
 
 from nti.site.site import get_component_hierarchy_names
 
