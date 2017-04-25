@@ -54,7 +54,7 @@ class DisplayablePlatformPresentationResources(DCTimesLastModifiedMixin,
         return self.root.lastModified
 
 
-def get_platform_resentation_resources(root=None):
+def get_platform_presentation_resources(root=None):
     if not root:
         return ()
 
@@ -99,8 +99,8 @@ class DisplayableContentMixin(object):
     root = None
 
     @classmethod
-    def get_platform_resentation_resources(self, root=None):
-        return get_platform_resentation_resources(root)
+    def get_platform_presentation_resources(self, root=None):
+        return get_platform_presentation_resources(root)
 
     @property
     def _v_root(self):
@@ -117,8 +117,8 @@ class DisplayableContentMixin(object):
 
     @CachedProperty('root', '_v_rootLastModified')
     def _v_PlatformPresentationResources(self):
-        return get_platform_resentation_resources(self._v_root)
+        return get_platform_presentation_resources(self._v_root)
 
     @CachedProperty('root')
     def PlatformPresentationResources(self):
-        return get_platform_resentation_resources(self._v_root)
+        return get_platform_presentation_resources(self._v_root)
