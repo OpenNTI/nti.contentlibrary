@@ -19,6 +19,9 @@ from zope import interface
 
 from zope.cachedescriptors.method import cachedIn
 
+from zope.cachedescriptors.property import readproperty
+from zope.cachedescriptors.property import CachedProperty
+
 from ZODB.POSException import ConnectionStateError
 
 from nti.contentlibrary import eclipse
@@ -43,16 +46,13 @@ from nti.contentlibrary.interfaces import IGlobalFilesystemContentPackageLibrary
 from nti.contentlibrary.interfaces import IPersistentFilesystemContentPackageLibrary
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
 
-from nti.property.property import readproperty
-from nti.property.property import CachedProperty
-
 
 def _TOCPath(path):
     return os.path.abspath(path_join(path, eclipse.TOC_FILENAME))
 
 
 def _hasTOC(path):
-    """ 
+    """
     Does the given path point to a directory containing a TOC file?
     """
     return os.path.exists(_TOCPath(path))
@@ -82,7 +82,7 @@ def _package_factory(item, _package_factory=None, _unit_factory=None):
     temp_entry = FilesystemContentUnit(key=key)
     assert key.absolute_path == _TOCPath(directory) == temp_entry.filename
 
-    package = eclipse.EclipseContentPackage(temp_entry, 
+    package = eclipse.EclipseContentPackage(temp_entry,
                                             _package_factory,
                                             _unit_factory)
 
@@ -177,12 +177,12 @@ class _AbsolutePathMixin(object):
 @interface.implementer(IDCTimes)
 class _FilesystemTimesMixin(object):
 
-    lastModified = _FilesystemTime('lastModified', 
-                                   os.path.stat.ST_MTIME, 
+    lastModified = _FilesystemTime('lastModified',
+                                   os.path.stat.ST_MTIME,
                                    'absolute_path',
                                    cache=False)
     createdTime = _FilesystemTime('createdTime',
-                                  os.path.stat.ST_CTIME, 
+                                  os.path.stat.ST_CTIME,
                                   'absolute_path')
 
     # Here we cache the datetime object based on the timestamp
@@ -302,7 +302,7 @@ class _FilesystemLibraryEnumeration(library.AbstractDelimitedHiercharchyContentP
             root_path = os.path.abspath(root_path)
             if root_path.endswith('/'):
                 root_path = root_path[:-1]
-            self._root = FilesystemBucket(bucket=self, 
+            self._root = FilesystemBucket(bucket=self,
                                           name=os.path.basename(root_path))
             self._root.absolute_path = root_path
             # Keep this unnamed so it doesn't get in the traversal path
@@ -388,19 +388,19 @@ class AbstractFilesystemLibrary(library.AbstractContentPackageLibrary):
 @component.adapter(IFilesystemKey)
 @interface.implementer(IDelimitedHierarchyEntry)
 class _KeyDelimitedHierarchyEntry(object):
-    
+
     __slots__ = ('key',)
-    
+
     def __init__(self, key):
         self.key = key
-        
+
     def read_contents(self):
         return self.key.readContents()
     readContents = read_contents
 
     def get_parent_key(self):
         return self.key.bucket
-    
+
     def make_sibling_key(self, sibling_name):
         assert bool(sibling_name)
         assert not sibling_name.startswith('/')
