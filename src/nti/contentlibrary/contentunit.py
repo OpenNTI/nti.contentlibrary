@@ -13,6 +13,8 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
+from zope.cachedescriptors.property import CachedProperty
+
 from zope.container.contained import Contained
 
 from nti.contentlibrary.interfaces import IContentUnit
@@ -27,7 +29,6 @@ from nti.dublincore.time_mixins import DCTimesLastModifiedMixin
 
 from nti.property.property import alias
 from nti.property.property import read_alias
-from nti.property.property import CachedProperty
 
 from nti.schema.fieldproperty import createFieldProperties
 from nti.schema.fieldproperty import createDirectFieldProperties
