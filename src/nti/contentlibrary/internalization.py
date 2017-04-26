@@ -26,12 +26,12 @@ from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
-from nti.coremetadata.interfaces import IPublishable
-
 from nti.externalization.datastructures import InterfaceObjectIO
 
 from nti.externalization.interfaces import IInternalObjectUpdater
 from nti.externalization.interfaces import StandardExternalFields
+
+from nti.publishing.interfaces import IPublishable
 
 NTIID = StandardExternalFields.NTIID
 MIME_TYPE = StandardExternalFields.MIMETYPE

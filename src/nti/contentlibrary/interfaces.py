@@ -46,8 +46,6 @@ from nti.base.interfaces import ICreated
 from nti.base.interfaces import ILastModified
 
 from nti.coremetadata.interfaces import IVersioned
-from nti.coremetadata.interfaces import IPublishable
-from nti.coremetadata.interfaces import INoPublishLink
 from nti.coremetadata.interfaces import IShouldHaveTraversablePath
 
 from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
@@ -57,6 +55,9 @@ from nti.ntiids.schema import ValidNTIID
 from nti.recorder.interfaces import IRecordable
 
 from nti.property.property import alias
+
+from nti.publishing.interfaces import IPublishable
+from nti.publishing.interfaces import INoPublishLink
 
 from nti.schema.field import Int
 from nti.schema.field import Bool

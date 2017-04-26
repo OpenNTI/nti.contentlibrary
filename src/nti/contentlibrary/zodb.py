@@ -27,8 +27,6 @@ from persistent.list import PersistentList
 
 from nti.base._compat import unicode_
 
-from nti.coremetadata.mixins import PublishableMixin
-
 from nti.contentlibrary.bucket import AbstractKey
 from nti.contentlibrary.bucket import AbstractBucket
 
@@ -49,7 +47,9 @@ from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 from nti.contentlibrary.interfaces import IDelimitedHierarchyEditableContentUnit
 from nti.contentlibrary.interfaces import IDelimitedHierarchyEditableContentPackage
 
-from nti.coremetadata.interfaces import INoPublishLink
+from nti.publishing.interfaces import INoPublishLink
+
+from nti.publishing.mixins import PublishableMixin
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 

@@ -60,6 +60,7 @@ setup(
         'nti.mimetype',
         'nti.ntiids',
         'nti.property',
+        'nti.publishing',
         'nti.recorder',
         'nti.schema',
         'nti.site',

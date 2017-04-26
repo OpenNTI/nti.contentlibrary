@@ -12,7 +12,7 @@
 	<include package="zope.location" />
 
 	<!-- Publishing -->
-	<include package="nti.coremetadata" />
+	<include package="nti.publishing" />
 
 	<!-- for IComponentLookup(context) and queryNextUtility to work -->
 	<include package="zope.site" />
