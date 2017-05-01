@@ -119,14 +119,14 @@ def CreatorIndex(family=None):
 
 class PublishLastModifiedRawIndex(RawIntegerValueIndex):
     pass
-
+CreatedTimeRawIndex = LastModifiedRawIndex = PublishLastModifiedRawIndex # BWC
 
 def PublishLastModifiedIndex(family=None):
     return NormalizationWrapper(field_name='publishLastModified',
                                 interface=IEditableContentUnit,
                                 index=PublishLastModifiedRawIndex(family=family),
                                 normalizer=TimestampToNormalized64BitIntNormalizer())
-
+CreatedTimeIndex = LastModifiedIndex = PublishLastModifiedIndex # BWC
 
 class LibraryCatalog(Catalog):
     family = BTrees.family64
