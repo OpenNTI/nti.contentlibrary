@@ -45,8 +45,6 @@ IX_NTIID = 'ntiid'
 IX_CREATOR = 'creator'
 IX_MIMETYPE = 'mimeType'
 IX_CHILDREN = 'children'
-IX_CREATEDTIME = 'createdTime'
-IX_LASTMODIFIED = 'lastModified'
 IX_PUBLISH_LASTMODIFIED = 'publishLastModified'
 
 
@@ -119,28 +117,6 @@ def CreatorIndex(family=None):
                                 normalizer=StringTokenNormalizer())
 
 
-class CreatedTimeRawIndex(RawIntegerValueIndex):
-    pass
-
-
-def CreatedTimeIndex(family=None):
-    return NormalizationWrapper(field_name='createdTime',
-                                interface=IContentUnit,
-                                index=CreatedTimeRawIndex(family=family),
-                                normalizer=TimestampToNormalized64BitIntNormalizer())
-
-
-class LastModifiedRawIndex(RawIntegerValueIndex):
-    pass
-
-
-def LastModifiedIndex(family=None):
-    return NormalizationWrapper(field_name='lastModified',
-                                interface=IContentUnit,
-                                index=LastModifiedRawIndex(family=family),
-                                normalizer=TimestampToNormalized64BitIntNormalizer())
-
-
 class PublishLastModifiedRawIndex(RawIntegerValueIndex):
     pass
 
@@ -167,8 +143,6 @@ def create_library_catalog(catalog=None, family=None):
                         (IX_CREATOR, CreatorIndex),
                         (IX_CHILDREN, ChildrenIndex),
                         (IX_MIMETYPE, MimeTypeIndex),
-                        (IX_CREATEDTIME, CreatedTimeIndex),
-                        (IX_LASTMODIFIED, LastModifiedIndex),
                         (IX_PUBLISH_LASTMODIFIED, PublishLastModifiedIndex)):
         index = clazz(family=family)
         locate(index, catalog, name)
