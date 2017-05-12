@@ -137,7 +137,7 @@ class PersistentContentUnit(RecordableMixin,
     contents_last_modified = alias("ContentsLastModified")
 
     icon = FP(IEditableContentUnit['icon'])
-    
+
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)
         self.contents_key = self._key_type(name="contents")

@@ -28,6 +28,7 @@ from nti.contentlibrary.interfaces import IS3Key
 from nti.contentlibrary.interfaces import IFilesystemKey
 from nti.contentlibrary.interfaces import IS3ContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IFilesystemBucket
 from nti.contentlibrary.interfaces import IRequestSiteNames
 from nti.contentlibrary.interfaces import IContentPackageBundle
@@ -36,6 +37,7 @@ from nti.contentlibrary.interfaces import IContentUnitHrefMapper
 from nti.contentlibrary.interfaces import IDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IFilesystemContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
+from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
 from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
@@ -247,9 +249,12 @@ class _EditableContentPackageExternal(_ContentPackageExternal):
                 result.pop(name, None)
         return result
 
+    def _is_published(self):
+        return self.package.is_published()
+
     def toExternalObject(self, **kwargs):
         result = super(_EditableContentPackageExternal, self).toExternalObject(**kwargs)
-        is_published = self.package.is_published()
+        is_published = self._is_published()
         # remove anything empty
         if not is_published:
             self._remove_empty(result)
@@ -261,6 +266,15 @@ class _EditableContentPackageExternal(_ContentPackageExternal):
         result['indexLastModified'] = self.package.index_last_modified
         result['publishLastModified'] = self.package.publishLastModified
         return result
+
+
+@component.adapter(IRenderableContentPackage)
+class _RenderableContentPackageExternal(_EditableContentPackageExternal):
+
+    def _is_published(self):
+        # Only display as published if also rendered
+        return  self.package.is_published() \
+            and IContentRendered.providedBy(self.package)
 
 
 @component.adapter(IEditableContentPackage)

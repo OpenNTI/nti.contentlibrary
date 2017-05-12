@@ -113,6 +113,7 @@
 	<adapter factory=".externalization._ContentPackageExternal" />
 	<adapter factory=".externalization._ContentPackageLibraryExternal" />
 	<adapter factory=".externalization._EditableContentPackageExternal" />
+	<adapter factory=".externalization._RenderableContentPackageExternal" />
 	<adapter factory=".externalization._LegacyCourseConflatedContentPackageExternal" />
 
 	<adapter factory=".externalization._ContentBundleIO" />
