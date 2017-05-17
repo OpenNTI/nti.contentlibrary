@@ -145,7 +145,7 @@ from zope.deprecation import deprecated
 
 from zope.container.contained import Contained
 
-from zc.dict import Dict
+from nti.containers.dicts import Dict
 
 deprecated('_IndexedDataDict', 'No longer used')
 class _IndexedDataDict(Dict, Contained):
