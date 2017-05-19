@@ -255,7 +255,7 @@ class BotoS3ContentUnit(ContentUnit):
 
     @Lazy
     def modified(self):
-        return datetime.datetime.utcfromtimestamp(self.lastModified)
+        return datetime.datetime.utcfromtimestamp(self.lastModified or 0)
 
     created = modified
 
