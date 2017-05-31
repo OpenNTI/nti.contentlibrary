@@ -129,7 +129,7 @@ def uninstall_bundle_library(library, event):
                                         event)
 
 
-@component.adapter(IPersistentContentPackageLibrary, 
+@component.adapter(IPersistentContentPackageLibrary,
                    IContentPackageLibraryDidSyncEvent)
 def sync_bundles_when_library_synched(library, event):
     """

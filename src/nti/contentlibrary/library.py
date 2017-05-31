@@ -705,6 +705,7 @@ class AbstractContentPackageLibrary(object):
         """
         Fetch the content unit referenced by the given ntiid.
         """
+        self._checkSync()
         if not key:
             return None
         result = self._contentUnitsByNTIID.get(key)
