@@ -398,11 +398,20 @@ class AbstractContentPackageLibrary(object):
             raise Exception("No packages to update were found")
         return result
 
+    def _check_parent_synced(self):
+        """
+        Make sure our parent library is synced.
+        """
+        parent = queryNextUtility(self, IContentPackageLibrary)
+        if parent is not None:
+            parent._checkSync()
+
     def syncContentPackages(self, params=None, results=None):
         """
         Fires created, added, modified, or removed events for each
         content package, as appropriate.
         """
+        self._check_parent_synced()
         packages = params.ntiids if params is not None else ()
         results = SynchronizationResults() if results is None else results
         notify(ContentPackageLibraryWillSyncEvent(self, params))
