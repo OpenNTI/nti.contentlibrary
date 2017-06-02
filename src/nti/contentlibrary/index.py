@@ -137,7 +137,8 @@ def get_contentlibrary_catalog(registry=component):
 
 
 def create_library_catalog(catalog=None, family=BTrees.family64):
-    catalog = LibraryCatalog() if catalog is None else catalog
+    if catalog is None:
+        catalog = LibraryCatalog(family=family)
     for name, clazz in ((IX_SITE, SiteIndex),
                         (IX_NTIID, NTIIDIndex),
                         (IX_CREATOR, CreatorIndex),
@@ -157,12 +158,13 @@ def install_library_catalog(site_manager_container, intids=None):
     if catalog is not None:
         return catalog
 
-    catalog = LibraryCatalog()
+    catalog = create_library_catalog(family=intids.family)
     locate(catalog, site_manager_container, CATALOG_INDEX_NAME)
     intids.register(catalog)
-    lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_INDEX_NAME)
+    lsm.registerUtility(catalog, 
+                        provided=ICatalog,
+                        name=CATALOG_INDEX_NAME)
 
-    catalog = create_library_catalog(catalog=catalog, family=intids.family)
     for index in catalog.values():
         intids.register(index)
     return catalog
