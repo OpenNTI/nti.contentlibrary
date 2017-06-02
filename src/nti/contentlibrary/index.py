@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -50,7 +50,7 @@ IX_PUBLISH_LASTMODIFIED = 'publishLastModified'
 
 class ValidatingSiteName(object):
 
-    __slots__ = (b'site',)
+    __slots__ = ('site',)
 
     def __init__(self, obj, default=None):
         if IContentUnit.providedBy(obj):
@@ -79,7 +79,7 @@ class MimeTypeIndex(ValueIndex):
 
 class ValidatingChildren(object):
 
-    __slots__ = (b'children',)
+    __slots__ = ('children',)
 
     def __init__(self, obj, default=None):
         if IContentUnit.providedBy(obj):
@@ -96,7 +96,7 @@ class ChildrenIndex(AttributeSetIndex):
 
 class ValidatingCreator(object):
 
-    __slots__ = (b'creator',)
+    __slots__ = ('creator',)
 
     def __init__(self, obj, default=None):
         try:
@@ -132,11 +132,11 @@ class LibraryCatalog(Catalog):
     family = BTrees.family64
 
 
-def get_contentlibrary_catalog():
-    return component.queryUtility(ICatalog, name=CATALOG_INDEX_NAME)
+def get_contentlibrary_catalog(registry=component):
+    return registry.queryUtility(ICatalog, name=CATALOG_INDEX_NAME)
 
 
-def create_library_catalog(catalog=None, family=None):
+def create_library_catalog(catalog=None, family=BTrees.family64):
     catalog = LibraryCatalog() if catalog is None else catalog
     for name, clazz in ((IX_SITE, SiteIndex),
                         (IX_NTIID, NTIIDIndex),
@@ -153,7 +153,7 @@ def create_library_catalog(catalog=None, family=None):
 def install_library_catalog(site_manager_container, intids=None):
     lsm = site_manager_container.getSiteManager()
     intids = lsm.getUtility(IIntIds) if intids is None else intids
-    catalog = lsm.queryUtility(ICatalog, name=CATALOG_INDEX_NAME)
+    catalog = get_contentlibrary_catalog(lsm)
     if catalog is not None:
         return catalog
 
