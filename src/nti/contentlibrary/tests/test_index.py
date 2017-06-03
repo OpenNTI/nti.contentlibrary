@@ -13,6 +13,8 @@ from hamcrest import is_not
 from hamcrest import has_length
 from hamcrest import assert_that
 
+from nti.testing.matchers import is_empty
+
 from nti.contentlibrary.index import LibraryCatalog
 from nti.contentlibrary.index import create_library_catalog
 
@@ -29,12 +31,19 @@ class TestIndex(ContentlibraryLayerTest):
         assert_that(catalog, has_length(6))
         assert_that(isinstance(catalog, LibraryCatalog), is_(True))
 
+        ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
         package = RenderableContentPackage()
-        package.ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
+        package.ntiid = ntiid
+        package.creator = u'ichigo'
         package.title = u'Cohen vs California'
         package.description = u'Cohen vs California'
-        package.contentType = b'text/x-rst'
-        package.contents = b'Cohen vs California'
         package.publishLastModified = 10000
         package.index_last_modified = 80000
         catalog.index_doc(1, package)
+
+        for query in (
+                {'ntiid': {'any_of': (ntiid,)}},
+                {'creator': {'any_of': ('ichigo',)}},
+                {'mimeType': {'any_of': ('application/vnd.nextthought.renderablecontentpackage',)}}):
+            results = catalog.apply(query) or ()
+            assert_that(results, is_not(is_empty()))
