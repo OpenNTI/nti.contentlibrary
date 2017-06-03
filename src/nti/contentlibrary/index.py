@@ -24,7 +24,7 @@ from nti.contentlibrary.interfaces import IEditableContentUnit
 
 from nti.site.interfaces import IHostPolicyFolder
 
-from nti.traversal.location import find_interface
+from nti.traversal.traversal import find_interface
 
 from nti.zope_catalog.catalog import Catalog
 
@@ -54,7 +54,7 @@ class ValidatingSiteName(object):
 
     def __init__(self, obj, default=None):
         if IContentUnit.providedBy(obj):
-            folder = find_interface(obj, IHostPolicyFolder)
+            folder = find_interface(obj, IHostPolicyFolder, strict=False)
             if folder is not None:
                 self.site = folder.__name__
 
