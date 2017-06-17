@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -51,5 +51,5 @@ def vendor_info_factory(package):
         result = package._package_vendor_info = DefaultContentPackageVendorInfo()
         result.createdTime = time.time()
         result.__parent__ = package
-        result.__name__ = '_package_vendor_info'
+        result.__name__ = u'_package_vendor_info'
         return result

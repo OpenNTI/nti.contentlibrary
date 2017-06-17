@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Adopter implementations.
+Adapter implementations.
 
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -16,6 +16,7 @@ import time
 from zope import component
 from zope import interface
 
+from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
@@ -23,6 +24,16 @@ from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnume
 from nti.recorder.interfaces import ITransactionRecordHistory
 
 from nti.recorder.adapters import TransactionRecordContainer
+
+from nti.site.interfaces import IHostPolicyFolder
+
+from nti.traversal.traversal import find_interface
+
+
+@component.adapter(IContentUnit)
+@interface.implementer(IHostPolicyFolder)
+def contentunit_to_site(context):
+    return find_interface(context, IHostPolicyFolder, strict=False)
 
 
 @component.adapter(IContentPackageLibrary)
@@ -51,5 +62,5 @@ def trx_recorder_history_factory(package):
         result = package._package_trx_record_history = TransactionRecordContainer()
         result.createdTime = time.time()
         result.__parent__ = package
-        result.__name__ = '_package_trx_record_history'
+        result.__name__ = u'_package_trx_record_history'
         return result

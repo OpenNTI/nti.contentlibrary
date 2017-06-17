@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -37,7 +37,7 @@ from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 from nti.testing.matchers import verifiably_provides
 
-HEAD_ZCML_STRING = """
+HEAD_ZCML_STRING = u"""
         <configure xmlns="http://namespaces.zope.org/zope"
             xmlns:zcml="http://namespaces.zope.org/zcml"
             xmlns:lib="http://nextthought.com/ntp/contentlibrary"
@@ -50,7 +50,7 @@ HEAD_ZCML_STRING = """
 
 """
 
-ZCML_STRING = HEAD_ZCML_STRING + """
+ZCML_STRING = HEAD_ZCML_STRING + u"""
             <lib:filesystemLibrary
                 directory="tests/"
                 prefix="SomePrefix"
@@ -58,7 +58,7 @@ ZCML_STRING = HEAD_ZCML_STRING + """
         </configure>
         """
 
-BOTO_ZCML_STRING = HEAD_ZCML_STRING + """
+BOTO_ZCML_STRING = HEAD_ZCML_STRING + u"""
             <lib:s3Library
                 bucket="foobar"
                 cdn_name="cdnname"
@@ -104,8 +104,6 @@ class TestZcml(ContentlibraryLayerTest):
         xmlconfig.registerCommonDirectives(context)
 
         xmlconfig.string(BOTO_ZCML_STRING, context)
-        # assert_that(component.queryUtility( IContentPackageLibrary ), 
-        #              is_( none() ) )
 
         lib = component.getUtility(IContentPackageLibrary)
         assert_that(lib, verifiably_provides(IContentPackageLibrary))

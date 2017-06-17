@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -27,6 +27,7 @@ from nti.contentlibrary.index import IX_SITE
 from nti.contentlibrary.index import IX_MIMETYPE
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
+from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
@@ -46,9 +47,10 @@ from nti.site.interfaces import IHostPolicyFolder
 
 from nti.site.site import get_component_hierarchy_names
 
-from nti.traversal.location import find_interface
-
 from nti.zodb.containers import time_to_64bit_int
+
+#: Default NTIID provider
+NTI = u'NTI'
 
 
 def get_content_packages(sites=(), mime_types=None):
@@ -159,11 +161,11 @@ def get_published_contents(package):
     return snapshot.contents if snapshot is not None else None
 
 
-def make_package_ntiid(provider='NTI', base=None, extra=None):
+def make_package_ntiid(provider=NTI, base=None, extra=None):
     creator = SYSTEM_USER_NAME
     current_time = time_to_64bit_int(time.time())
     if not provider:
-        provider = (get_provider(base) or 'NTI') if base else 'NTI'
+        provider = (get_provider(base) or NTI) if base else NTI
 
     specific_base = get_specific(base) if base else None
     if specific_base:
@@ -182,7 +184,7 @@ def make_package_ntiid(provider='NTI', base=None, extra=None):
     return ntiid
 
 
-def make_content_package_ntiid(package=None, provider='NTI', base=None, extra=None):
+def make_content_package_ntiid(package=None, provider=NTI, base=None, extra=None):
     if IRenderableContentPackage.providedBy(package):
         specific = get_specific(base) if base else None
         if not specific:
@@ -198,13 +200,11 @@ def make_content_package_ntiid(package=None, provider='NTI', base=None, extra=No
 
 
 def get_content_package_site(context):
-    package = IContentPackage(context, None)
-    folder = find_interface(package, IHostPolicyFolder)
+    folder = IHostPolicyFolder(IContentUnit(context, None), None)
     return folder.__name__ if folder is not None else None  # folder name
 get_content_package_site_name = get_content_package_site
 
 
 def get_content_package_site_registry(context):
-    package = IContentPackage(context, None)
-    folder = find_interface(package, IHostPolicyFolder)
+    folder = IHostPolicyFolder(IContentUnit(context, None), None)
     return folder.getSiteManager() if folder is not None else None

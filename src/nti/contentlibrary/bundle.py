@@ -6,7 +6,7 @@ Implementations of content bundles.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -99,7 +99,7 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
     creators = ()
     subjects = ()
     contributors = ()
-    publisher = ''
+    publisher = u''
 
     @property
     def PlatformPresentationResources(self):
@@ -280,8 +280,8 @@ def get_package_for_bundle(package, library=None):
 class IContentBundleMetaInfo(IContentPackageBundle):
 
     ContentPackages = IndexedIterable(
-            title="An iterable of NTIIDs of sub-containers embedded via reference in this content",
-            value_type=ValidNTIID(title="The embedded NTIID"),
+            title=u"An iterable of NTIIDs of sub-containers embedded via reference in this content",
+            value_type=ValidNTIID(title=u"The embedded NTIID"),
             unique=True,
             default=())
 _IContentBundleMetaInfo = IContentBundleMetaInfo  # alias
@@ -335,7 +335,7 @@ class ContentBundleMetaInfo(object):
 
         if self.ContentPackages:
             self._ContentPackages_wrefs = self.getContentPackagesWrefs(content_library)
-            self.__dict__[str('ContentPackages')] = self._ContentPackages_wrefs
+            self.__dict__['ContentPackages'] = self._ContentPackages_wrefs
 
     def getContentPackagesWrefs(self, library):
         """

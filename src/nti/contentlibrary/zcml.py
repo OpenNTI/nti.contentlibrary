@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-ZCML directives relating to link providers.
-
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -26,6 +24,8 @@ from zope.configuration.exceptions import ConfigurationError
 
 import zope.configuration.fields
 
+from nti.base._compat import text_
+
 from nti.contentlibrary.boto_s3 import NameEqualityBucket
 from nti.contentlibrary.boto_s3 import BotoS3BucketContentLibrary
 
@@ -43,13 +43,13 @@ class IFilesystemLibrary(interface.Interface):
     """
 
     directory = zope.configuration.fields.Path(
-        title="Path to a directory containing content as subdirectories.",
+        title=u"Path to a directory containing content as subdirectories.",
         required=True
     )
 
     prefix = ValidTextLine(
-        title="The URL prefix for the content items",
-        description="""If you do not give this, then the content items are assumed to be directly
+        title=u"The URL prefix for the content items",
+        description=u"""If you do not give this, then the content items are assumed to be directly
             accessible from the root of the URL space. This is most commonly needed
             when setting up multiple libraries for different sub-sites; in that case each
             such library must use a different prefix.
@@ -60,7 +60,7 @@ class IFilesystemLibrary(interface.Interface):
             of the directory.
             """,
         required=False,
-        default="")
+        default=u"")
 
 
 def registerFilesystemLibrary(_context, directory=None, prefix=""):
@@ -74,8 +74,8 @@ def registerFilesystemLibrary(_context, directory=None, prefix=""):
         prefix = prefix + '/'
 
     factory = functools.partial(GlobalFilesystemContentPackageLibrary,
-                                root=directory, 
-                                prefix=prefix)
+                                root=text_(directory), 
+                                prefix=text_(prefix))
     utility(_context, factory=factory, provides=IContentPackageLibrary)
 register_filesystem_library = registerFilesystemLibrary
 
@@ -86,14 +86,14 @@ class IS3Library(interface.Interface):
     """
 
     bucket = ValidTextLine(
-        title="The name of the S3 bucket that contains content",
-        description="For example, dev-content.nextthought.com",
+        title=u"The name of the S3 bucket that contains content",
+        description=u"For example, dev-content.nextthought.com",
         required=True
     )
 
     cdn_name = ValidTextLine(
-        title="The name of a CDN distribution placed on top of the S3 bucket.",
-        description="For example, d2wnvtui8zrua9.cloudfront.net",
+        title=u"The name of a CDN distribution placed on top of the S3 bucket.",
+        description=u"For example, d2wnvtui8zrua9.cloudfront.net",
         required=False
     )
 
@@ -113,9 +113,9 @@ def registerS3Library(_context, bucket, cdn_name=None):
     # Use the same discriminator as normally registering a utility
     # does. That way, we properly conflict with a filesystem library
     _context.action(
-        discriminator=('utility', IContentPackageLibrary, ''),
+        discriminator=('utility', IContentPackageLibrary, u''),
         callable=_connect_and_register,
-        args=(bucket, _context.info),
+        args=(text_(bucket), _context.info),
     )
     # If we are serving content from a bucket, we might have a CDN on top of it
     # in the case that we are also serving the application. Rewrite bucket
@@ -123,6 +123,7 @@ def registerS3Library(_context, bucket, cdn_name=None):
     # we would do if we were serving the application and content both from a
     # cdn.
     if cdn_name:
+        cdn_name = text_(cdn_name)
         _context.action(
             discriminator=('map_all_buckets_to', cdn_name),
             callable=map_all_buckets_to,

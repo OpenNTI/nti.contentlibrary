@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -25,7 +25,7 @@ from ZODB.POSException import ConnectionStateError
 
 from persistent.list import PersistentList
 
-from nti.base._compat import unicode_
+from nti.base._compat import text_
 
 from nti.contentlibrary.bucket import AbstractKey
 from nti.contentlibrary.bucket import AbstractBucket
@@ -127,7 +127,7 @@ class PersistentContentUnit(RecordableMixin,
     """
     A persistent version of a content unit.
     """
-    mime_type = mimeType = u'application/vnd.nextthought.persistentcontentunit'
+    mime_type = mimeType = 'application/vnd.nextthought.persistentcontentunit'
 
     _key_type = PersistentHierarchyKey
 
@@ -140,7 +140,7 @@ class PersistentContentUnit(RecordableMixin,
 
     def __init__(self, *args, **kwargs):
         super(PersistentContentUnit, self).__init__(*args, **kwargs)
-        self.contents_key = self._key_type(name="contents")
+        self.contents_key = self._key_type(name=u"contents")
 
     @readproperty
     def key(self):
@@ -175,7 +175,7 @@ class PersistentContentUnit(RecordableMixin,
 
     @readproperty
     def version(self):
-        return unicode_(str(self.ContentsLastModified))
+        return text_(str(self.ContentsLastModified))
 
     def publish(self, *args, **kwargs):
         # Override our mixin to allow continuous publishes.
@@ -195,7 +195,7 @@ class PersistentContentPackage(PersistentContentUnit, ContentPackage):
     """
     A persistent content package.
     """
-    mime_type = mimeType = u'application/vnd.nextthought.persistentcontentpackage'
+    mime_type = mimeType = 'application/vnd.nextthought.persistentcontentpackage'
 
     index_last_modified = -1
     indexLastModified = alias("index_last_modified")
@@ -209,7 +209,7 @@ class RenderableContentUnit(PersistentContentUnit):
     """
     createDirectFieldProperties(IRenderableContentUnit)
 
-    mime_type = mimeType = u'application/vnd.nextthought.renderablecontentunit'
+    mime_type = mimeType = 'application/vnd.nextthought.renderablecontentunit'
 
     @readproperty
     def ntiid(self):
@@ -253,4 +253,4 @@ class RenderableContentPackage(RenderableContentUnit,
     """
     createDirectFieldProperties(IRenderableContentPackage)
 
-    mime_type = mimeType = u'application/vnd.nextthought.renderablecontentpackage'
+    mime_type = mimeType = 'application/vnd.nextthought.renderablecontentpackage'

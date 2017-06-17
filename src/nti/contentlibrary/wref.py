@@ -6,7 +6,7 @@ Weak references for content units.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -34,7 +34,7 @@ from nti.wref.interfaces import IWeakRef
 @interface.implementer(IWeakRef)
 class ContentUnitWeakRef(object):
 
-    __slots__ = (b'_ntiid',)
+    __slots__ = ('_ntiid',)
 
     def __init__(self, contentunit):
         self._ntiid = contentunit.ntiid

@@ -6,7 +6,7 @@ Home of presentation resources.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -81,7 +81,7 @@ def get_platform_presentation_resources(root=None):
 
     result = list()
     for x in data:
-        ip_name = 'shared' if inherit and x[0].name != 'shared' else None
+        ip_name = u'shared' if inherit and x[0].name != 'shared' else None
         result.append(
             DisplayablePlatformPresentationResources(PlatformName=x[0].name,
                                                      root=x[1],
