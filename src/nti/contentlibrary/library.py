@@ -659,6 +659,7 @@ class AbstractContentPackageLibrary(object):
 
         # In the past this worked even if the library had not been synced
         # because it used self.contentPackages to do the implicit sync.
+        self._checkSync()
         try:
             result = self._contentPackages[key]
         except KeyError:
