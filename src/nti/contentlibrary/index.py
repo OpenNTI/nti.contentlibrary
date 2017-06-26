@@ -290,7 +290,7 @@ def create_contentbundle_catalog(catalog=None, family=BTrees.family64):
 def install_contentbundle_catalog(site_manager_container, intids=None):
     lsm = site_manager_container.getSiteManager()
     intids = lsm.getUtility(IIntIds) if intids is None else intids
-    catalog = get_contentlibrary_catalog(lsm)
+    catalog = get_contentbundle_catalog(lsm)
     if catalog is not None:
         return catalog
 
