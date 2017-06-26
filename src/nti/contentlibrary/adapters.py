@@ -17,6 +17,7 @@ from zope import component
 from zope import interface
 
 from nti.contentlibrary.interfaces import IContentUnit
+from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
@@ -33,6 +34,12 @@ from nti.traversal.traversal import find_interface
 @component.adapter(IContentUnit)
 @interface.implementer(IHostPolicyFolder)
 def contentunit_to_site(context):
+    return find_interface(context, IHostPolicyFolder, strict=False)
+
+
+@component.adapter(IContentPackageBundle)
+@interface.implementer(IHostPolicyFolder)
+def contentbundle_to_site(context):
     return find_interface(context, IHostPolicyFolder, strict=False)
 
 
