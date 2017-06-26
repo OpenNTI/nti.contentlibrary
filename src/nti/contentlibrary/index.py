@@ -21,6 +21,7 @@ import BTrees
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IEditableContentUnit
+from nti.contentlibrary.interfaces import IContentPackageBundle
 
 from nti.site.interfaces import IHostPolicyFolder
 
@@ -37,6 +38,10 @@ from nti.zope_catalog.index import AttributeValueIndex as ValueIndex
 from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
 
 from nti.zope_catalog.string import StringTokenNormalizer
+
+
+# library catalog
+
 
 CATALOG_INDEX_NAME = 'nti.dataserver.++etc++contentlibrary.catalog'
 
@@ -119,14 +124,19 @@ def CreatorIndex(family=None):
 
 class PublishLastModifiedRawIndex(RawIntegerValueIndex):
     pass
-CreatedTimeRawIndex = LastModifiedRawIndex = PublishLastModifiedRawIndex # BWC
+
+
+CreatedTimeRawIndex = LastModifiedRawIndex = PublishLastModifiedRawIndex  # BWC
+
 
 def PublishLastModifiedIndex(family=None):
     return NormalizationWrapper(field_name='publishLastModified',
                                 interface=IEditableContentUnit,
-                                index=PublishLastModifiedRawIndex(family=family),
+                                index=PublishLastModifiedRawIndex(
+                                    family=family),
                                 normalizer=TimestampToNormalized64BitIntNormalizer())
-CreatedTimeIndex = LastModifiedIndex = PublishLastModifiedIndex # BWC
+CreatedTimeIndex = LastModifiedIndex = PublishLastModifiedIndex  # BWC
+
 
 class LibraryCatalog(Catalog):
     family = BTrees.family64
@@ -161,9 +171,161 @@ def install_library_catalog(site_manager_container, intids=None):
     catalog = create_library_catalog(family=intids.family)
     locate(catalog, site_manager_container, CATALOG_INDEX_NAME)
     intids.register(catalog)
-    lsm.registerUtility(catalog, 
+    lsm.registerUtility(catalog,
                         provided=ICatalog,
                         name=CATALOG_INDEX_NAME)
+
+    for index in catalog.values():
+        intids.register(index)
+    return catalog
+
+
+# content bundles
+
+
+CONTENT_BUNDLES_CATALOG_NAME = 'nti.dataserver.++etc++contentbundles.catalog'
+
+IX_TITLE = 'title'
+IX_PACKAGES = 'packages'
+IX_CREATEDTIME = 'createdTime'
+IX_LASTMODIFIED = 'lastModified'
+
+
+class ContentBundleTitleIndex(ValueIndex):
+    default_field_name = 'title'
+    default_interface = IContentPackageBundle
+
+
+class ContentBundleNTIIDIndex(ValueIndex):
+    default_field_name = 'ntiid'
+    default_interface = IContentPackageBundle
+
+
+class ContentBundleMimeTypeIndex(ValueIndex):
+    default_field_name = 'mimeType'
+    default_interface = IContentPackageBundle
+
+
+class ValidatingContentBundleSiteName(object):
+
+    __slots__ = ('site',)
+
+    def __init__(self, obj, default=None):
+        if IContentPackageBundle.providedBy(obj):
+            folder = find_interface(obj, IHostPolicyFolder, strict=False)
+            if folder is not None:
+                self.site = folder.__name__
+
+    def __reduce__(self):
+        raise TypeError()
+
+
+class ContentBundleSiteIndex(ValueIndex):
+    default_field_name = 'site'
+    default_interface = ValidatingContentBundleSiteName
+
+
+class ValidatingContentPackages(object):
+
+    __slots__ = ('packages',)
+
+    def __init__(self, obj, default=None):
+        if IContentPackageBundle.providedBy(obj):
+            self.packages = tuple(x.ntiid for x in obj.ContentPackages or ())
+
+    def __reduce__(self):
+        raise TypeError()
+
+
+class ContentBundlePackagesIndex(AttributeSetIndex):
+    default_field_name = 'packages'
+    default_interface = ValidatingContentPackages
+
+
+class ValidatingContentBundleCreator(object):
+
+    __slots__ = ('creator',)
+
+    def __init__(self, obj, default=None):
+        try:
+            if IContentPackageBundle.providedBy(obj):
+                creator = getattr(obj.creator, 'username', obj.creator)
+                self.creator = getattr(creator, 'id', creator)
+        except (AttributeError, TypeError):
+            pass
+
+    def __reduce__(self):
+        raise TypeError()
+
+
+def ContentBundleCreatorIndex(family=None):
+    return NormalizationWrapper(field_name='creator',
+                                index=RawValueIndex(family=family),
+                                normalizer=StringTokenNormalizer(),
+                                interface=ValidatingContentBundleCreator)
+
+
+class ContentBundleLastModifiedRawIndex(RawIntegerValueIndex):
+    pass
+
+
+def ContentBundleLastModifiedIndex(family=None):
+    return NormalizationWrapper(field_name='lastModified',
+                                interface=IContentPackageBundle,
+                                normalizer=TimestampToNormalized64BitIntNormalizer(),
+                                index=ContentBundleLastModifiedRawIndex(family=family))
+
+
+class ContentBundleCreatedTimeRawIndex(RawIntegerValueIndex):
+    pass
+
+
+def ContentBundleCreatedTimeIndex(family=None):
+    return NormalizationWrapper(field_name='createdTime',
+                                interface=IContentPackageBundle,
+                                normalizer=TimestampToNormalized64BitIntNormalizer(),
+                                index=ContentBundleCreatedTimeRawIndex(family=family))
+
+
+class ContentBundleCatalog(Catalog):
+    family = BTrees.family64
+
+
+def get_contentbundle_catalog(registry=component):
+    return registry.queryUtility(ICatalog,
+                                 name=CONTENT_BUNDLES_CATALOG_NAME)
+
+
+def create_contentbundle_catalog(catalog=None, family=BTrees.family64):
+    if catalog is None:
+        catalog = ContentBundleCatalog(family=family)
+    for name, clazz in ((IX_SITE, ContentBundleSiteIndex),
+                        (IX_NTIID, ContentBundleNTIIDIndex),
+                        (IX_TITLE, ContentBundleTitleIndex),
+                        (IX_CREATOR,  ContentBundleCreatorIndex),
+                        (IX_MIMETYPE, ContentBundleMimeTypeIndex),
+                        (IX_PACKAGES, ContentBundlePackagesIndex),
+                        (IX_CREATEDTIME, ContentBundleCreatedTimeIndex),
+                        (IX_LASTMODIFIED, ContentBundleLastModifiedIndex)):
+        index = clazz(family=family)
+        locate(index, catalog, name)
+        catalog[name] = index
+    return catalog
+
+
+def install_contentbundle_catalog(site_manager_container, intids=None):
+    lsm = site_manager_container.getSiteManager()
+    intids = lsm.getUtility(IIntIds) if intids is None else intids
+    catalog = get_contentlibrary_catalog(lsm)
+    if catalog is not None:
+        return catalog
+
+    catalog = create_contentbundle_catalog(family=intids.family)
+    locate(catalog, site_manager_container, CONTENT_BUNDLES_CATALOG_NAME)
+    intids.register(catalog)
+    lsm.registerUtility(catalog,
+                        provided=ICatalog,
+                        name=CONTENT_BUNDLES_CATALOG_NAME)
 
     for index in catalog.values():
         intids.register(index)
