@@ -187,8 +187,6 @@ CONTENT_BUNDLES_CATALOG_NAME = 'nti.dataserver.++etc++contentbundles.catalog'
 
 IX_TITLE = 'title'
 IX_PACKAGES = 'packages'
-IX_CREATEDTIME = 'createdTime'
-IX_LASTMODIFIED = 'lastModified'
 
 
 class ContentBundleTitleIndex(ValueIndex):
@@ -265,28 +263,6 @@ def ContentBundleCreatorIndex(family=None):
                                 interface=ValidatingContentBundleCreator)
 
 
-class ContentBundleLastModifiedRawIndex(RawIntegerValueIndex):
-    pass
-
-
-def ContentBundleLastModifiedIndex(family=None):
-    return NormalizationWrapper(field_name='lastModified',
-                                interface=IContentPackageBundle,
-                                normalizer=TimestampToNormalized64BitIntNormalizer(),
-                                index=ContentBundleLastModifiedRawIndex(family=family))
-
-
-class ContentBundleCreatedTimeRawIndex(RawIntegerValueIndex):
-    pass
-
-
-def ContentBundleCreatedTimeIndex(family=None):
-    return NormalizationWrapper(field_name='createdTime',
-                                interface=IContentPackageBundle,
-                                normalizer=TimestampToNormalized64BitIntNormalizer(),
-                                index=ContentBundleCreatedTimeRawIndex(family=family))
-
-
 class ContentBundleCatalog(Catalog):
     family = BTrees.family64
 
@@ -304,9 +280,7 @@ def create_contentbundle_catalog(catalog=None, family=BTrees.family64):
                         (IX_TITLE, ContentBundleTitleIndex),
                         (IX_CREATOR,  ContentBundleCreatorIndex),
                         (IX_MIMETYPE, ContentBundleMimeTypeIndex),
-                        (IX_PACKAGES, ContentBundlePackagesIndex),
-                        (IX_CREATEDTIME, ContentBundleCreatedTimeIndex),
-                        (IX_LASTMODIFIED, ContentBundleLastModifiedIndex)):
+                        (IX_PACKAGES, ContentBundlePackagesIndex)):
         index = clazz(family=family)
         locate(index, catalog, name)
         catalog[name] = index
