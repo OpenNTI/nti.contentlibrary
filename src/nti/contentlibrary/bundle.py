@@ -61,6 +61,8 @@ from nti.wref.interfaces import IWeakRef
 
 from nti.zodb.persistentproperty import PersistentPropertyHolder
 
+BUNDLE_MIME_TYPE = 'application/vnd.nextthought.contentpackagebundle'
+
 
 @WithRepr
 @interface.implementer(IContentPackageBundle, IAttributeAnnotatable)
