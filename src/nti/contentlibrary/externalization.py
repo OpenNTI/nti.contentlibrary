@@ -207,8 +207,7 @@ class _ContentPackageExternal(object):
             try:
                 name = DEFAULT_PRESENTATION_PROPERTIES_FILE
                 try:
-                    ext_data = self.package.read_contents_of_sibling_entry(
-                        name)
+                    ext_data = self.package.read_contents_of_sibling_entry(name)
                 except AttributeError:
                     ext_data = None
             except self.package.TRANSIENT_EXCEPTIONS:
@@ -235,8 +234,7 @@ class _ContentPackageExternal(object):
 class _LegacyCourseConflatedContentPackageExternal(_ContentPackageExternal):
 
     def toExternalObject(self, **kwargs):
-        result = super(_LegacyCourseConflatedContentPackageExternal,
-                       self).toExternalObject(**kwargs)
+        result = super(_LegacyCourseConflatedContentPackageExternal, self).toExternalObject(**kwargs)
         result['isCourse'] = self.package.isCourse
         result['courseName'] = self.package.courseName
         result['courseTitle'] = self.package.courseTitle
@@ -257,8 +255,7 @@ class _EditableContentPackageExternal(_ContentPackageExternal):
         return self.package.is_published()
 
     def toExternalObject(self, **kwargs):
-        result = super(_EditableContentPackageExternal,
-                       self).toExternalObject(**kwargs)
+        result = super(_EditableContentPackageExternal, self).toExternalObject(**kwargs)
         is_published = self._is_published()
         # remove anything empty
         if not is_published:
@@ -286,8 +283,7 @@ class _RenderableContentPackageExternal(_EditableContentPackageExternal):
 class _EditableContentPackageExporter(_EditableContentPackageExternal):
 
     def toExternalObject(self, **kwargs):
-        result = super(_EditableContentPackageExporter,
-                       self).toExternalObject(**kwargs)
+        result = super(_EditableContentPackageExporter, self).toExternalObject(**kwargs)
         # export data as b64 gzip
         data = base64.b64encode(zlib.compress(self.package.contents or b''))
         result['contents'] = data
