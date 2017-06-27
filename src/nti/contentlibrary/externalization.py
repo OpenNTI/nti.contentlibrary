@@ -6,7 +6,7 @@ Support for externalizing portions of the library.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -41,6 +41,8 @@ from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
 from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
+
+from nti.contentlibrary.wref import contentunit_wref_to_missing_ntiid
 
 from nti.externalization.interfaces import IExternalObject
 from nti.externalization.interfaces import LocatedExternalDict
@@ -160,8 +162,8 @@ class _ContentPackageExternal(object):
         result['title'] = self.package.title  # Matches result['DCTitle']
 
         index_dc = ''
-        if      self.package.index_last_modified \
-            and self.package.index_last_modified > 0:
+        if self.package.index_last_modified \
+                and self.package.index_last_modified > 0:
             index_dc = '?dc=' + str(self.package.index_last_modified)
 
         index = self.package.index
@@ -205,7 +207,8 @@ class _ContentPackageExternal(object):
             try:
                 name = DEFAULT_PRESENTATION_PROPERTIES_FILE
                 try:
-                    ext_data = self.package.read_contents_of_sibling_entry(name)
+                    ext_data = self.package.read_contents_of_sibling_entry(
+                        name)
                 except AttributeError:
                     ext_data = None
             except self.package.TRANSIENT_EXCEPTIONS:
@@ -232,7 +235,8 @@ class _ContentPackageExternal(object):
 class _LegacyCourseConflatedContentPackageExternal(_ContentPackageExternal):
 
     def toExternalObject(self, **kwargs):
-        result = super(_LegacyCourseConflatedContentPackageExternal, self).toExternalObject(**kwargs)
+        result = super(_LegacyCourseConflatedContentPackageExternal,
+                       self).toExternalObject(**kwargs)
         result['isCourse'] = self.package.isCourse
         result['courseName'] = self.package.courseName
         result['courseTitle'] = self.package.courseTitle
@@ -253,7 +257,8 @@ class _EditableContentPackageExternal(_ContentPackageExternal):
         return self.package.is_published()
 
     def toExternalObject(self, **kwargs):
-        result = super(_EditableContentPackageExternal, self).toExternalObject(**kwargs)
+        result = super(_EditableContentPackageExternal,
+                       self).toExternalObject(**kwargs)
         is_published = self._is_published()
         # remove anything empty
         if not is_published:
@@ -273,7 +278,7 @@ class _RenderableContentPackageExternal(_EditableContentPackageExternal):
 
     def _is_published(self):
         # Only display as published if also rendered
-        return  self.package.is_published() \
+        return self.package.is_published() \
             and IContentRendered.providedBy(self.package)
 
 
@@ -281,7 +286,8 @@ class _RenderableContentPackageExternal(_EditableContentPackageExternal):
 class _EditableContentPackageExporter(_EditableContentPackageExternal):
 
     def toExternalObject(self, **kwargs):
-        result = super( _EditableContentPackageExporter, self).toExternalObject(**kwargs)
+        result = super(_EditableContentPackageExporter,
+                       self).toExternalObject(**kwargs)
         # export data as b64 gzip
         data = base64.b64encode(zlib.compress(self.package.contents or b''))
         result['contents'] = data
@@ -308,9 +314,12 @@ class ContentBundleIO(InterfaceObjectIO):
 
     _ext_iface_upper_bound = IContentPackageBundle
 
-    _excluded_in_ivars_ = InterfaceObjectIO._excluded_in_ivars_.union(
-        {'root', 'ContentPackages'}
+    _excluded_in_ivars_ = getattr(InterfaceObjectIO,'_excluded_in_ivars_').union(
+        {'root', 'PlatformPresentationResources', 'ContentPackages', 
+         'contributors', 'subjects', 'creators'}
     )
+
+    validate_packages = True
 
     def toExternalObject(self, *args, **kwargs):
         result = InterfaceObjectIO.toExternalObject(self, *args, **kwargs)
@@ -326,14 +335,16 @@ class ContentBundleIO(InterfaceObjectIO):
 
     def updateFromExternalObject(self, parsed, *args, **kwargs):
         result = InterfaceObjectIO.updateFromExternalObject(self, parsed)
-        items = parsed.get('ContentPackages') or parsed.get(ITEMS)
+        items = parsed.get('ContentPackages') or parsed.get('Items')
         library = component.queryUtility(IContentPackageLibrary)
         if items is not None:
             packages = []
             for ntiid in items:
                 package = self.resolve(ntiid, library)
-                if package is None:
+                if self.validate_packages and package is None:
                     raise KeyError("Cannot find content package", ntiid)
+                else:
+                    package = contentunit_wref_to_missing_ntiid(ntiid)
                 packages.append(package)
             self._ext_self.ContentPackages = packages
             result = True
@@ -357,6 +368,7 @@ class _DisplayablePlatformPresentationResourcesIO(InterfaceObjectIO):
     def updateFromExternalObject(self, *args, **kwargs):
         raise NotImplementedError()
 
+
 # key/path-to-URL-mapping
 
 
@@ -375,6 +387,7 @@ class _FilesystemContentUnitHrefMapper(object):
         else:
             # This shouldn't be hit?
             self.href = IContentUnitHrefMapper(key).href
+
 
 from zope.location.interfaces import IRoot
 from zope.location.location import LocationIterator

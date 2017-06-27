@@ -72,10 +72,7 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
     """
     Basic implementation of a content package bundle.
     """
-    __external_class_name__ = 'ContentPackageBundle'
     __external_can_create__ = False
-
-    mime_type = mimeType = 'application/vnd.nextthought.contentpackagebundle'
 
     _SET_CREATED_MODTIME_ON_INIT = False
 
@@ -128,6 +125,11 @@ class PersistentContentPackageBundle(ContentPackageBundle,
     As required, references to content packages are
     maintained weakly.
     """
+    __external_can_create__ = True
+    __external_class_name__ = 'ContentPackageBundle'
+
+    mime_type = mimeType = 'application/vnd.nextthought.contentpackagebundle'
+
     # NOTE we don't extend the convenience class PersistentCreatedAndModifiedTimeObject
     # from time_mixins, because it re-introduces the CreatedAndModifiedTimeMixin
     # we got from ContentPackageBundle; that makes it hard to further subclass.
@@ -173,6 +175,7 @@ class PersistentContentPackageBundle(ContentPackageBundle,
             return object.__str__(self)
 
     __unicode__ = __str__
+
 
 _marker = object()
 
@@ -462,8 +465,8 @@ def synchronize_bundle(data_source, bundle,
                 _set_bundle_packages(bundle, meta)
         elif getattr(bundle, k, None) != getattr(meta, k):
             modified = True
-            validate_named_field_value(
-                bundle, bundle_iface, str(k), getattr(meta, k))()
+            validate_named_field_value(bundle, bundle_iface, 
+                                       str(k), getattr(meta, k))()
 
     if update_bundle and bundle.root != meta.key.__parent__:
         modified = True

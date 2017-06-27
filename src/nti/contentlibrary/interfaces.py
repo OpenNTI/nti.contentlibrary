@@ -1251,7 +1251,7 @@ class IContentPackageBundle(IDisplayableContent,
     root = Object(IDelimitedHierarchyItem,
                   title=u"The key giving the root of this content package",
                   description=u"Will be externalized through the href mapper",
-                  required=True)
+                  required=False)
     root.setTaggedValue('_ext_excluded_out', True)
 
     ntiid = ValidNTIID(title=u"The NTIID for this item",

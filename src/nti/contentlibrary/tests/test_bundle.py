@@ -7,7 +7,11 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
+from hamcrest import none
+from hamcrest import is_not
+from hamcrest import has_length
 from hamcrest import assert_that
+from hamcrest import has_entries
 from hamcrest import greater_than
 from hamcrest import has_property
 
@@ -26,6 +30,11 @@ from nti.contentlibrary.interfaces import IEditableContentPackageBundle
 from nti.contentlibrary.bundle import _ContentBundleMetaInfo
 from nti.contentlibrary.bundle import sync_bundle_from_json_key
 from nti.contentlibrary.bundle import PersistentContentPackageBundle
+
+from nti.externalization.externalization import to_external_object
+
+from nti.externalization.internalization import find_factory_for
+from nti.externalization.internalization import update_from_external_object
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
 
@@ -84,6 +93,29 @@ class TestBundle(ContentlibraryLayerTest):
         # adding them back
         sync_bundle_from_json_key(key, bundle, self.global_library, _meta=meta)
         assert_that(bundle, has_property('lastModified', greater_than(lm)))
+        
+        ext_obj = to_external_object(bundle)
+        assert_that(ext_obj,
+                    has_entries('Class', 'ContentPackageBundle',
+                                'ContentPackages', has_length(1),
+                                'MimeType', 'application/vnd.nextthought.contentpackagebundle',
+                                'NTIID', 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle',
+                                'title', 'A Title',
+                                'root', u'/ABundle/',
+                                'PlatformPresentationResources', has_length(3)))
+        
+        ext_obj['ContentPackages'] = [u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.']
+        factory = find_factory_for(ext_obj)
+        assert_that(factory, is_not(none()))
+        
+        bundle = factory()
+        update_from_external_object(bundle, ext_obj, notify=False)
+        assert_that(bundle, 
+                    has_property('ntiid', 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle'))
+        assert_that(bundle, 
+                    has_property('title', 'A Title'))
+        assert_that(bundle, 
+                    has_property('ContentPackages', has_length(1)))
 
     @time_monotonically_increases
     def test_missing_package(self):
@@ -102,4 +134,3 @@ class TestBundle(ContentlibraryLayerTest):
         meta.lastModified = -1
 
         sync_bundle_from_json_key(key, bundle, self.global_library, _meta=meta)
-

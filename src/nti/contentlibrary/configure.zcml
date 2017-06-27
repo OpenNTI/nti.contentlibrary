@@ -113,6 +113,8 @@
 		root_interfaces=".interfaces.IEditableContentUnit"
 		modules=".zodb" />
 
+	<ext:registerMimeFactories module=".bundle" />
+
 	<adapter factory=".externalization._ContentPackageExternal" />
 	<adapter factory=".externalization._ContentPackageLibraryExternal" />
 	<adapter factory=".externalization._EditableContentPackageExternal" />
