@@ -61,7 +61,7 @@ from nti.wref.interfaces import IWeakRef
 
 from nti.zodb.persistentproperty import PersistentPropertyHolder
 
-BUNDLE_MIME_TYPE = 'application/vnd.nextthought.contentpackagebundle'
+DEFAULT_BUNDLE_MIME_TYPE = 'application/vnd.nextthought.contentpackagebundle'
 
 
 @WithRepr
