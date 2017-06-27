@@ -308,6 +308,8 @@ class ContentBundleIO(InterfaceObjectIO):
 
     _ext_iface_upper_bound = IContentPackageBundle
 
+    _excluded_in_ivars_ = InterfaceObjectIO._excluded_in_ivars_.union({'root'})
+
     def toExternalObject(self, *args, **kwargs):
         result = InterfaceObjectIO.toExternalObject(self, *args, **kwargs)
         root_url = _root_url_of_key(self._ext_self.root)
@@ -315,8 +317,25 @@ class ContentBundleIO(InterfaceObjectIO):
         result['root'] = root_url
         return result
 
-    def updateFromExternalObject(self, *args, **kwargs):
-        raise NotImplementedError()
+    @classmethod
+    def resolve(cls, ntiid, library):
+        paths = library.pathToNTIID(ntiid) if library is not None else None
+        return paths[0] if paths else None
+
+    def updateFromExternalObject(self, parsed, *args, **kwargs):
+        result = InterfaceObjectIO.updateFromExternalObject(self, parsed)
+        items = parsed.get('ContentPackages') or parsed.get(ITEMS)
+        library = component.queryUtility(IContentPackageLibrary)
+        if items is not None:
+            packages = []
+            for ntiid in items:
+                package = self.resolve(ntiid, library)
+                if package is None:
+                    raise KeyError("Cannot find content package", ntiid)
+                packages.append(package)
+            self._ext_self.ContentPackages = packages
+            result = True
+        return result
 _ContentBundleIO = ContentBundleIO
 
 
