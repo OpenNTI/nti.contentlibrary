@@ -76,8 +76,6 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
     """
     __external_can_create__ = False
     __external_class_name__ = 'ContentPackageBundle'
-
-    mime_type = mimeType = 'application/vnd.nextthought.contentpackagebundle'
     
     _SET_CREATED_MODTIME_ON_INIT = False
 
@@ -131,7 +129,10 @@ class PersistentContentPackageBundle(ContentPackageBundle,
     maintained weakly.
     """
     __external_can_create__ = True
+    __external_class_name__ = 'ContentPackageBundle'
 
+    mime_type = mimeType = DEFAULT_BUNDLE_MIME_TYPE
+        
     # NOTE we don't extend the convenience class PersistentCreatedAndModifiedTimeObject
     # from time_mixins, because it re-introduces the CreatedAndModifiedTimeMixin
     # we got from ContentPackageBundle; that makes it hard to further subclass.

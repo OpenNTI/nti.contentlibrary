@@ -7,8 +7,8 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
-# from hamcrest import none
-# from hamcrest import is_not
+from hamcrest import none
+from hamcrest import is_not
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_entries
@@ -33,8 +33,8 @@ from nti.contentlibrary.bundle import PersistentContentPackageBundle
 
 from nti.externalization.externalization import to_external_object
 
-# from nti.externalization.internalization import find_factory_for
-# from nti.externalization.internalization import update_from_external_object
+from nti.externalization.internalization import find_factory_for
+from nti.externalization.internalization import update_from_external_object
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
 
@@ -104,18 +104,18 @@ class TestBundle(ContentlibraryLayerTest):
                                 'root', u'/ABundle/',
                                 'PlatformPresentationResources', has_length(3)))
         
-#         ext_obj['ContentPackages'] = [u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.']
-#         factory = find_factory_for(ext_obj)
-#         assert_that(factory, is_not(none()))
-#         
-#         bundle = factory()
-#         update_from_external_object(bundle, ext_obj, notify=False)
-#         assert_that(bundle, 
-#                     has_property('ntiid', 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle'))
-#         assert_that(bundle, 
-#                     has_property('title', 'A Title'))
-#         assert_that(bundle, 
-#                     has_property('ContentPackages', has_length(1)))
+        ext_obj['ContentPackages'] = [u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.']
+        factory = find_factory_for(ext_obj)
+        assert_that(factory, is_not(none()))
+         
+        bundle = factory()
+        update_from_external_object(bundle, ext_obj, notify=False)
+        assert_that(bundle, 
+                    has_property('ntiid', 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle'))
+        assert_that(bundle, 
+                    has_property('title', 'A Title'))
+        assert_that(bundle, 
+                    has_property('ContentPackages', has_length(1)))
 
     @time_monotonically_increases
     def test_missing_package(self):
