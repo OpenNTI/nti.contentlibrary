@@ -308,7 +308,9 @@ class ContentBundleIO(InterfaceObjectIO):
 
     _ext_iface_upper_bound = IContentPackageBundle
 
-    _excluded_in_ivars_ = InterfaceObjectIO._excluded_in_ivars_.union({'root'})
+    _excluded_in_ivars_ = InterfaceObjectIO._excluded_in_ivars_.union(
+        {'root', 'ContentPackages'}
+    )
 
     def toExternalObject(self, *args, **kwargs):
         result = InterfaceObjectIO.toExternalObject(self, *args, **kwargs)
