@@ -231,7 +231,7 @@ def get_content_package_site_registry(context):
     return folder.getSiteManager() if folder is not None else None
 
 
-def is_valid_presentation_asset_source(source):
+def is_valid_presentation_assets_source(source):
     tmpdirs = []
     result = False
     try:

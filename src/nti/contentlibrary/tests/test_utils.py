@@ -15,7 +15,7 @@ import os
 import shutil
 import tempfile
 
-from nti.contentlibrary.utils import is_valid_presentation_asset_source
+from nti.contentlibrary.utils import is_valid_presentation_assets_source
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
 
@@ -26,22 +26,22 @@ class TestUtils(ContentlibraryLayerTest):
         path = os.path.join(os.path.dirname(__file__),
                             'TestFilesystem',
                             'presentation-assets')
-        result = is_valid_presentation_asset_source(path)
+        result = is_valid_presentation_assets_source(path)
         assert_that(result, is_(path))
 
         tmpdir = tempfile.mkdtemp()
         try:
             filename = os.path.join(tmpdir, "source")
             filename = shutil.make_archive(filename, 'zip', path)
-            result = is_valid_presentation_asset_source(filename)
+            result = is_valid_presentation_assets_source(filename)
             assert_that(result, is_not(path))
             assert_that(os.path.isdir(result), is_(True))
             shutil.rmtree(result, ignore_errors=True)
         finally:
             shutil.rmtree(tmpdir, ignore_errors=True)
 
-        result = is_valid_presentation_asset_source(os.path.dirname(__file__))
+        result = is_valid_presentation_assets_source(os.path.dirname(__file__))
         assert_that(result, is_(False))
         
-        result = is_valid_presentation_asset_source(None)
+        result = is_valid_presentation_assets_source(None)
         assert_that(result, is_(False))
