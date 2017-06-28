@@ -39,3 +39,9 @@ class TestUtils(ContentlibraryLayerTest):
             shutil.rmtree(result, ignore_errors=True)
         finally:
             shutil.rmtree(tmpdir, ignore_errors=True)
+
+        result = is_valid_presentation_asset_source(os.path.dirname(__file__))
+        assert_that(result, is_(False))
+        
+        result = is_valid_presentation_asset_source(None)
+        assert_that(result, is_(False))
