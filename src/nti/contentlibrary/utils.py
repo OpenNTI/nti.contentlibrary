@@ -21,6 +21,7 @@ from zope.intid.interfaces import IIntIds
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.contentlibrary import HTML
+from nti.contentlibrary import BUNDLE
 from nti.contentlibrary import ALL_CONTENT_PACKAGE_MIME_TYPES
 
 from nti.contentlibrary.index import IX_SITE
@@ -197,6 +198,18 @@ def make_content_package_ntiid(package=None, provider=NTI, base=None, extra=None
                           specific=specific)
     else:
         return make_package_ntiid(provider, base, extra)
+
+
+def make_content_package_bundle_ntiid(bundle=None, provider=NTI, base=None, extra=None):
+    specific = get_specific(base) if base else None
+    if not specific:
+        intids = component.getUtility(IIntIds)
+        specific = '%s' % intids.getId(bundle)
+    elif extra:
+        specific += ".%s" % extra
+    return make_ntiid(nttype=BUNDLE,
+                      provider=provider,
+                      specific=specific)
 
 
 def get_content_package_site(context):
