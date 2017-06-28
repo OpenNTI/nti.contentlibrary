@@ -9,8 +9,14 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import os
+import re
 import six
 import time
+import shutil
+import zipfile
+import tempfile
+from PIL import Image
 from datetime import datetime
 from collections import namedtuple
 
@@ -78,8 +84,8 @@ def get_content_packages(sites=(), mime_types=None):
         }
         for doc_id in catalog.apply(query) or ():
             context = intids.queryObject(doc_id)
-            if      IContentPackage.providedBy(context) \
-                and context.ntiid not in result:
+            if IContentPackage.providedBy(context) \
+                    and context.ntiid not in result:
                 result[context.ntiid] = context
 
     return list(result.values())
@@ -88,7 +94,7 @@ def get_content_packages(sites=(), mime_types=None):
 def _include_record(record, publish_time):
     # Only want records before our timestamp and that
     # changed the package contents.
-    return  record.created <= publish_time \
+    return record.created <= publish_time \
         and record.attributes \
         and 'contents' in record.attributes
 
@@ -215,9 +221,89 @@ def make_content_package_bundle_ntiid(bundle=None, provider=NTI, base=None, extr
 def get_content_package_site(context):
     folder = IHostPolicyFolder(IContentUnit(context, None), None)
     return folder.__name__ if folder is not None else None  # folder name
+
+
 get_content_package_site_name = get_content_package_site
 
 
 def get_content_package_site_registry(context):
     folder = IHostPolicyFolder(IContentUnit(context, None), None)
     return folder.getSiteManager() if folder is not None else None
+
+
+def is_valid_presentation_asset_source(source):
+    tmpdirs = []
+    result = False
+    try:
+        if hasattr("source", "read"):
+            tmpdir = tempfile.mkdtemp()
+            name = os.path.join(tmpdir, 'source.zip')
+            with open(name, "wb") as fp:
+                fp.read(source.read())
+            source = name
+            tmpdirs.append(tmpdir)
+        if isinstance(source, six.string_types):
+            tmpdir = None
+            if os.path.isfile(source):
+                if zipfile.is_zipfile(source):
+                    tmpdir = tempfile.mkdtemp()
+                    z_file = zipfile.ZipFile(source)
+                    z_file.extractall(path=tmpdir)
+                    files = os.listdir(tmpdir)
+                    if files and len(files) == 1:
+                        source = os.path.join(tmpdir, files[0])
+                    else:
+                        source = tmpdir
+            if not os.path.isdir(source):
+                tmpdirs.append(tmpdir) if tmpdir else ()
+            else:  # directory
+                targets = []
+                result = source
+                for name in os.listdir(source):
+                    if name.startswith('.'):
+                        continue
+                    # validate target
+                    target = os.path.join(source, name)
+                    if not os.path.isdir(target):
+                        logger.error(
+                            "%s is not valid target directory", target)
+                        result = False
+                        break
+                    targets.append(target)
+                # inside each target check versions
+                versions = []
+                if result:
+                    for path in targets:
+                        for name in os.listdir(path):
+                            if name.startswith('.'):
+                                continue
+                            if not re.match('v\d+$', name):
+                                result = False
+                                logger.error("%s is not a valid version directory name",
+                                             name)
+                                break
+                            version = os.path.join(target, name)
+                            if not os.path.isdir(version):
+                                result = False
+                                logger.error("%s is not valid version directory",
+                                             version)
+                                break
+                            versions.append(version)
+                # if no error check asset directories
+                if result:
+                    for path in versions:
+                        for name in os.listdir(path):
+                            if name.startswith('.'):
+                                continue
+                            name = os.path.join(path, name)
+                            try:
+                                Image.open(name)
+                            except Exception:
+                                result = False
+                                logger.error("%s is not a valid image file",
+                                             name)
+                                break
+        return result
+    finally:
+        for path in tmpdirs:
+            shutil.rmtree(path, ignore_errors=True)
