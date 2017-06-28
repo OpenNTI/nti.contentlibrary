@@ -27,6 +27,8 @@ AUTHORED_PREFIX = u"_authored"
 #: Named prefix to distinguish API rendered content
 RENDERED_PREFIX = u"_rendered"
 
+#: Content package bundle bucket name
+CONTENT_PACKAGE_BUNDLES = 'ContentPackageBundles'
 
 CONTENT_UNIT_MIME_TYPE = 'application/vnd.nextthought.contentunit'
 CONTENT_PACKAGE_MIME_TYPE = 'application/vnd.nextthought.contentpackage'
