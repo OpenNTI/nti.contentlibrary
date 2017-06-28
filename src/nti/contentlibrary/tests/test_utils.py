@@ -14,7 +14,7 @@ from hamcrest import assert_that
 import os
 import shutil
 import tempfile
- 
+
 from nti.contentlibrary.utils import is_valid_presentation_asset_source
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
