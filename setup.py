@@ -69,6 +69,7 @@ setup(
         'nti.zodb',
         'nti.zope_catalog',
         'persistent',
+        'Pillow',
         'PyYAML',
         'repoze.lru',
         'six',
