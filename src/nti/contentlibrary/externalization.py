@@ -320,9 +320,10 @@ class ContentBundleIO(InterfaceObjectIO):
 
     def toExternalObject(self, *args, **kwargs):
         result = InterfaceObjectIO.toExternalObject(self, *args, **kwargs)
-        root_url = _root_url_of_key(self._ext_self.root)
-        result._root_url = root_url
-        result['root'] = root_url
+        if self._ext_self.root is not None:
+            root_url = _root_url_of_key(self._ext_self.root)
+            result._root_url = root_url
+            result['root'] = root_url
         return result
 
     @classmethod
