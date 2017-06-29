@@ -1280,6 +1280,14 @@ class IEditableContentPackageBundle(IContentPackageBundle):
         """
 
 
+class IPublishableContentPackageBundle(IEditableContentPackageBundle,
+                                       IPublishable,
+                                       INoPublishLink):
+    """
+    An publishable context package bundle
+    """
+
+
 class IContentPackageBundleLibrary(IContentContainer):
     """
     A \"library\" that contains bundles.

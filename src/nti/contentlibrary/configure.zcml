@@ -122,6 +122,7 @@
 	<adapter factory=".externalization._LegacyCourseConflatedContentPackageExternal" />
 
 	<adapter factory=".externalization._ContentBundleIO" />
+	<adapter factory=".externalization._PublishableContentBundleIO" />
 
 	<adapter factory=".externalization._DisplayablePlatformPresentationResourcesIO" />
 

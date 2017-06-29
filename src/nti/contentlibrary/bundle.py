@@ -39,6 +39,7 @@ from nti.contentlibrary.interfaces import IDisplayableContent
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackageBundle
+from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 
 from nti.contentlibrary.presentationresource import DisplayableContentMixin
 
@@ -49,6 +50,8 @@ from nti.externalization.persistence import NoPickle
 from nti.externalization.representation import WithRepr
 
 from nti.property.property import alias
+
+from nti.publishing.mixins import PublishableMixin
 
 from nti.schema.eqhash import EqHash
 
@@ -178,6 +181,15 @@ class PersistentContentPackageBundle(ContentPackageBundle,
             return object.__str__(self)
 
     __unicode__ = __str__
+
+
+@interface.implementer(IPublishableContentPackageBundle)
+class PublishableContentPackageBundle(PersistentContentPackageBundle,
+                                      PublishableMixin):
+    __external_can_create__ = True
+    __external_class_name__ = 'ContentPackageBundle'
+
+    mime_type = mimeType = 'application/vnd.nextthought.publishablecontentpackagebundle'
 
 
 _marker = object()

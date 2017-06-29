@@ -39,6 +39,7 @@ from nti.contentlibrary.interfaces import IFilesystemContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
+from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
 
@@ -346,6 +347,13 @@ class ContentBundleIO(InterfaceObjectIO):
             result = True
         return result
 _ContentBundleIO = ContentBundleIO
+
+
+@component.adapter(IPublishableContentPackageBundle)
+class PublishableContentBundleIO(ContentBundleIO):
+    _ext_iface_upper_bound = IPublishableContentPackageBundle
+
+_PublishableContentBundleIO = PublishableContentBundleIO
 
 
 @component.adapter(IDisplayablePlatformPresentationResources)
