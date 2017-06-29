@@ -65,6 +65,7 @@ from nti.wref.interfaces import IWeakRef
 from nti.zodb.persistentproperty import PersistentPropertyHolder
 
 DEFAULT_BUNDLE_MIME_TYPE = 'application/vnd.nextthought.contentpackagebundle'
+PUBLISHABLE_BUNDLE_MIME_TYPE = 'application/vnd.nextthought.publishablecontentpackagebundle'
 
 
 @WithRepr
@@ -189,7 +190,7 @@ class PublishableContentPackageBundle(PersistentContentPackageBundle,
     __external_can_create__ = True
     __external_class_name__ = 'ContentPackageBundle'
 
-    mime_type = mimeType = 'application/vnd.nextthought.publishablecontentpackagebundle'
+    mime_type = mimeType = PUBLISHABLE_BUNDLE_MIME_TYPE
 
 
 _marker = object()
