@@ -235,7 +235,7 @@ def is_valid_presentation_assets_source(source):
     tmpdirs = []
     result = False
     try:
-        if hasattr("source", "read"):
+        if hasattr(source, "read"):
             tmpdir = tempfile.mkdtemp()
             name = os.path.join(tmpdir, 'source.zip')
             with open(name, "wb") as fp:
