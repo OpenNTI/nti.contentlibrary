@@ -240,7 +240,7 @@ def is_valid_presentation_assets_source(source):
             tmpdirs.append(tmpdir)
             name = os.path.join(tmpdir, 'source.zip')
             with open(name, "wb") as fp:
-                fp.read(source.read())
+                fp.write(source.read())
             source = name
         if isinstance(source, six.string_types):
             tmpdir = None
