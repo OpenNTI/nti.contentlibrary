@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -93,8 +93,8 @@ class IDelimitedHierarchyItem(IZContained):
     The __parent__ of the bucket should be the containing bucket;
     it *should* be aliased to the ``bucket`` property.
     """
-    name = TextLine(title=u"The name of this bucket;"
-                    " __name__ is an alias.")
+    name = TextLine(title=u"The name of this bucket; "
+                    u"__name__ is an alias.")
 
 
 class IDelimitedHierarchyBucket(IDelimitedHierarchyItem):
@@ -134,8 +134,8 @@ class IDelimitedHierarchyKey(IDelimitedHierarchyItem):
     """
 
     bucket = Object(IDelimitedHierarchyBucket,
-                    title=u"The bucket to which this key is relative;"
-                    " __parent__ is an alias.",
+                    title=u"The bucket to which this key is relative; "
+                    u"__parent__ is an alias.",
                     default=None,
                     required=False)
 
@@ -324,8 +324,7 @@ class IContentPackageLibrary(ILastModified,
         The number of content packages in this library
         """
 
-    contentPackages = Iterable(
-        title=u'Sequence of all known :class:`IContentPackage`')
+    contentPackages = Iterable(title=u'Sequence of all known :class:`IContentPackage`')
 
 
 class ISynchronizationParams(interface.Interface):
@@ -657,7 +656,7 @@ class IDisplayablePlatformPresentationResources(interface.Interface):
 
     InheritPlatformName = TextLine(title=u"A platform to inherit from",
                                    description=u"If present, this object should merge missing resources "
-                                   "from this named platform.",
+                                   u"from this named platform.",
                                    required=False)
 
     Version = Int(title=u"The version of the layout of resources",
@@ -772,12 +771,12 @@ class IContentUnit(IZContained,
 
     href = TextLine(title=u"A relative path within the containing bucket",
                     description=u"This may include URL fragments when the same key is re-used",
-                    default='')
+                    default=u'')
 
     key = Object(IDelimitedHierarchyKey,
                  title=u"Key that identifies where the contents for this unit are",
-                 description=u"Should have a bucket its relative to; will not have fragment"
-                 " identifiers, and thus may be reused within a hierarchy",
+                 description=u"Should have a bucket its relative to; will not have fragment "
+                 u"identifiers, and thus may be reused within a hierarchy",
                  default=None)
 
     ntiid = ValidNTIID(title=u"The NTIID for this item",
@@ -1056,7 +1055,7 @@ class ILegacyCourseConflatedContentPackage(IPotentialLegacyCourseConflatedConten
     courseInfoSrc = TextLine(title=u"The relative path to a JSON file",
                              description=u"This should be a IDelimitedHierarchyKey, but isn't; Assume it is a sibling",
                              required=True,
-                             default='')
+                             default=u'')
 
 
 class IDelimitedHierarchyContentUnit(IContentUnit, IDelimitedHierarchyEntry):
