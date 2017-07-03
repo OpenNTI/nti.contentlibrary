@@ -19,7 +19,7 @@ parent site annotations.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -63,7 +63,7 @@ class _WithId(object):
         if self.id is None:
             raise ValueError("ContentUnit with no NTIID cannot be annotated",
                              unit)
-        self.id = self.id + ':ordinal %s' % unit.ordinal
+        self.id = self.id + u':ordinal %s' % unit.ordinal
         try:
             self.id += _WithId(unit.__parent__).id
         except (AttributeError, ValueError):
@@ -86,10 +86,8 @@ def _im_func(obj):
 class ContentUnitAnnotationUtility(PrincipalAnnotationUtility):
 
     # These two methods are the only ones that depend on the id attribute
-    getAnnotations = _to_id(
-        _im_func(PrincipalAnnotationUtility.getAnnotations))
-    hasAnnotations = _to_id(
-        _im_func(PrincipalAnnotationUtility.hasAnnotations))
+    getAnnotations = _to_id(_im_func(PrincipalAnnotationUtility.getAnnotations))
+    hasAnnotations = _to_id(_im_func(PrincipalAnnotationUtility.hasAnnotations))
 
     def getAnnotationsById(self, principalId):
         """
@@ -103,6 +101,7 @@ class ContentUnitAnnotationUtility(PrincipalAnnotationUtility):
             notes.__parent__ = self
             notes.__name__ = principalId
         return notes
+
 
 from nti.site.localutility import queryNextUtility
 
