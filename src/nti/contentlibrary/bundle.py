@@ -249,6 +249,7 @@ class ContentPackageBundleLibrary(CheckingLastModifiedBTreeContainer):
         else:
             self._setitemf(bundle.ntiid, bundle)
             locate(bundle, self, bundle.ntiid)
+            self.updateLastMod()
     append = add
     
     def getBundles(self):
