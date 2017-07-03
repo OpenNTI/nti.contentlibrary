@@ -1311,6 +1311,11 @@ class IContentPackageBundleLibrary(IContentContainer):
         or a parent.
         """
 
+    def add(bundle, event=True):
+        """
+        Add a bundle to this library
+        """
+
     def getBundles():
         """
         Return all the bundles from this library

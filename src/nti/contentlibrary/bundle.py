@@ -241,6 +241,13 @@ class ContentPackageBundleLibrary(CheckingLastModifiedBTreeContainer):
 
             return parent_lib[key]
 
+    def add(self, bundle, event=True):
+        if event:
+            self[bundle.ntiid] = bundle
+        else:
+            self._setitemf(bundle.ntiid, bundle)
+    append = add
+    
     def getBundles(self):
         # recall that lower bundles override higher ones
         seen_ids = set()
