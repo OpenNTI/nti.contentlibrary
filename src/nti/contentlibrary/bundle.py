@@ -26,6 +26,8 @@ from zope.container.contained import Contained
 
 from zope.event import notify
 
+from zope.location.location import locate
+
 from ZODB.POSException import ConnectionStateError
 
 from BTrees.OOBTree import OOSet
@@ -246,6 +248,7 @@ class ContentPackageBundleLibrary(CheckingLastModifiedBTreeContainer):
             self[bundle.ntiid] = bundle
         else:
             self._setitemf(bundle.ntiid, bundle)
+            locate(bundle, self, bundle.ntiid)
     append = add
     
     def getBundles(self):
