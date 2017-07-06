@@ -1,12 +1,10 @@
 #!/Sr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Classes useful for working with libraries.
-
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -85,7 +83,7 @@ class AbstractContentPackageEnumeration(object):
     __name__ = None
     __parent__ = None
 
-    def _package_factory(self, possible_content_package):
+    def _package_factory(self, _):
         """
         A callable object that is passed each item from :attr:`possible_content_packages`
         and returns either a package factory, or `None`.
@@ -168,11 +166,17 @@ def register_content_units(context, content_unit):
     def _register(obj):
         add_to_connection(context, obj)
         for child in obj.children or ():
+            # take ownership
+            if getattr(child, '__parent__', None) is None:
+                child.__parent__ = obj
+            # process children
             _register(child)
+        # register w/ intid utility
         if is_indexable(obj):
             intid = intids.queryId(obj)
             if intid is None:
                 addIntId(obj)
+
     _register(content_unit)
 
 
@@ -210,7 +214,7 @@ class AbstractContentPackageLibrary(object):
 
     # Placeholder for prefixes that should be applied when generating
     # URLs for items in this library.
-    url_prefix = ''
+    url_prefix = u''
 
     # A place where we will cache the list of known
     # content packages. A value of `None` means we have never
@@ -232,10 +236,10 @@ class AbstractContentPackageLibrary(object):
     # library last modified timestamp
     _last_modified = 0
 
-    __name__ = 'Library'
+    __name__ = u'Library'
     __parent__ = None
 
-    def __init__(self, enumeration, prefix='', **kwargs):
+    def __init__(self, enumeration, prefix=u'', **kwargs):
         self._enumeration = enumeration
         enumeration.__parent__ = self
         assert enumeration is not None
@@ -256,6 +260,7 @@ class AbstractContentPackageLibrary(object):
 
     def _get_content_units_for_package(self, package):
         result = []
+
         def _recur(unit):
             result.append(unit)
             for child in unit.children:
@@ -469,8 +474,8 @@ class AbstractContentPackageLibrary(object):
                 logger.info("Library %s changing packages %s", self, changed)
 
             if removed and params is not None and not params.allowRemoval:
-                raise ContentRemovalException(
-                    "Cannot remove content packages without explicitly allowing it")
+                msg = "Cannot remove content packages without explicitly allowing it"
+                raise ContentRemovalException(msg)
 
             # Now fire the events letting listeners (e.g., index and question adders)
             # know that we have content. Randomize the order of this across worker
@@ -501,7 +506,7 @@ class AbstractContentPackageLibrary(object):
 
             # Ok, new let people know that 'contentPackages' changed
             attributes = lifecycleevent.Attributes(IContentPackageLibrary,
-                                                   'contentPackages')
+                                                   u'contentPackages')
             event = ContentPackageLibraryModifiedOnSyncEvent(self,
                                                              added=added,
                                                              removed=removed,
@@ -652,8 +657,8 @@ class AbstractContentPackageLibrary(object):
         """
         if isinstance(key, numbers.Integral):
             if key != 0:
-                raise TypeError(
-                    "Integers other than 0---first---not supported")
+                msg = "Integers other than 0---first---not supported"
+                raise TypeError(msg)
             # This should only be done by tests
             return list(self.contentPackages)[key]
 
@@ -812,7 +817,7 @@ class _EmptyEnumeration(AbstractContentPackageEnumeration):
         return ()
 
 
-def EmptyLibrary(prefix=''):
+def EmptyLibrary(prefix=u''):
     """
     A library that is perpetually empty.
     """
