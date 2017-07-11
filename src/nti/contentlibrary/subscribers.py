@@ -6,7 +6,7 @@ Event listeners.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -15,12 +15,18 @@ from zope import component
 
 from zope.component.hooks import site
 
+from zope.lifecycleevent.interfaces import IObjectCreatedEvent
+
+from nti.base.interfaces import ICreated
+
 from nti.contentlibrary.annotation import ContentUnitAnnotationUtility
 
 from nti.contentlibrary.interfaces import ISiteLibraryFactory
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentUnitAnnotationUtility
 from nti.contentlibrary.interfaces import IPersistentContentPackageLibrary
+
+from nti.site.interfaces import IHostPolicyFolder
 
 from nti.site.localutility import install_utility
 from nti.site.localutility import install_utility_on_registration
@@ -95,6 +101,7 @@ def install_site_content_library(local_site_manager, _=None):
 
 # Bundle-related subscribers
 
+
 from zope.interface.interfaces import IRegistered
 from zope.interface.interfaces import IUnregistered
 
@@ -110,7 +117,7 @@ _BUNDLE_LIBRARY_NAME = 'ContentPackageBundles'
 
 
 @component.adapter(IPersistentContentPackageLibrary, IRegistered)
-def install_bundle_library(library, event):
+def install_bundle_library(context, event):
     """
     When a new persistent library is installed, beside it we
     put something to manage (persistent) content bundles, driven
@@ -142,8 +149,8 @@ def sync_bundles_when_library_synched(library, event):
     # Find the local site manager
     site_manager = component.getSiteManager(library)
     if library.__parent__ is not site_manager:
-        logger.warn(
-            "Expected to find persistent library in its own site; refusing to sync")
+        msg = "Expected to find persistent library in its own site; refusing to sync"
+        logger.warn(msg)
         return
 
     bundle_library = site_manager.getUtility(IContentPackageBundleLibrary)
@@ -151,7 +158,6 @@ def sync_bundles_when_library_synched(library, event):
            "Make sure we got the immediate parent"
 
     enumeration = IDelimitedHierarchyContentPackageEnumeration(library)
-
     enumeration_root = enumeration.root
 
     bundle_bucket = enumeration_root.getChildNamed(bundle_library.__name__)
@@ -170,3 +176,14 @@ def sync_bundles_when_library_synched(library, event):
                 getattr(bundle_bucket, 'absolute_path', bundle_bucket))
     syncable = ISyncableContentPackageBundleLibrary(bundle_library)
     syncable.syncFromBucket(bundle_bucket)
+
+
+@component.adapter(IHostPolicyFolder, IObjectCreatedEvent)
+def on_site_created(site, event):
+    if ICreated.providedBy(site):
+        site_manager = site.getSiteManager()
+        install_site_content_library(site_manager)
+        install_utility(ContentPackageBundleLibrary(),
+                        _BUNDLE_LIBRARY_NAME,
+                        IContentPackageBundleLibrary,
+                        site_manager)
