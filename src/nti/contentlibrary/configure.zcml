@@ -88,6 +88,7 @@
 				for="nti.site.interfaces.IHostPolicySiteManager
 					 zope.site.interfaces.INewLocalSite" />
 
+	<subscriber handler=".subscribers.on_site_created" />
 	<subscriber handler=".subscribers.install_bundle_library" />
 	<subscriber handler=".subscribers.uninstall_bundle_library" />
 	<subscriber handler=".subscribers.sync_bundles_when_library_synched" />
