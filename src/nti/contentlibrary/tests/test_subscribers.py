@@ -11,7 +11,7 @@ from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
 from hamcrest import has_key
-from hamcrest import contains
+from hamcrest import not_none
 from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
@@ -155,32 +155,43 @@ class TestSubscribers(ContentlibraryLayerTest):
 
         subscribers.install_site_content_library(sm, NewLocalSite(sm))
 
-        evts = eventtesting.getEvents(
+        events = eventtesting.getEvents(
             interfaces.IContentPackageBundleLibraryModifiedOnSyncEvent)
-        assert_that(evts, has_length(1))
+        assert_that(events, has_length(1))
 
-        bundle_lib = evts[0].object
-        bundle_bucket = evts[0].bucket
+        bundle_lib = events[0].object
+        bundle_bucket = events[0].bucket
 
-        evts = eventtesting.getEvents(
+        events = eventtesting.getEvents(
             IObjectAddedEvent,
             filter=lambda e: interfaces.IContentPackageBundle.providedBy(getattr(e, 'object', None)))
 
-        assert_that(evts, has_length(1))
-        assert_that(evts[0], has_property('object',
+        assert_that(events, has_length(2))
+        evt = next(x for x in events if x.newName == 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle')
+        assert_that(evt, has_property('object',
                                           has_property('ContentPackages', has_length(1))))
 
-        bundle = evts[0].object
-        assert_that(list(bundle_lib.getBundles()), contains(bundle))
+        bundle = evt.object
+        bundles = [x.object for x in events]
+        assert_that(list(bundle_lib.getBundles()), contains_inanyorder(*bundles))
         assert_that(bundle_lib.get(bundle.ntiid), is_(bundle))
         assert_that(bundle_lib.get('missing', 1), is_(1))
 
         # XXX: This doesn't exactly belong here, it's just convenient
-
         # test externalization
+        restricted_ntiid = 'tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle'
+        restricted_bundle = bundle_lib[restricted_ntiid]
+        assert_that(restricted_bundle, not_none())
+        assert_that(restricted_bundle, validly_provides(interfaces.IContentPackageBundle))
+        assert_that(restricted_bundle,
+                    externalizes(has_entries('Class', 'ContentPackageBundle',
+                                             'ContentPackages', has_length(1),
+                                             'title', 'Restricted',
+                                             'root', '/sites/localsite/ContentPackageBundles/RestrictedBundle/',
+                                             'NTIID', restricted_ntiid,
+                                             'RestrictedAccess', True)))
 
         assert_that(bundle, validly_provides(interfaces.IContentPackageBundle))
-
         # check that we have the right kind of property, didn't overwrite
         # through createFieldProperties
         assert_that(bundle, has_property('_lastModified', is_(NumericMaximum)))
@@ -192,6 +203,7 @@ class TestSubscribers(ContentlibraryLayerTest):
                                              'root', '/sites/localsite/ContentPackageBundles/ABundle/',
                                              'NTIID', bundle.ntiid,
                                              'Last Modified', greater_than(0),
+                                             'RestrictedAccess', False,
                                              'PlatformPresentationResources', contains_inanyorder(
                                                  has_entry(
                                                      'PlatformName',

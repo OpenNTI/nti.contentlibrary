@@ -632,7 +632,7 @@ class IEditableContentPackageLibrary(ISyncableContentPackageLibrary):
         """
         Remove a `IContentPackage`
 
-        @paran package - class `IContentPackage` to remove
+        @param package - class `IContentPackage` to remove
         @param event - notify package removal
         @param unregister - unregister from intid facility
 
@@ -643,7 +643,7 @@ class IEditableContentPackageLibrary(ISyncableContentPackageLibrary):
         """
         Replace a content package
 
-        @paran package - new class `IContentPackage` 
+        @param package - new class `IContentPackage`
         """
 
 class IDisplayablePlatformPresentationResources(interface.Interface):
@@ -1257,10 +1257,18 @@ class IContentPackageBundle(IDisplayableContent,
                        default=None,
                        required=False)
 
-    ContentPackages = UniqueIterable(value_type=Object(IContentPackage, 
+    ContentPackages = UniqueIterable(value_type=Object(IContentPackage,
                                                        title=u"A content package"),
                                      title=u"The referenced content packages",
                                      default=())
+
+    RestrictedAccess = Bool(title=u"Restrict access to this bundle.",
+                            description=u"""Defines whether we'll restrict access to this bundle.
+                                    Historically, bundles have always been visible to all. By
+                                    default, we maintain that behavior. This implies nothing about
+                                    accessing the underlying content packages of this bundle.""",
+                            default=False,
+                            required=False)
 
 
 class IEditableContentPackageBundle(IContentPackageBundle):

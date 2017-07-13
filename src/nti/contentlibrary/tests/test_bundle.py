@@ -63,7 +63,7 @@ class TestBundle(ContentlibraryLayerTest):
         vendor = IContentPackageBundleVendorInfo(bundle, None)
         assert_that(vendor, is_not(none()))
         assert_that(vendor, verifiably_provides(IContentPackageBundleVendorInfo))
-        assert_that(vendor, 
+        assert_that(vendor,
                     has_property('__parent__', is_(bundle)))
 
     @time_monotonically_increases
@@ -100,7 +100,7 @@ class TestBundle(ContentlibraryLayerTest):
         # adding them back
         sync_bundle_from_json_key(key, bundle, self.global_library, _meta=meta)
         assert_that(bundle, has_property('lastModified', greater_than(lm)))
-        
+
         ext_obj = to_external_object(bundle)
         assert_that(ext_obj,
                     has_entries('Class', 'ContentPackageBundle',
@@ -110,19 +110,35 @@ class TestBundle(ContentlibraryLayerTest):
                                 'title', 'A Title',
                                 'root', u'/ABundle/',
                                 'PlatformPresentationResources', has_length(3)))
-        
+
         ext_obj['ContentPackages'] = [u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.']
         factory = find_factory_for(ext_obj)
         assert_that(factory, is_not(none()))
-         
+
         bundle = factory()
         update_from_external_object(bundle, ext_obj, notify=False)
-        assert_that(bundle, 
+        assert_that(bundle,
                     has_property('ntiid', 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle'))
-        assert_that(bundle, 
+        assert_that(bundle,
                     has_property('title', 'A Title'))
-        assert_that(bundle, 
+        assert_that(bundle,
                     has_property('ContentPackages', has_length(1)))
+
+        # Validate restricted access
+        bucket = FilesystemBucket()
+        bucket.absolute_path = os.path.join(os.path.dirname(__file__),
+                                            'sites', 'localsite',
+                                            'ContentPackageBundles', 'RestrictedBundle')
+        bucket.name = u'RestrictedBundle'
+        key = bucket.getChildNamed('bundle_meta_info.json')
+        bundle = PersistentContentPackageBundle()
+        bundle.lastModified = -1
+        bundle.createdTime = -1
+        meta = _ContentBundleMetaInfo(key, self.global_library)
+        meta.lastModified = -1
+        sync_bundle_from_json_key(key, bundle, self.global_library, _meta=meta)
+        assert_that(bundle, has_property('RestrictedAccess', is_(True)))
+
 
     @time_monotonically_increases
     def test_missing_package(self):
