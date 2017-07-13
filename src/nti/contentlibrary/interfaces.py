@@ -324,7 +324,8 @@ class IContentPackageLibrary(ILastModified,
         The number of content packages in this library
         """
 
-    contentPackages = Iterable(title=u'Sequence of all known :class:`IContentPackage`')
+    contentPackages = Iterable(
+        title=u'Sequence of all known :class:`IContentPackage`')
 
 
 class ISynchronizationParams(interface.Interface):
@@ -645,6 +646,7 @@ class IEditableContentPackageLibrary(ISyncableContentPackageLibrary):
 
         @param package - new class `IContentPackage`
         """
+
 
 class IDisplayablePlatformPresentationResources(interface.Interface):
     """
@@ -1222,6 +1224,7 @@ class IGlobalFilesystemContentPackageLibrary(IGlobalContentPackageLibrary,
                                              IFilesystemContentPackageLibrary):
     pass
 
+
 # Content bundles
 
 
@@ -1580,9 +1583,37 @@ class IContentVendorInfo(IEnumerableMapping,
     information.
     """
 
+
 class IContentPackageVendorInfo(IContentVendorInfo):
     pass
 
 
 class IContentPackageBundleVendorInfo(IContentVendorInfo):
+    pass
+
+
+class IContentVendorInfoSynchronized(IObjectEvent):
+    pass
+
+
+class IContentPackageVendorInfoSynchronized(IContentVendorInfoSynchronized):
+    pass
+
+
+class IContentPackageBundleVendorInfoSynchronized(IContentVendorInfoSynchronized):
+    pass
+
+
+@interface.implementer(IContentVendorInfoSynchronized)
+class ContentVendorInfoSynchronized(ObjectEvent):
+    pass
+
+
+@interface.implementer(IContentPackageVendorInfoSynchronized)
+class ContentPackageVendorInfoSynchronized(ContentVendorInfoSynchronized):
+    pass
+
+
+@interface.implementer(IContentPackageBundleVendorInfoSynchronized)
+class ContentPackageBundleVendorInfoSynchronized(ContentVendorInfoSynchronized):
     pass
