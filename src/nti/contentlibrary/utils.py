@@ -34,10 +34,12 @@ from nti.contentlibrary.index import IX_SITE
 from nti.contentlibrary.index import IX_MIMETYPE
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
-from nti.contentlibrary.interfaces import IContentUnit
+from nti.contentlibrary.interfaces import IContentUnit, IContentVendorInfo
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
+
+from nti.contentlibrary.vendorinfo import VENDOR_INFO_KEY
 
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import get_provider
@@ -308,3 +310,18 @@ def is_valid_presentation_assets_source(source):
         for path in tmpdirs:
             shutil.rmtree(path, ignore_errors=True)
 
+
+def get_content_vendor_info(context, create=True):
+    result = None
+    if create:
+        result = IContentVendorInfo(context, None)
+    else:
+        try:
+            if IContentPackage.providedBy(context):
+                result = context._package_vendor_info
+            else:
+                annotations = context.__annotations__
+                result = annotations.get(VENDOR_INFO_KEY, None)
+        except AttributeError:
+            pass
+    return result
