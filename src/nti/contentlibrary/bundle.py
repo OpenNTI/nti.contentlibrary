@@ -431,8 +431,8 @@ def _set_bundle_packages(bundle, meta):
 def synchronize_bundle(data_source, bundle,
                        content_library=None,
                        excluded_keys=(),
-                       _meta=None,
-                       update_bundle=True):
+                       update_bundle=True,
+                       _meta=None):
     """
     Given either a :class:`IDelimitedHierarchyKey` whose contents are a JSON
     or a JSON source, and an object representing a :class:`IContentPackageBundle`,
@@ -460,14 +460,16 @@ def synchronize_bundle(data_source, bundle,
         content_library = component.getUtility(IContentPackageLibrary)
 
     bundle_iface = IContentPackageBundle
-    # ^ In the past, we used interface.providedBy(bundle), but that
+    # In the past, we used interface.providedBy(bundle), but that
     # could let anything be set
     meta = _meta or _ContentBundleMetaInfo(data_source,
                                            content_library,
                                            require_ntiid='ntiid' not in excluded_keys)
-    fields_to_update = (set(meta.__dict__)
-                        - set(excluded_keys)
-                        - {'lastModified', 'createdTime', 'modified', 'created'})
+    fields_to_update = (
+        set(meta.__dict__)
+        - set(excluded_keys)
+        - {'lastModified', 'createdTime', 'modified', 'created'}
+    )
 
     # Be careful to only update fields that have changed
     modified = False
@@ -475,7 +477,6 @@ def synchronize_bundle(data_source, bundle,
         if not bundle_iface.get(k):
             # not an interface field, ignore
             continue
-
         if k == 'ContentPackages':
             # Treat these specially so that we don't have to resolve
             # weak references; if everything was *missing*, the ContentPackages
@@ -507,12 +508,13 @@ def synchronize_bundle(data_source, bundle,
     return modified
 
 
-def sync_bundle_from_json_key(data_key, bundle, content_library=None,
+def sync_bundle_from_json_key(data_key, bundle, 
+                              content_library=None,
                               dc_meta_name=DCMETA_FILENAME,
                               excluded_keys=(),
-                              _meta=None,
                               dc_bucket=None,
-                              update_bundle=True):
+                              update_bundle=True,
+                              _meta=None):
     """
     :keyword dc_meta_name: If given (defaults to a standard value),
             DublinCore metadata will be read from this file (a sibling of the `data_key`).
@@ -520,14 +522,13 @@ def sync_bundle_from_json_key(data_key, bundle, content_library=None,
             filename if you might have multiple things in the same bucket.
     """
     result = synchronize_bundle(data_key, bundle,
-                                content_library=content_library,
                                 excluded_keys=excluded_keys,
-                                _meta=_meta,
-                                update_bundle=update_bundle)
+                                update_bundle=update_bundle,
+                                content_library=content_library,
+                                _meta=_meta)
     # Metadata if we need it
     dc_bucket = data_key.__parent__ if dc_bucket is None else dc_bucket
     read_dublincore_from_named_key(bundle, dc_bucket, dc_meta_name)
-
     return result
 
 
