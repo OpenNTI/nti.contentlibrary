@@ -35,13 +35,16 @@ from BTrees.OOBTree import difference as ooset_difference
 
 from nti.containers.containers import CheckingLastModifiedBTreeContainer
 
+from nti.contentlibrary import VENDOR_INFO_NAME
 from nti.contentlibrary import MissingContentBundleNTIIDException
 
 from nti.contentlibrary.interfaces import IDisplayableContent
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackageBundle
+from nti.contentlibrary.interfaces import IContentPackageBundleVendorInfo
 from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
+from nti.contentlibrary.interfaces import ContentPackageBundleVendorInfoSynchronized
 
 from nti.contentlibrary.presentationresource import DisplayableContentMixin
 
@@ -389,6 +392,21 @@ from nti.externalization.internalization import validate_named_field_value
 from nti.zodb import readCurrent as _readCurrent
 
 
+def synchronize_bundle_vendor_info(bundle, bucket):
+    vendor_json_key = bucket.getChildNamed(VENDOR_INFO_NAME)
+    vendor_info = IContentPackageBundleVendorInfo(bundle)
+    if not vendor_json_key:
+        vendor_info.clear()
+        vendor_info.createdTime = 0
+        vendor_info.lastModified = 0
+    elif vendor_json_key.lastModified > vendor_info.lastModified:
+        vendor_info.clear()
+        vendor_info.update(vendor_json_key.readContentsAsJson())
+        vendor_info.createdTime = vendor_json_key.createdTime
+        vendor_info.lastModified = vendor_json_key.lastModified
+        notify(ContentPackageBundleVendorInfoSynchronized(bundle))
+
+
 def _are_package_refs_equal(a, b):
     if isinstance(a, OOSet) and isinstance(b, OOSet):
         return not bool(ooset_difference(a, b))
@@ -529,6 +547,7 @@ def sync_bundle_from_json_key(data_key, bundle,
     # Metadata if we need it
     dc_bucket = data_key.__parent__ if dc_bucket is None else dc_bucket
     read_dublincore_from_named_key(bundle, dc_bucket, dc_meta_name)
+    synchronize_bundle_vendor_info(bundle, dc_bucket)
     return result
 
 

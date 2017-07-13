@@ -24,6 +24,9 @@ AUTHORED_PREFIX = u"_authored"
 #: Named prefix to distinguish API rendered content
 RENDERED_PREFIX = u"_rendered"
 
+#: Content vendor info file name
+VENDOR_INFO_NAME = 'vendor_info.json'
+
 #: Content package bundle bucket name
 CONTENT_PACKAGE_BUNDLES = 'ContentPackageBundles'
 
