@@ -82,7 +82,7 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
     """
     __external_can_create__ = False
     __external_class_name__ = 'ContentPackageBundle'
-    
+
     _SET_CREATED_MODTIME_ON_INIT = False
 
     # Equality and hashcode not defined on purpose,
@@ -138,7 +138,7 @@ class PersistentContentPackageBundle(ContentPackageBundle,
     __external_class_name__ = 'ContentPackageBundle'
 
     mime_type = mimeType = DEFAULT_BUNDLE_MIME_TYPE
-        
+
     # NOTE we don't extend the convenience class PersistentCreatedAndModifiedTimeObject
     # from time_mixins, because it re-introduces the CreatedAndModifiedTimeMixin
     # we got from ContentPackageBundle; that makes it hard to further subclass.
@@ -251,7 +251,7 @@ class ContentPackageBundleLibrary(CheckingLastModifiedBTreeContainer):
             locate(bundle, self, bundle.ntiid)
             self.updateLastMod()
     append = add
-    
+
     def getBundles(self):
         # recall that lower bundles override higher ones
         seen_ids = set()
@@ -493,7 +493,7 @@ def synchronize_bundle(data_source, bundle,
                 _set_bundle_packages(bundle, meta)
         elif getattr(bundle, k, None) != getattr(meta, k):
             modified = True
-            validate_named_field_value(bundle, bundle_iface, 
+            validate_named_field_value(bundle, bundle_iface,
                                        str(k), getattr(meta, k))()
 
     if update_bundle and bundle.root != meta.key.__parent__:
@@ -540,6 +540,10 @@ class _ContentPackageBundleLibrarySynchronizer(object):
         self.context = context
 
     def syncFromBucket(self, bucket):
+        """
+        Sync anything we have on disk, without removing any bundles
+        that may have been created through some API.
+        """
         sm = component.getSiteManager(self.context)
         content_library = sm.getUtility(IContentPackageLibrary)
         _readCurrent(content_library)
@@ -559,85 +563,61 @@ class _ContentPackageBundleLibrarySynchronizer(object):
 
         need_event = False
 
-        # Trivial case: everything is gone
-        # TODO: How do we want to handle deletions?
-        # Ideally we want to "archive" the objects somewhere probably
-        # (a special 'archive' subcontainer?)
-        if not bundle_meta_keys and self.context:
-            logger.info("Removing all bundles from library %s: %s",
-                        self.context, list(self.context))
+        bundle_metas = {_ContentBundleMetaInfo(k, content_library)
+                        for k in bundle_meta_keys}
+        # Now determine what to add/update.
+        # Order matters here, very much.
+        # The __contains__ operation for keys does not take parent
+        # libraries into account, nor does iterating the keys; thus,
+        # we're safe by checking the ntiids against our context.
+        # By the time we look for things to update, we know we will
+        # be accessing an item local in our context, not from parent,
+        # even though __getitem__ is recursive.
+
+        things_to_add = {
+            x for x in bundle_metas if x.ntiid not in self.context
+        }
+        # Take those out
+        bundle_metas = bundle_metas - things_to_add
+
+        things_to_update = {x for x in bundle_metas
+                            if x.lastModified > self.context[x.ntiid].lastModified}
+
+        # All of these remaining things haven't changed,
+        # but by definition must still be in the container
+        bundle_metas = bundle_metas - things_to_update
+
+        def _update_bundle(bundle, meta):
+            sync_bundle_from_json_key(meta.key, bundle,
+                                      content_library=content_library,
+                                      # pass in the existing object as an
+                                      # optimization
+                                      _meta=meta)
+            assert meta.ntiid == bundle.ntiid
+
+        # Start with the adds
+        if things_to_add:
             need_event = True
-            for k in list(self.context):
-                del self.context[k]  # fires bunches of events
-        else:
-            bundle_metas = {_ContentBundleMetaInfo(k, content_library)
-                            for k in bundle_meta_keys}
-            all_ntiids = {x.ntiid for x in bundle_metas}
-            # Now determine what to add/update/remove.
-            # Order matters here, very much.
-            # The __contains__ operation for keys does not take parent
-            # libraries into account, nor does iterating the keys; thus,
-            # we're safe by checking the ntiids against our context.
-            # By the time we look for things to update, we know we will
-            # be accessing an item local in our context, not from parent,
-            # even though __getitem__ is recursive.
+            logger.info("Adding bundles to library %s: %s",
+                        self.context, things_to_add)
+            for meta in things_to_add:
+                bundle = PersistentContentPackageBundle()
+                bundle.createdTime = meta.createdTime
+                _update_bundle(bundle, meta)
 
-            things_to_add = {
-                x for x in bundle_metas if x.ntiid not in self.context
-            }
-            # Take those out
-            bundle_metas = bundle_metas - things_to_add
+                lifecycleevent.created(bundle)
+                self.context[meta.ntiid] = bundle  # added
 
-            things_to_update = {x for x in bundle_metas
-                                if x.lastModified > self.context[x.ntiid].lastModified}
-
-            # All of these remaining things haven't changed,
-            # but by definition must still be in the container
-            bundle_metas = bundle_metas - things_to_update
-
-            # any ntiids in the container that we don't have on disk
-            # have to go
-            del_ntiids = {x for x in self.context if x not in all_ntiids}
-
-            def _update_bundle(bundle, meta):
-                sync_bundle_from_json_key(meta.key, bundle,
-                                          content_library=content_library,
-                                          # pass in the existing object as an
-                                          # optimization
-                                          _meta=meta)
-                assert meta.ntiid == bundle.ntiid
-
-            # Start with the adds
-            if things_to_add:
-                need_event = True
-                logger.info("Adding bundles to library %s: %s",
-                            self.context, things_to_add)
-                for meta in things_to_add:
-                    bundle = PersistentContentPackageBundle()
-                    bundle.createdTime = meta.createdTime
-                    _update_bundle(bundle, meta)
-
-                    lifecycleevent.created(bundle)
-                    self.context[meta.ntiid] = bundle  # added
-
-            # Now the deletions
-            if del_ntiids:
-                logger.info("Removing bundles from library %s: %s",
-                            self.context, del_ntiids)
-                for ntiid in del_ntiids:
-                    need_event = True
-                    del self.context[ntiid]
-
-            # Now any updates
-            if things_to_update:
-                need_event = True
-                logger.info("Updating bundles in library %s: %s",
-                            self.context, things_to_update)
-                for meta in things_to_update:
-                    bundle = self.context[meta.ntiid]
-                    _update_bundle(bundle, meta)
-                    # TODO: make update_bundle return the changed attributes?
-                    lifecycleevent.modified(bundle)
+        # Now any updates
+        if things_to_update:
+            need_event = True
+            logger.info("Updating bundles in library %s: %s",
+                        self.context, things_to_update)
+            for meta in things_to_update:
+                bundle = self.context[meta.ntiid]
+                _update_bundle(bundle, meta)
+                # TODO: make update_bundle return the changed attributes?
+                lifecycleevent.modified(bundle)
 
         if need_event:
             event = ContentPackageBundleLibraryModifiedOnSyncEvent(self.context)

@@ -307,3 +307,4 @@ def is_valid_presentation_assets_source(source):
     finally:
         for path in tmpdirs:
             shutil.rmtree(path, ignore_errors=True)
+

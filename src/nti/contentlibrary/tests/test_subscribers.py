@@ -38,7 +38,6 @@ from zope.component.hooks import site as current_site
 from zope.annotation.interfaces import IAnnotations
 
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
-from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 
 from zope.site.folder import Folder
@@ -50,8 +49,6 @@ from zope.schema.interfaces import IFieldUpdatedEvent
 from nti.contentlibrary import filesystem
 from nti.contentlibrary import interfaces
 from nti.contentlibrary import subscribers
-
-from nti.contentlibrary.bundle import ContentPackageBundle
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
@@ -188,7 +185,7 @@ class TestSubscribers(ContentlibraryLayerTest):
         # through createFieldProperties
         assert_that(bundle, has_property('_lastModified', is_(NumericMaximum)))
 
-        assert_that(bundle, 
+        assert_that(bundle,
                     externalizes(has_entries('Class', 'ContentPackageBundle',
                                              'ContentPackages', has_length(1),
                                              'title', 'A Title',
@@ -203,7 +200,7 @@ class TestSubscribers(ContentlibraryLayerTest):
                                                      'PlatformName',
                                                      'webapp'),
                                                  has_entry(
-                                                     'PlatformName', 
+                                                     'PlatformName',
                                                      'shared')),
                                              'PlatformPresentationResources', contains_inanyorder(
                                                  has_entry(
@@ -245,16 +242,4 @@ class TestSubscribers(ContentlibraryLayerTest):
         evts = eventtesting.getEvents(IObjectModifiedEvent)
         assert_that(evts, has_length(0))
 
-        # If we put a 'fake' bundle in there, if we sync again, it gets
-        # removed
-        fake_bundle = ContentPackageBundle()
-        bundle_lib['tag:nextthought.com,2011-10:FOO-BAR-BAZ'] = fake_bundle
-
-        eventtesting.clearEvents()
-        interfaces.ISyncableContentPackageBundleLibrary(
-            bundle_lib).syncFromBucket(bundle_bucket)
-
-        evts = eventtesting.getEvents(IObjectRemovedEvent)
-        assert_that(evts, has_length(1))
-
-        assert_that(evts[0], has_property('object', is_(fake_bundle)))
+        # Note: we no longer remove bundles via sync.
