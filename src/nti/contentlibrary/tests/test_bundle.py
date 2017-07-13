@@ -7,6 +7,7 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
+from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
 from hamcrest import has_length
@@ -26,6 +27,7 @@ from nti.contentlibrary.filesystem import GlobalFilesystemContentPackageLibrary
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackageBundle
+from nti.contentlibrary.interfaces import IContentPackageBundleVendorInfo
 
 from nti.contentlibrary.bundle import _ContentBundleMetaInfo
 from nti.contentlibrary.bundle import sync_bundle_from_json_key
@@ -58,6 +60,11 @@ class TestBundle(ContentlibraryLayerTest):
     def test_bundle(self):
         bundle = PersistentContentPackageBundle()
         assert_that(bundle, verifiably_provides(IEditableContentPackageBundle))
+        vendor = IContentPackageBundleVendorInfo(bundle, None)
+        assert_that(vendor, is_not(none()))
+        assert_that(vendor, verifiably_provides(IContentPackageBundleVendorInfo))
+        assert_that(vendor, 
+                    has_property('__parent__', is_(bundle)))
 
     @time_monotonically_increases
     def test_sync_bundle_from_meta(self):

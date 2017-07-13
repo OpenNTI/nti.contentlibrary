@@ -14,18 +14,20 @@ import time
 from zope import component
 from zope import interface
 
+from zope.annotation.factory import factory as an_factory
+
 from persistent.mapping import PersistentMapping
 
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageVendorInfo
+from nti.contentlibrary.interfaces import IContentPackageBundleVendorInfo
 
 from nti.dublincore.time_mixins import PersistentCreatedAndModifiedTimeObject
 
 
-@component.adapter(IContentPackage)
-@interface.implementer(IContentPackageVendorInfo)
-class DefaultContentPackageVendorInfo(PersistentMapping,
-                                      PersistentCreatedAndModifiedTimeObject):
+class DefaultVendorInfo(PersistentMapping,
+                        PersistentCreatedAndModifiedTimeObject):
     """
     The default representation of vendor info. We expect the info
     to be small.
@@ -38,12 +40,18 @@ class DefaultContentPackageVendorInfo(PersistentMapping,
     _SET_CREATED_MODTIME_ON_INIT = False
 
     def __init__(self):
-        super(DefaultContentPackageVendorInfo, self).__init__()
+        super(DefaultVendorInfo, self).__init__()
 
 
 @component.adapter(IContentPackage)
 @interface.implementer(IContentPackageVendorInfo)
-def vendor_info_factory(package):
+class DefaultContentPackageVendorInfo(DefaultVendorInfo):
+    pass
+
+
+@component.adapter(IContentPackage)
+@interface.implementer(IContentPackageVendorInfo)
+def package_vendor_info_factory(package):
     try:
         result = package._package_vendor_info
         return result
@@ -53,3 +61,14 @@ def vendor_info_factory(package):
         result.__parent__ = package
         result.__name__ = u'_package_vendor_info'
         return result
+
+
+@component.adapter(IContentPackageBundle)
+@interface.implementer(IContentPackageBundleVendorInfo)
+class DefaultContentPackageBundleVendorInfo(DefaultVendorInfo):
+    pass
+
+
+VENDOR_INFO_KEY = 'ContentPackageBundleVendorInfo'
+ContentPackageBundleVendorInfo = an_factory(DefaultContentPackageBundleVendorInfo,
+                                            VENDOR_INFO_KEY)

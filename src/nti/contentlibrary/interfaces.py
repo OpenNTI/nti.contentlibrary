@@ -1558,9 +1558,9 @@ class IEclipseContentPackageFactory(interface.Interface):
         """
 
 
-class IContentPackageVendorInfo(IEnumerableMapping,
-                                ILastModified,
-                                IZContained):
+class IContentVendorInfo(IEnumerableMapping,
+                         ILastModified,
+                         IZContained):
     """
     Arbitrary package vendor-specific information associated with a
     content package. Content packages should be adaptable to their vendor
@@ -1571,3 +1571,10 @@ class IContentPackageVendorInfo(IEnumerableMapping,
     keys be the vendor names and within them be the actual vendor specific
     information.
     """
+
+class IContentPackageVendorInfo(IContentVendorInfo):
+    pass
+
+
+class IContentPackageBundleVendorInfo(IContentVendorInfo):
+    pass

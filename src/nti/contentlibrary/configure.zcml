@@ -38,7 +38,6 @@
 	<adapter factory=".adapters.enumeration_from_library" />
 	<adapter factory=".adapters.trx_recorder_history_factory" />
 
-	<adapter factory=".vendorinfo.vendor_info_factory" />
 	<adapter factory=".bundle._ContentPackageBundleLibrarySynchronizer" />
 
 	<!-- annotations -->
@@ -163,4 +162,8 @@
         root_interfaces=".interfaces.IContentValidationError"
         modules=".validators" />
 
+	<!-- Validators -->
+	<adapter factory=".vendorinfo.package_vendor_info_factory" />
+	<adapter factory=".vendorinfo.ContentPackageBundleVendorInfo" />
+		
 </configure>

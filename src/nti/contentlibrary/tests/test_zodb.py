@@ -104,3 +104,5 @@ class TestZODB(ContentlibraryLayerTest):
                     has_property('_package_vendor_info', is_(info)))
         assert_that(info, validly_provides(IContentPackageVendorInfo))
         assert_that(info, verifiably_provides(IContentPackageVendorInfo))
+        assert_that(info, 
+                    has_property('__parent__', is_(package)))
