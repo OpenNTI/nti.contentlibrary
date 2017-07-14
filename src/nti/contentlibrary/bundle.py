@@ -33,6 +33,8 @@ from ZODB.POSException import ConnectionStateError
 from BTrees.OOBTree import OOSet
 from BTrees.OOBTree import difference as ooset_difference
 
+from nti.base.interfaces import ICreated
+
 from nti.containers.containers import CheckingLastModifiedBTreeContainer
 
 from nti.contentlibrary import VENDOR_INFO_NAME
@@ -47,6 +49,8 @@ from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 from nti.contentlibrary.interfaces import ContentPackageBundleVendorInfoSynchronized
 
 from nti.contentlibrary.presentationresource import DisplayableContentMixin
+
+from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.dublincore.time_mixins import CreatedAndModifiedTimeMixin
 
@@ -74,7 +78,7 @@ PUBLISHABLE_BUNDLE_MIME_TYPE = 'application/vnd.nextthought.publishablecontentpa
 
 
 @WithRepr
-@interface.implementer(IContentPackageBundle, IAttributeAnnotatable)
+@interface.implementer(IContentPackageBundle, IAttributeAnnotatable, ICreated)
 class ContentPackageBundle(CreatedAndModifiedTimeMixin,
                            DisplayableContentMixin,
                            Contained,
@@ -109,6 +113,8 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
     subjects = ()
     contributors = ()
     publisher = u''
+
+    creator = SYSTEM_USER_NAME
 
     @property
     def PlatformPresentationResources(self):
