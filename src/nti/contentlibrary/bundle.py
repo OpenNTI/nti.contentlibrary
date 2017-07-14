@@ -28,6 +28,8 @@ from zope.event import notify
 
 from zope.location.location import locate
 
+from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
+
 from ZODB.POSException import ConnectionStateError
 
 from BTrees.OOBTree import OOSet
@@ -99,6 +101,8 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
     createFieldProperties(IDisplayableContent,
                           omit='PlatformPresentationResources')
     createDirectFieldProperties(IContentPackageBundle)
+
+    RestrictedAccess = FP(IContentPackageBundle['RestrictedAccess'])
 
     # the above defined the ntiid property and the name
     # property, but the ntiid property has the constraint on it

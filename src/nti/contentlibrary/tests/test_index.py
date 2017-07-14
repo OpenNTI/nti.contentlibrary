@@ -75,7 +75,7 @@ class TestIndex(ContentlibraryLayerTest):
     def test_bundle_catalog(self):
         catalog = create_contentbundle_catalog()
         assert_that(catalog, is_not(none()))
-        assert_that(catalog, has_length(6))
+        assert_that(catalog, has_length(7))
         assert_that(isinstance(catalog, ContentBundleCatalog), is_(True))
 
         pkg_ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
@@ -95,6 +95,7 @@ class TestIndex(ContentlibraryLayerTest):
                 {'creator': {'any_of': ('ichigo',)}},
                 {'title': {'any_of': ('Janux FAQ',)}},
                 {'packages': {'any_of': (pkg_ntiid,)}},
+                {'restrictedAccess': {'any_of': (False,)}},
                 {'mimeType': {'any_of': ('application/vnd.nextthought.contentpackagebundle',)}}):
             results = catalog.apply(query) or ()
             assert_that(results, is_not(is_empty()))
