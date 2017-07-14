@@ -1234,15 +1234,19 @@ class IContentPackageBundle(IDisplayableContent,
                             dub_interfaces.IDCTimes,
                             IAnnotatable):
     """
-    A (typically persistent) object representing a collection
-    of one or more content packages, presented as a viewable unit
-    in the user interface. These bundles may have additional
-    resources associated with them and may imply certain types
-    of security precautions or other.
+    A (typically persistent) object representing a collection of one or more
+    content packages, presented as a viewable unit in the user interface. These
+    bundles may have additional resources associated with them and may imply
+    certain types of security precautions or other.
 
-    When arranged into a hierarchy, the parent for this item
-    should be a class:`IContentPackageBundleLibrary`, and its
-    ``__name__`` should be a synonym for its NTIID.
+    When arranged into a hierarchy, the parent for this item should be an
+    :class:`IContentPackageBundleLibrary`, and its ``__name__`` should be a
+    synonym for its NTIID.
+
+    If this bundle is ``RestrictedAccess``, it should only point to packages
+    that have appropriately restricted ACLs. Thus, any unrestricted bundles
+    should point to packages that are likewise also unrestricted via acls. Any
+    scenario where the access is mixed is undefined.
     """
 
     # However, there are other places that can refer to a bundle,
