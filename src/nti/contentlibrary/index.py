@@ -187,7 +187,7 @@ CONTENT_BUNDLES_CATALOG_NAME = 'nti.dataserver.++etc++contentbundles.catalog'
 
 IX_TITLE = 'title'
 IX_PACKAGES = 'packages'
-
+IX_RESTRICTED_ACCESS = 'restrictedAccess'
 
 class ContentBundleTitleIndex(ValueIndex):
     default_field_name = 'title'
@@ -201,6 +201,11 @@ class ContentBundleNTIIDIndex(ValueIndex):
 
 class ContentBundleMimeTypeIndex(ValueIndex):
     default_field_name = 'mimeType'
+    default_interface = IContentPackageBundle
+
+
+class ContentBundleRestrictedAccessIndex(ValueIndex):
+    default_field_name = 'RestrictedAccess'
     default_interface = IContentPackageBundle
 
 
@@ -280,7 +285,8 @@ def create_contentbundle_catalog(catalog=None, family=BTrees.family64):
                         (IX_TITLE, ContentBundleTitleIndex),
                         (IX_CREATOR,  ContentBundleCreatorIndex),
                         (IX_MIMETYPE, ContentBundleMimeTypeIndex),
-                        (IX_PACKAGES, ContentBundlePackagesIndex)):
+                        (IX_PACKAGES, ContentBundlePackagesIndex),
+                        (IX_RESTRICTED_ACCESS, ContentBundleRestrictedAccessIndex)):
         index = clazz(family=family)
         locate(index, catalog, name)
         catalog[name] = index
