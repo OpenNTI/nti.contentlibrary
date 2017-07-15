@@ -52,7 +52,7 @@ from nti.contentlibrary.interfaces import ContentPackageBundleVendorInfoSynchron
 
 from nti.contentlibrary.presentationresource import DisplayableContentMixin
 
-from nti.coremetadata.interfaces import SYSTEM_USER_NAME
+from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
 from nti.dublincore.time_mixins import CreatedAndModifiedTimeMixin
 
@@ -118,7 +118,7 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
     contributors = ()
     publisher = u''
 
-    creator = SYSTEM_USER_NAME
+    creator = SYSTEM_USER_ID
 
     @property
     def PlatformPresentationResources(self):
