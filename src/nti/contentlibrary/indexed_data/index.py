@@ -24,6 +24,8 @@ import BTrees
 
 from persistent import Persistent
 
+from nti.base._compat import text_
+
 from nti.contentlibrary.indexed_data import CATALOG_INDEX_NAME
 
 from nti.contentlibrary.indexed_data.interfaces import IContainedTypeAdapter
@@ -98,7 +100,7 @@ class ValidatingSiteName(object):
             self.site = obj.__name__
         elif isinstance(obj, six.string_types):
             # TODO: Validate?
-            self.site = unicode(obj)
+            self.site = text_(obj)
         else:
             self.site = getSite().__name__
 
