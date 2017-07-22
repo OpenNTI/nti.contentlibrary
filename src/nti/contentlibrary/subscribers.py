@@ -16,6 +16,7 @@ from zope import component
 from zope.component.hooks import site
 
 from zope.lifecycleevent.interfaces import IObjectCreatedEvent
+from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 
 from nti.base.interfaces import ICreated
 
@@ -23,6 +24,7 @@ from nti.contentlibrary.annotation import ContentUnitAnnotationUtility
 
 from nti.contentlibrary.interfaces import ISiteLibraryFactory
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IContentUnitAnnotationUtility
 from nti.contentlibrary.interfaces import IPersistentContentPackageLibrary
 
@@ -178,8 +180,17 @@ def sync_bundles_when_library_synched(library, event):
     syncable.syncFromBucket(bundle_bucket)
 
 
+@component.adapter(IEditableContentPackage, IObjectRemovedEvent)
+def editable_content_package_removed(package, _):
+    try:
+        result = package._package_trx_record_history
+        result.clear()
+    except AttributeError:
+        pass
+
+
 @component.adapter(IHostPolicyFolder, IObjectCreatedEvent)
-def on_site_created(site, event):
+def on_site_created(site, _):
     if ICreated.providedBy(site):
         site_manager = site.getSiteManager()
         install_site_content_library(site_manager)

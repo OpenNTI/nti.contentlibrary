@@ -90,6 +90,7 @@
 	<subscriber handler=".subscribers.on_site_created" />
 	<subscriber handler=".subscribers.install_bundle_library" />
 	<subscriber handler=".subscribers.uninstall_bundle_library" />
+	<subscriber handler=".subscribers.editable_content_package_removed" />
 	<subscriber handler=".subscribers.sync_bundles_when_library_synched" />
 
 	<!-- No need to try to index these objects -->
