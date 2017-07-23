@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -62,7 +62,7 @@ class TestWref(ContentlibraryLayerTest):
 
     def test_wref_to_persistent(self):
         unit = filesystem.PersistentFilesystemContentUnit()
-        unit.ntiid = 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
+        unit.ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
 
         wref = IWeakRef(unit)
         assert_that(wref, is_(ContentUnitWeakRef))

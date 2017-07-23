@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -46,13 +46,13 @@ class TestZODB(ContentlibraryLayerTest):
         package.index_last_modified = 80000
         ext_obj = to_external_object(package, name='exporter', decorate=False)
         assert_that(ext_obj,
-                    has_entries(u'isPublished', is_(False),
-                                u'publishLastModified', is_(10000),
-                                u'indexLastModified', is_(80000),
-                                u'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
-                                u'NTIID', u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.',
-                                u'title', is_(u'Cohen vs California'),
-                                u'contents', is_not(none())))
+                    has_entries('isPublished', is_(False),
+                                'publishLastModified', is_(10000),
+                                'indexLastModified', is_(80000),
+                                'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
+                                'NTIID', 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.',
+                                'title', is_('Cohen vs California'),
+                                'contents', is_not(none())))
 
         factory = find_factory_for(ext_obj)
         assert_that(factory, is_not(none()))
@@ -60,11 +60,11 @@ class TestZODB(ContentlibraryLayerTest):
         update_from_external_object(new_package, ext_obj)
 
         assert_that(new_package,
-                    has_property('ntiid', u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'))
+                    has_property('ntiid', 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'))
         assert_that(new_package,
-                    has_property('title', u'Cohen vs California'))
+                    has_property('title', 'Cohen vs California'))
         assert_that(new_package,
-                    has_property('description', u'Cohen vs California'))
+                    has_property('description', 'Cohen vs California'))
         assert_that(new_package,
                     has_property('publishLastModified', is_(10000)))
         assert_that(new_package,
@@ -86,8 +86,8 @@ class TestZODB(ContentlibraryLayerTest):
         
     def test_icon(self):
         package = RenderableContentPackage()
-        package.icon = 'foo'
-        package.icon = AbstractKey(name='ichigo')
+        package.icon = u'foo'
+        package.icon = AbstractKey(name=u'ichigo')
         
     def test_recorder(self):
         package = RenderableContentPackage()

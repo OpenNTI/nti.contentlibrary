@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -32,7 +32,7 @@ class TestPresentationResource(unittest.TestCase):
     def test_discovery(self):
         absolute_path = os.path.join(os.path.dirname(__file__),
                                      'TestFilesystem')
-        bucket = filesystem.FilesystemBucket(name='TestFilesystem')
+        bucket = filesystem.FilesystemBucket(name=u'TestFilesystem')
         bucket.absolute_path = absolute_path
 
         package = presentationresource.DisplayableContentMixin()
@@ -53,7 +53,7 @@ class TestPresentationResource(unittest.TestCase):
         assert_that(v2, same_instance(v1))
 
         # create a fake bucket w/ the same name and last modified
-        fakebucket = _AbstractDelimitedHierarchyObject(name='TestFilesystem')
+        fakebucket = _AbstractDelimitedHierarchyObject(name=u'TestFilesystem')
         fakebucket.lastModified = bucket.lastModified
         package.root = fakebucket
 

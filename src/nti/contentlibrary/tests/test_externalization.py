@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -15,6 +15,8 @@ from hamcrest import assert_that
 from hamcrest import has_entries
 from hamcrest import has_property
 from hamcrest import greater_than_or_equal_to
+
+from nti.testing.matchers import validly_provides
 
 import fudge
 
@@ -33,15 +35,13 @@ from nti.externalization.interfaces import IExternalObject
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
 
-from nti.testing.matchers import validly_provides
-
 
 class TestExternalization(ContentlibraryLayerTest):
 
     def test_doesnt_dual_escape(self):
         bucket = filesystem.FilesystemBucket(name=u"prealgebra",
                                              bucket=rootFolder())
-        bucket.__parent__.absolute_path = '/'
+        bucket.__parent__.absolute_path = u'/'
         key = filesystem.FilesystemKey(bucket=bucket, 
                                        name=u'index.html')
         unit = filesystem.FilesystemContentPackage(
@@ -64,28 +64,23 @@ class TestExternalization(ContentlibraryLayerTest):
                                   prefix=u'',
                                   installable=True):
         if isinstance(key, basestring):
-
             parts = key.split('/')
-
             parent = rootFolder()
             parent.absolute_path = '/'
             if parts and parts[0] == '':
                 parts = parts[1:]
-
             for k in parts[:-1]:
                 parent = filesystem.FilesystemBucket(bucket=parent, name=k)
-
             key = filesystem.FilesystemKey(bucket=parent, name=parts[-1])
 
-        unit = factory(
-            key=key,
-            href=u'index.html',
-            # root='prealgebra',
-            title=u'Prealgebra',
-            description='',
-            installable=installable,
-            index=index,
-            isCourse=True)
+        unit = factory(key=key,
+                       href=u'index.html',
+                       # root='prealgebra',
+                       title=u'Prealgebra',
+                       description=u'',
+                       installable=installable,
+                       index=index,
+                       isCourse=True)
         unit.icon = unit.make_sibling_key(u'icons/The Icon.png')
 
         # This is a legacy code path for boto, which is not yet updated
@@ -132,10 +127,9 @@ class TestExternalization(ContentlibraryLayerTest):
                                                                   href=u'archive.zip')
 
             return r
-        self._do_test_escape_if_needed(
-            factory,
-            key='prealgebra/index.html',
-            index=None)
+        self._do_test_escape_if_needed(factory,
+                                       key=u'prealgebra/index.html',
+                                       index=None)
 
     def test_escape_if_needed_filesystem_full_path(self):
     
@@ -147,7 +141,7 @@ class TestExternalization(ContentlibraryLayerTest):
             return r
 
         root = rootFolder()
-        root.absolute_path = '/'
+        root.absolute_path = u'/'
         # Do not fire events
         child = Folder()
         root.__setitem__(u'DNE', child)
@@ -185,7 +179,7 @@ class TestExternalization(ContentlibraryLayerTest):
         # ...finally producing the key
         child_key_with_spaces = package.make_sibling_key(child_name_with_spaces)
         assert_that(child_key_with_spaces.name,
-                    is_(u'Sample_2_chFixedinc.html'))
+                    is_('Sample_2_chFixedinc.html'))
 
         child = filesystem.FilesystemContentUnit(key=child_key_with_spaces,
                                                  href=child_href_with_spaces)
@@ -217,7 +211,7 @@ class TestExternalization(ContentlibraryLayerTest):
             boto_s3.BotoS3ContentPackage,
             key=key,
             index=index,
-            prefix='http://content.nextthought.com',
+            prefix=u'http://content.nextthought.com',
             archive_unit=boto_s3.BotoS3ContentUnit(key=boto.s3.key.Key(bucket=bucket,
                                                                        name=u'prealgebra/archive.zip')),
             installable=True)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -53,29 +53,27 @@ class TestFilesystem(ContentlibraryLayerTest):
 
         unit = filesystem.FilesystemContentPackage(
             # filename='prealgebra/index.html',
-            href='index.html',
+            href=u'index.html',
             #root = 'prealgebra',
             #icon = 'icons/The%20Icon.png'
         )
 
-        assert_that(
-            unit,
-            verifiably_provides(
-                interfaces.IFilesystemContentPackage))
+        assert_that(unit,
+                    verifiably_provides(interfaces.IFilesystemContentPackage))
 
     def test_adapters(self):
-        bucket = filesystem.FilesystemBucket(name='TestFilesystem')
+        bucket = filesystem.FilesystemBucket(name=u'TestFilesystem')
         factory = IEclipseContentPackageFactory(bucket, None)
         assert_that(factory, is_not(none()))
 
-        key = filesystem.FilesystemKey(name='TestFilesystem')
+        key = filesystem.FilesystemKey(name=u'TestFilesystem')
         factory = IEclipseContentPackageFactory(key, None)
         assert_that(factory, is_not(none()))
 
     def test_read_contents(self):
         absolute_path = os.path.join(os.path.dirname(__file__),
                                      'TestFilesystem')
-        bucket = filesystem.FilesystemBucket(name='TestFilesystem')
+        bucket = filesystem.FilesystemBucket(name=u'TestFilesystem')
         bucket.absolute_path = absolute_path
 
         package = filesystem._package_factory(bucket,
@@ -95,7 +93,7 @@ class TestFilesystem(ContentlibraryLayerTest):
     def test_from_filesystem(self):
         absolute_path = os.path.join(os.path.dirname(__file__),
                                      'TestFilesystem')
-        bucket = filesystem.FilesystemBucket(name='TestFilesystem')
+        bucket = filesystem.FilesystemBucket(name=u'TestFilesystem')
         bucket.absolute_path = absolute_path
 
         package = filesystem._package_factory(bucket,
@@ -106,20 +104,17 @@ class TestFilesystem(ContentlibraryLayerTest):
 
         assert_that(package,
                     validly_provides(interfaces.IFilesystemContentPackage))
-        assert_that(
-            package,
-            has_property(
-                'PlatformPresentationResources',
-                has_length(3)))
+        assert_that(package,
+                    has_property('PlatformPresentationResources', has_length(3)))
 
         assert_that(package.creators, is_(('Jason',)))
         # stays in sync
         zdc = IWriteZopeDublinCore(package)
         assert_that(zdc, has_property('lastModified', greater_than(0)))
-        zdc.creators = ['Foo']
+        zdc.creators = [u'Foo']
         assert_that(package.creators, is_(('Foo',)))
 
-        zdc.creators = ['Jason']
+        zdc.creators = [u'Jason']
 
         assert_that(package.children[-1].children[-1],
                     has_property('embeddedContainerNTIIDs',
@@ -131,9 +126,7 @@ class TestFilesystem(ContentlibraryLayerTest):
         # use `touch` if you have to
         assert_that(package,
                     has_property('lastModified',
-                                 greater_than_or_equal_to(
-                                     package.key.lastModified)
-                                 ))
+                                 greater_than_or_equal_to(package.key.lastModified)))
 
         # package pickles ok
         assert_that(pickle.loads(pickle.dumps(package)),
@@ -177,14 +170,13 @@ class TestFilesystem(ContentlibraryLayerTest):
         json.loads(json.dumps(ext_package))  # Round trips through JSON
 
     def test_library(self):
-        library = filesystem.EnumerateOnceFilesystemLibrary(
-            os.path.dirname(__file__))
+        library = filesystem.EnumerateOnceFilesystemLibrary(os.path.dirname(__file__))
         library.syncContentPackages()
 
         assert_that(library, has_property('lastModified', greater_than(0)))
 
-        embed_paths = library.pathsToEmbeddedNTIID(
-            'tag:nextthought.com,2011-10:testing-NTICard-temp.nticard.1')
+        ntiid = 'tag:nextthought.com,2011-10:testing-NTICard-temp.nticard.1'
+        embed_paths = library.pathsToEmbeddedNTIID(ntiid)
         assert_that(embed_paths, has_length(1))
         assert_that(embed_paths[0], has_length(3))
         assert_that(embed_paths[0][-1],
@@ -203,11 +195,8 @@ class TestFilesystem(ContentlibraryLayerTest):
         library.url_prefix = '/SomePrefix/'
 
         pack_ext = to_external_object(package)
-        assert_that(
-            pack_ext,
-            has_entry(
-                'href',
-                '/SomePrefix/TestFilesystem/index.html'))
+        assert_that(pack_ext,
+                    has_entry('href', '/SomePrefix/TestFilesystem/index.html'))
         assert_that(pack_ext, has_entry('root', '/SomePrefix/TestFilesystem/'))
 
         assert_that(interfaces.IContentUnitHrefMapper(package.children[0].children[0]),
@@ -215,8 +204,7 @@ class TestFilesystem(ContentlibraryLayerTest):
                                  '/SomePrefix/TestFilesystem/tag_nextthought_com_2011-10_USSC-HTML-Cohen_18.html#22'))
 
     def test_path_to_ntiid(self):
-        library = filesystem.EnumerateOnceFilesystemLibrary(
-            os.path.dirname(__file__))
+        library = filesystem.EnumerateOnceFilesystemLibrary(os.path.dirname(__file__))
         library.syncContentPackages()
 
         path1 = 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.18'
@@ -234,7 +222,7 @@ class TestFilesystem(ContentlibraryLayerTest):
 
         site_factory = interfaces.ISiteLibraryFactory(global_library)
 
-        site_lib = site_factory.library_for_site_named('foobar')
+        site_lib = site_factory.library_for_site_named(u'foobar')
 
         assert_that(site_lib,
                     validly_provides(interfaces.IPersistentContentPackageLibrary))
@@ -279,21 +267,17 @@ class TestGlobalFilesystemLibrary(ContentlibraryLayerTest):
                                                            provided=interfaces.IContentPackageLibrary)
 
     def testGlobalPickle(self):
-
         new_lib = pickle.loads(pickle.dumps(self.global_library))
-
         assert_that(new_lib, is_(same_instance(self.global_library)))
-
         enum = self.global_library._enumeration
         new_enum = pickle.loads(pickle.dumps(enum))
-
         assert_that(new_enum, is_(same_instance(enum)))
 
     def testPickleOfSiteLibWhenGlobalPathChanges(self):
         global_library = self.global_library
         site_factory = interfaces.ISiteLibraryFactory(global_library)
 
-        site_lib = site_factory.library_for_site_named('localsite')
+        site_lib = site_factory.library_for_site_named(u'localsite')
 
         assert_that(site_lib,
                     validly_provides(interfaces.IPersistentContentPackageLibrary))
@@ -325,11 +309,8 @@ class TestGlobalFilesystemLibrary(ContentlibraryLayerTest):
 
         getattr(new_enum, 'absolute_path')
 
-        assert_that(
-            new_enum,
-            has_property(
-                'absolute_path',
-                '/DNE/Hah/sites/localsite'))
+        assert_that(new_enum,
+                    has_property('absolute_path', '/DNE/Hah/sites/localsite'))
 
         new_content_package = new_site_lib[0]
         assert_that(new_content_package,
