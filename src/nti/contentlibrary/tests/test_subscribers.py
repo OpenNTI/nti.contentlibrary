@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -74,7 +74,7 @@ class TestSubscribers(ContentlibraryLayerTest):
     def test_install_site_library(self):
 
         site = Folder()
-        site.__name__ = 'Site'
+        site.__name__ = u'Site'
         sm = LocalSiteManager(site)
 
         site.setSiteManager(sm)
@@ -101,9 +101,8 @@ class TestSubscribers(ContentlibraryLayerTest):
         IAnnotations(unit)['foo'] = 42
 
         IAnnotations(unit)
-        assert_that(
-            IAnnotations(unit),
-            has_key('foo'))  # check the dict contract
+        assert_that(IAnnotations(unit),
+                    has_key('foo'))  # check the dict contract
 
         # ...we can read them in the child site...
         with current_site(site):
@@ -146,11 +145,11 @@ class TestSubscribers(ContentlibraryLayerTest):
         site_factory = interfaces.ISiteLibraryFactory(global_library)
 
         site = Folder()
-        site.__name__ = 'localsite'
+        site.__name__ = u'localsite'
         sm = LocalSiteManager(site)
         site.setSiteManager(sm)
 
-        site_factory.library_for_site_named('localsite')
+        site_factory.library_for_site_named(u'localsite')
         eventtesting.clearEvents()
 
         subscribers.install_site_content_library(sm, NewLocalSite(sm))
@@ -169,7 +168,7 @@ class TestSubscribers(ContentlibraryLayerTest):
         assert_that(events, has_length(2))
         evt = next(x for x in events if x.newName == 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle')
         assert_that(evt, has_property('object',
-                                          has_property('ContentPackages', has_length(1))))
+                                      has_property('ContentPackages', has_length(1))))
 
         bundle = evt.object
         bundles = [x.object for x in events]
@@ -179,7 +178,7 @@ class TestSubscribers(ContentlibraryLayerTest):
 
         # XXX: This doesn't exactly belong here, it's just convenient
         # test externalization
-        restricted_ntiid = 'tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle'
+        restricted_ntiid = u'tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle'
         restricted_bundle = bundle_lib[restricted_ntiid]
         assert_that(restricted_bundle, not_none())
         assert_that(restricted_bundle, validly_provides(interfaces.IContentPackageBundle))

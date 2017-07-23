@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -40,7 +40,7 @@ class TestBotoS3(ContentlibraryLayerTest):
 
         @interface.implementer(interfaces.IS3Bucket)
         class Bucket(object):
-            name = __name__ = 'bucket'
+            name = __name__ = u'bucket'
 
             def get_key(self, k):
                 return object()
@@ -60,16 +60,16 @@ class TestBotoS3(ContentlibraryLayerTest):
             def open(self):
                 self.last_modified = 1234.5
 
-        key = Key(name='foo/bar')
+        key = Key(name=u'foo/bar')
         key.bucket = Bucket()
         unit = BotoS3ContentUnit(key=key)
 
-        unit.title = 'foo'
-        unit.ntiid = 'tag:nextthought.com,2011-10:foo-bar-baz'
-        unit.icon = Key(name='icons/chapters/c1.png')
+        unit.title = u'foo'
+        unit.ntiid = u'tag:nextthought.com,2011-10:foo-bar-baz'
+        unit.icon = Key(name=u'icons/chapters/c1.png')
         unit.icon.bucket = key.bucket
-        unit.description = 'comment'
-        unit.href = 'index.html'
+        unit.description = u'comment'
+        unit.href = u'index.html'
 
         assert_that(unit, validly_provides(interfaces.IS3ContentUnit))
 
@@ -83,7 +83,7 @@ class TestBotoS3(ContentlibraryLayerTest):
 
         @interface.implementer(interfaces.IS3Bucket)
         class Bucket(object):
-            name = __name__ = 'bucket'
+            name = __name__ = u'bucket'
 
             def get_key(self, k):
                 return object()
@@ -114,21 +114,16 @@ class TestBotoS3(ContentlibraryLayerTest):
                 self.last_modified = 1234.5
 
         key = Key()
-        key.name = 'foo/bar'
+        key.name = u'foo/bar'
         key.bucket = Bucket()
         unit = BotoS3ContentUnit(key=key)
 
         assert_that(unit.does_sibling_entry_exist('baz'), is_(not_none()))
-        assert_that(
-            unit.does_sibling_entry_exist('baz'), is_(
-                same_instance(
-                    unit.does_sibling_entry_exist('baz'))))
+        assert_that(unit.does_sibling_entry_exist('baz'), 
+                    is_(same_instance(unit.does_sibling_entry_exist('baz'))))
 
-        assert_that(
-            unit.does_sibling_entry_exist('bar'),
-            is_not(
-                same_instance(
-                    unit.does_sibling_entry_exist('baz'))))
+        assert_that(unit.does_sibling_entry_exist('bar'),
+                    is_not(same_instance(unit.does_sibling_entry_exist('baz'))))
 
     def test_response_exception(self):
         @interface.implementer(interfaces.IS3Bucket)
@@ -153,7 +148,7 @@ class TestBotoS3(ContentlibraryLayerTest):
                 raise boto.exception.S3ResponseError("404", "Key not found")
 
         key = Key()
-        key.name = 'foo/bar'
+        key.name = u'foo/bar'
         key.bucket = Bucket()
         unit = BotoS3ContentUnit(key=key)
         assert_that(unit.lastModified, is_(-1))
@@ -178,8 +173,8 @@ class TestBotoS3(ContentlibraryLayerTest):
                     self.key = key
 
         bucket = Bucket()
-        bucket.name = 'content.nextthought.com'
-        key = Key(bucket, 'mathcounts2012/index.html')
+        bucket.name = u'content.nextthought.com'
+        key = Key(bucket, u'mathcounts2012/index.html')
 
         # by default we assume the bucket
         assert_that(component.getAdapter(key, interfaces.IAbsoluteContentUnitHrefMapper),
