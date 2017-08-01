@@ -24,6 +24,9 @@ AUTHORED_PREFIX = u"_authored"
 #: Named prefix to distinguish API rendered content
 RENDERED_PREFIX = u"_rendered"
 
+#: reStructuredText mime type
+RST_MIMETYPE = b'text/x-rst'
+
 #: Content vendor info file name
 VENDOR_INFO_NAME = 'vendor_info.json'
 
