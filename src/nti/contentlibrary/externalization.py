@@ -39,7 +39,6 @@ from nti.contentlibrary.interfaces import IFilesystemContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
-from nti.contentlibrary.interfaces import IContentPackageExporterDecorator
 from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
@@ -284,13 +283,7 @@ class _RenderableContentPackageExternal(_EditableContentPackageExternal):
 
 @component.adapter(IEditableContentPackage)
 class _ContentPackageExporter(_ContentPackageExternal):
-
-    def toExternalObject(self, **kwargs):
-        result = super(_ContentPackageExporter, self).toExternalObject(**kwargs)
-        for decorator in component.subscribers((self.package,), 
-                                               IContentPackageExporterDecorator):
-            decorator.decorateExternalObject(self.package, result)
-        return result
+    pass
 
 
 @component.adapter(IEditableContentPackage)
@@ -316,10 +309,6 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
         if MIMETYPE not in result:
             result[MIMETYPE] = decorateMimeType(self.package, result)
         result[LAST_MODIFIED] = self.package.lastModified
-        # decorate
-        for decorator in component.subscribers((self.package,), 
-                                                IContentPackageExporterDecorator):
-            decorator.decorateExternalObject(self.package, result)
         return result
 
 

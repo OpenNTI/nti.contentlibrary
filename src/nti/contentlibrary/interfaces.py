@@ -1629,11 +1629,13 @@ class IContentPackageExporterDecorator(interface.Interface):
     export externalization of a content package
     """
 
-    def decorateExternalObject(package, external):
+    def decorateExternalObject(package, external, backup=False, salt=None):
         """
         Decorate the externalized object
 
         :param package: The package that is being externalized.
         :param external: The externalization of that object, produced
+        :param backup: The backup flag
+        :param salt: Salt used to mangle the ntiids
         :return: Undefined.
         """
