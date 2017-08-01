@@ -99,6 +99,7 @@ def install_site_content_library(local_site_manager, _=None):
         library.syncContentPackages()
         return library
 
+
 # Bundle-related subscribers
 
 
@@ -117,7 +118,7 @@ _BUNDLE_LIBRARY_NAME = 'ContentPackageBundles'
 
 
 @component.adapter(IPersistentContentPackageLibrary, IRegistered)
-def install_bundle_library(context, event):
+def install_bundle_library(_, event):
     """
     When a new persistent library is installed, beside it we
     put something to manage (persistent) content bundles, driven
@@ -130,7 +131,7 @@ def install_bundle_library(context, event):
 
 
 @component.adapter(IPersistentContentPackageLibrary, IUnregistered)
-def uninstall_bundle_library(library, event):
+def uninstall_bundle_library(_, event):
     uninstall_utility_on_unregistration(_BUNDLE_LIBRARY_NAME,
                                         IContentPackageBundleLibrary,
                                         event)
@@ -138,7 +139,7 @@ def uninstall_bundle_library(library, event):
 
 @component.adapter(IPersistentContentPackageLibrary,
                    IContentPackageLibraryDidSyncEvent)
-def sync_bundles_when_library_synched(library, event):
+def sync_bundles_when_library_synched(library, _):
     """
     When a persistent content library is synchronized
     with the disk contents, whether or not anything actually changed,
