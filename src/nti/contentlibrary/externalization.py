@@ -39,6 +39,7 @@ from nti.contentlibrary.interfaces import IFilesystemContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
+from nti.contentlibrary.interfaces import IContentPackageExporterDecorator
 from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
@@ -243,7 +244,7 @@ class _LegacyCourseConflatedContentPackageExternal(_ContentPackageExternal):
 
 
 @component.adapter(IEditableContentPackage)
-class _EditableContentPackageExternal(_ContentPackageExternal):
+class EditableContentPackageExternal(_ContentPackageExternal):
 
     def _remove_empty(self, result):
         for name in list(result.keys()):
@@ -269,6 +270,7 @@ class _EditableContentPackageExternal(_ContentPackageExternal):
         result['indexLastModified'] = self.package.index_last_modified
         result['publishLastModified'] = self.package.publishLastModified
         return result
+_EditableContentPackageExternal = EditableContentPackageExternal
 
 
 @component.adapter(IRenderableContentPackage)
@@ -277,7 +279,18 @@ class _RenderableContentPackageExternal(_EditableContentPackageExternal):
     def _is_published(self):
         # Only display as published if also rendered
         return self.package.is_published() \
-            and IContentRendered.providedBy(self.package)
+           and IContentRendered.providedBy(self.package)
+
+
+@component.adapter(IEditableContentPackage)
+class _ContentPackageExporter(_ContentPackageExternal):
+
+    def toExternalObject(self, **kwargs):
+        result = super(_ContentPackageExporter, self).toExternalObject(**kwargs)
+        for decorator in component.subscribers((self.package,), 
+                                               IContentPackageExporterDecorator):
+            decorator.decorateExternalObject(self.package, result)
+        return result
 
 
 @component.adapter(IEditableContentPackage)
@@ -303,6 +316,10 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
         if MIMETYPE not in result:
             result[MIMETYPE] = decorateMimeType(self.package, result)
         result[LAST_MODIFIED] = self.package.lastModified
+        # decorate
+        for decorator in component.subscribers((self.package,), 
+                                                IContentPackageExporterDecorator):
+            decorator.decorateExternalObject(self.package, result)
         return result
 
 

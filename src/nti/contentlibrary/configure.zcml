@@ -133,6 +133,10 @@
 	<adapter factory=".externalization._S3KeyHrefMapper" />
 	<adapter factory=".externalization._S3ContentUnitHrefMapper" />
 
+	<adapter factory=".externalization._ContentPackageExporter"
+			 for=".interfaces.IContentPackage"
+			 name="exporter" />
+
 	<adapter factory=".externalization._EditableContentPackageExporter"
 			 for=".interfaces.IEditableContentPackage"
 			 name="exporter" />

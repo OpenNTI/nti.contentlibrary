@@ -1621,3 +1621,19 @@ class ContentPackageVendorInfoSynchronized(ContentVendorInfoSynchronized):
 @interface.implementer(IContentPackageBundleVendorInfoSynchronized)
 class ContentPackageBundleVendorInfoSynchronized(ContentVendorInfoSynchronized):
     pass
+
+
+class IContentPackageExporterDecorator(interface.Interface):
+    """
+    Used as a subscription adapter to provide additional information to the
+    export externalization of a content package
+    """
+
+    def decorateExternalObject(package, external):
+        """
+        Decorate the externalized object
+
+        :param package: The package that is being externalized.
+        :param external: The externalization of that object, produced
+        :return: Undefined.
+        """
