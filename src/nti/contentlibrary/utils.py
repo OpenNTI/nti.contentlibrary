@@ -34,12 +34,16 @@ from nti.contentlibrary.index import IX_SITE
 from nti.contentlibrary.index import IX_MIMETYPE
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
-from nti.contentlibrary.interfaces import IContentUnit, IContentVendorInfo
+from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentVendorInfo
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
+from nti.contentlibrary.interfaces import IContentPackageExporterDecorator
 
 from nti.contentlibrary.vendorinfo import VENDOR_INFO_KEY
+
+from nti.externalization.externalization import to_external_object
 
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import get_provider
@@ -325,3 +329,13 @@ def get_content_vendor_info(context, create=True):
         except AttributeError:
             pass
     return result
+
+
+def export_content_package(package, backup=False, salt=None):
+    ext_obj = to_external_object(package,
+                                 name="exporter",
+                                 decorate=False)
+    for decorator in component.subscribers((package,), 
+                                           IContentPackageExporterDecorator):
+        decorator.decorateExternalObject(package, ext_obj, backup, salt)
+    return ext_obj
