@@ -1639,3 +1639,19 @@ class IContentPackageExporterDecorator(interface.Interface):
         :param salt: Salt used to mangle the ntiids
         :return: Undefined.
         """
+
+
+class IContentPackageImporterUpdater(interface.Interface):
+    """
+    Used as a subscription adapter to process additional information to the
+    while importing a content package
+    """
+
+    def updateFromExternalObject(package, externalObject, *args, **kwargs):
+        """
+        Update the package from the external object.
+
+        :param package: The package that is being imported.
+        :param externalObject: The external source
+        :return: Undefined.
+        """
