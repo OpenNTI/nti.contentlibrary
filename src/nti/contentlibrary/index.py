@@ -25,8 +25,6 @@ from nti.contentlibrary.interfaces import IContentPackageBundle
 
 from nti.site.interfaces import IHostPolicyFolder
 
-from nti.traversal.traversal import find_interface
-
 from nti.zope_catalog.catalog import Catalog
 
 from nti.zope_catalog.datetime import TimestampToNormalized64BitIntNormalizer
@@ -57,9 +55,9 @@ class ValidatingSiteName(object):
 
     __slots__ = ('site',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         if IContentUnit.providedBy(obj):
-            folder = find_interface(obj, IHostPolicyFolder, strict=False)
+            folder = IHostPolicyFolder(obj, None)
             if folder is not None:
                 self.site = folder.__name__
 
@@ -86,7 +84,7 @@ class ValidatingChildren(object):
 
     __slots__ = ('children',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         if IContentUnit.providedBy(obj):
             self.children = tuple(x.ntiid for x in obj.children or ())
 
@@ -103,7 +101,7 @@ class ValidatingCreator(object):
 
     __slots__ = ('creator',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         try:
             if IContentUnit.providedBy(obj):
                 creator = getattr(obj.creator, 'username', obj.creator)
@@ -115,7 +113,7 @@ class ValidatingCreator(object):
         raise TypeError()
 
 
-def CreatorIndex(family=None):
+def CreatorIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='creator',
                                 interface=ValidatingCreator,
                                 index=RawValueIndex(family=family),
@@ -129,11 +127,10 @@ class PublishLastModifiedRawIndex(RawIntegerValueIndex):
 CreatedTimeRawIndex = LastModifiedRawIndex = PublishLastModifiedRawIndex  # BWC
 
 
-def PublishLastModifiedIndex(family=None):
+def PublishLastModifiedIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='publishLastModified',
                                 interface=IEditableContentUnit,
-                                index=PublishLastModifiedRawIndex(
-                                    family=family),
+                                index=PublishLastModifiedRawIndex(family=family),
                                 normalizer=TimestampToNormalized64BitIntNormalizer())
 CreatedTimeIndex = LastModifiedIndex = PublishLastModifiedIndex  # BWC
 
@@ -213,9 +210,9 @@ class ValidatingContentBundleSiteName(object):
 
     __slots__ = ('site',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         if IContentPackageBundle.providedBy(obj):
-            folder = find_interface(obj, IHostPolicyFolder, strict=False)
+            folder = IHostPolicyFolder(obj, None)
             if folder is not None:
                 self.site = folder.__name__
 
@@ -232,7 +229,7 @@ class ValidatingContentPackages(object):
 
     __slots__ = ('packages',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         if IContentPackageBundle.providedBy(obj):
             self.packages = tuple(x.ntiid for x in obj.ContentPackages or ())
 
@@ -249,7 +246,7 @@ class ValidatingContentBundleCreator(object):
 
     __slots__ = ('creator',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         try:
             if IContentPackageBundle.providedBy(obj):
                 creator = getattr(obj.creator, 'username', obj.creator)
@@ -261,7 +258,7 @@ class ValidatingContentBundleCreator(object):
         raise TypeError()
 
 
-def ContentBundleCreatorIndex(family=None):
+def ContentBundleCreatorIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='creator',
                                 index=RawValueIndex(family=family),
                                 normalizer=StringTokenNormalizer(),
