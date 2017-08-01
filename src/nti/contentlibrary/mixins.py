@@ -9,6 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import copy
 import time
 
 from zope import component
@@ -29,6 +30,9 @@ from nti.contentlibrary.library import register_content_units
 from nti.contentlibrary.utils import make_content_package_ntiid
 
 from nti.contentlibrary.validators import validate_content_package
+
+from nti.externalization.internalization import find_factory_for
+from nti.externalization.internalization import update_from_external_object
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
@@ -108,9 +112,25 @@ class ContentPackageImporterMixin(object):
         if locked:
             result.lock(event=False)
         # update from subscribers
-        for updater in component.subscribers((result,), 
+        for updater in component.subscribers((result,),
                                              IContentPackageImporterUpdater):
             updater.updateFromExternalObject(result, source)
         # update indexes
         lifecycleevent.modified(result)
         return result, (stored is None)
+
+    def handle_packages(self, items, context=None):
+        added = []
+        modified = []
+        for ext_obj in items or ():
+            source = copy.deepcopy(ext_obj)
+            factory = find_factory_for(ext_obj)
+            the_object = factory()  # create object
+            assert IEditableContentPackage.providedBy(the_object)
+            update_from_external_object(the_object, ext_obj, notify=False)
+            package, is_new = self.handle_package(the_object, source, context)
+            if is_new:
+                added.append(package)
+            else:
+                modified.append(package)
+        return added, modified
