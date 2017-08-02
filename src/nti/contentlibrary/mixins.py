@@ -25,6 +25,7 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageImporterUpdater
 
+from nti.contentlibrary.library import add_to_connection
 from nti.contentlibrary.library import register_content_units
 
 from nti.contentlibrary.utils import make_content_package_ntiid
@@ -33,6 +34,8 @@ from nti.contentlibrary.validators import validate_content_package
 
 from nti.externalization.internalization import find_factory_for
 from nti.externalization.internalization import update_from_external_object
+
+from nti.intid.common import addIntId
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
@@ -95,11 +98,13 @@ class ContentPackageImporterMixin(object):
         else:
             if context is None:
                 context = component.getSiteManager()
-            register_content_units(context, result)
-            # Use whatever NTIID we have....
+            # Use whatever NTIID we have...
             ntiid = self.get_ntiid(result)
             if ntiid is None:
+                add_to_connection(context, result)
+                addIntId(result)  # gain an intid
                 result.ntiid = make_content_package_ntiid(result)
+            register_content_units(context, result)
             # we need events to update
             self.library.add(result, event=True)
 
