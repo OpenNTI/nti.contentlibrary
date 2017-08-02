@@ -45,6 +45,9 @@ from nti.contentlibrary.vendorinfo import VENDOR_INFO_KEY
 
 from nti.externalization.externalization import to_external_object
 
+from nti.externalization.interfaces import StandardExternalFields
+
+from nti.ntiids.ntiids import hash_ntiid
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import get_provider
 from nti.ntiids.ntiids import get_specific
@@ -64,6 +67,8 @@ from nti.zodb.containers import time_to_64bit_int
 
 #: Default NTIID provider
 NTI = u'NTI'
+OID = StandardExternalFields.OID
+NTIID = StandardExternalFields.NTIID
 
 
 def get_content_packages(sites=(), mime_types=None):
@@ -335,6 +340,13 @@ def export_content_package(package, backup=False, salt=None):
     ext_obj = to_external_object(package,
                                  name="exporter",
                                  decorate=False)
+    if not backup:
+        ext_obj.pop(OID, None)
+        for name in (NTIID, NTIID.lower()):
+            ntiid = ext_obj.get(name)
+            if not ntiid:
+                continue
+            ext_obj[name] = hash_ntiid(ntiid, salt)
     for decorator in component.subscribers((package,), 
                                            IContentPackageExporterDecorator):
         decorator.decorateExternalObject(package, ext_obj, backup, salt)
