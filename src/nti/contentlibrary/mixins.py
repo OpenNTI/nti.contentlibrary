@@ -30,6 +30,7 @@ from nti.contentlibrary.library import register_content_units
 
 from nti.contentlibrary.utils import make_content_package_ntiid
 
+from nti.contentlibrary.validators import ContentValidationError
 from nti.contentlibrary.validators import validate_content_package
 
 from nti.externalization.internalization import find_factory_for
@@ -110,8 +111,14 @@ class ContentPackageImporterMixin(object):
 
         is_published = source.get('isPublished')
         if is_published:
-            self.validate_content_package(result)
-            result.publish()  # event trigger render job
+            try:
+                self.validate_content_package(result)
+                result.publish()  # event trigger render job
+            except ContentValidationError:
+                # Nothing we can do about this except log.
+                logger.warn('Invalid content in published package (%s)',
+                            result.ntiid,
+                            exc_info=True)
 
         locked = source.get('isLocked')
         if locked:
