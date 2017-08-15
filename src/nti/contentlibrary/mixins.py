@@ -75,7 +75,7 @@ class ContentPackageImporterMixin(object):
             e, unused = error
             raise e
 
-    def handle_package(self, the_object, source, context=None):
+    def handle_package(self, the_object, source, context=None, **kwargs):
         result = the_object
         stored = self.is_new(the_object)
         if stored is not None:
@@ -126,12 +126,12 @@ class ContentPackageImporterMixin(object):
         # update from subscribers
         for updater in component.subscribers((result,),
                                              IContentPackageImporterUpdater):
-            updater.updateFromExternalObject(result, source)
+            updater.updateFromExternalObject(result, source, **kwargs)
         # update indexes
         lifecycleevent.modified(result)
         return result, (stored is None)
 
-    def handle_packages(self, items, context=None):
+    def handle_packages(self, items, context=None, **kwargs):
         added = []
         modified = []
         for ext_obj in items or ():
@@ -140,7 +140,7 @@ class ContentPackageImporterMixin(object):
             the_object = factory()  # create object
             assert IEditableContentPackage.providedBy(the_object)
             update_from_external_object(the_object, ext_obj, notify=False)
-            package, is_new = self.handle_package(the_object, source, context)
+            package, is_new = self.handle_package(the_object, source, context, **kwargs)
             if is_new:
                 added.append(package)
             else:
