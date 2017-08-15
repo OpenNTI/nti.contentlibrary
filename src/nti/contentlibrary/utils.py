@@ -336,7 +336,7 @@ def get_content_vendor_info(context, create=True):
     return result
 
 
-def export_content_package(package, backup=False, salt=None):
+def export_content_package(package, backup=False, salt=None, filer=None):
     ext_obj = to_external_object(package,
                                  name="exporter",
                                  decorate=False)
@@ -349,5 +349,5 @@ def export_content_package(package, backup=False, salt=None):
             ext_obj[name] = hash_ntiid(ntiid, salt)
     for decorator in component.subscribers((package,), 
                                            IContentPackageExporterDecorator):
-        decorator.decorateExternalObject(package, ext_obj, backup, salt)
+        decorator.decorateExternalObject(package, ext_obj, backup, salt, filer)
     return ext_obj
