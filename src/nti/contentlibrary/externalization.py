@@ -296,15 +296,10 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
         result['contents'] = data
         result['contentType'] = self.package.contentType
         # remove unrequired
-        result.pop('href', None)
-        result.pop('root', None)
-        result.pop('index', None)
-        result.pop('archive', None)
-        result.pop('index_jsonp', None)
-        result.pop('installable', None)
-        result.pop('renderVersion', None)
-        result.pop('PresentationProperties', None)
-        result.pop('PlatformPresentationResources', None)
+        for name in ('href', 'root', 'index', 'archive', 'index_jsonp',
+                     'installable', 'renderVersion', 'PresentationProperties',
+                     'PlatformPresentationResources',):            
+            result.pop(name, None)
         # standard fields
         if MIMETYPE not in result:
             result[MIMETYPE] = decorateMimeType(self.package, result)
