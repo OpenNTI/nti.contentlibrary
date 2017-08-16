@@ -336,7 +336,7 @@ class ContentBundleIO(InterfaceObjectIO):
         paths = library.pathToNTIID(ntiid) if library is not None else None
         return paths[0] if paths else None
 
-    def updateFromExternalObject(self, parsed, *args, **kwargs):
+    def updateFromExternalObject(self, parsed, *unused_args, **unused_kwargs):
         result = InterfaceObjectIO.updateFromExternalObject(self, parsed)
         items = parsed.get('ContentPackages') or parsed.get('Items')
         library = component.queryUtility(IContentPackageLibrary)
