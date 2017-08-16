@@ -52,7 +52,7 @@ class TestZODB(ContentlibraryLayerTest):
                                 'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
                                 'NTIID', 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.',
                                 'title', is_('Cohen vs California'),
-                                'contents', is_not(none())))
+                                'contents', is_('eJxzzs9IzVMoK1ZwTszJTMsvystMBABEIAcP')))
 
         factory = find_factory_for(ext_obj)
         assert_that(factory, is_not(none()))
