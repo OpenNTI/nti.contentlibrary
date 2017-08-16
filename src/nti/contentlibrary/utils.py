@@ -336,7 +336,7 @@ def get_content_vendor_info(context, create=True):
     return result
 
 
-def operate_content(context, content):
+def operate_content(content, context):
     operators = list(component.subscribers((context,), IContentOperator))
     for operator in operators:
         content = operator.operate(content, context)

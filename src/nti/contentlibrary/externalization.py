@@ -295,7 +295,7 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
         result = super(_EditableContentPackageExporter, self).toExternalObject(**kwargs)
         # export data as b64 gzip
         contents = self.package.contents or b''
-        contents = operate_content(self.package, contents)
+        contents = operate_content(contents, self.package)
         data = base64.b64encode(zlib.compress(contents))
         result['contents'] = data
         result['contentType'] = self.package.contentType
