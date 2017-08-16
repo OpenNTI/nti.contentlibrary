@@ -347,7 +347,7 @@ def export_content_package(package, backup=False, salt=None, filer=None):
     ext_obj = to_external_object(package,
                                  name="exporter",
                                  decorate=False,
-                                 # ext params,
+                                 # export params,
                                  salt=salt,
                                  filer=filer,
                                  backup=backup)
