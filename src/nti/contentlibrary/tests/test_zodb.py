@@ -21,9 +21,9 @@ from nti.contentlibrary.bucket import AbstractKey
 
 from nti.contentlibrary.interfaces import IContentPackageVendorInfo
 
-from nti.contentlibrary.zodb import RenderableContentPackage
+from nti.contentlibrary.utils import export_content_package
 
-from nti.externalization.externalization import to_external_object
+from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.externalization.internalization import find_factory_for
 from nti.externalization.internalization import update_from_external_object
@@ -44,7 +44,7 @@ class TestZODB(ContentlibraryLayerTest):
         package.contents = b'Cohen vs California'
         package.publishLastModified = 10000
         package.index_last_modified = 80000
-        ext_obj = to_external_object(package, name='exporter', decorate=False)
+        ext_obj = export_content_package(package, backup=True)
         assert_that(ext_obj,
                     has_entries('isPublished', is_(False),
                                 'publishLastModified', is_(10000),
