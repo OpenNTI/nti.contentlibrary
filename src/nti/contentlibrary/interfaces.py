@@ -1503,11 +1503,24 @@ class IContentValidator(interface.Interface):
     Marker interface for a content validator utility
     """
 
-    def validate(content, contex):
+    def validate(content, context):
         """
         :param content: The content to validate
         :param context: :class:`IContentUnit` object
         :raises a :class:`IContentValidationError` object
+        """
+
+
+class IContentOperator(interface.Interface):
+    """
+    Marker interface for a content operator subscribers
+    """
+
+    def operate(content, context):
+        """
+        :param content: The content to operate
+        :param context: :class:`IContentUnit` object
+        :return manipulated content
         """
 
 

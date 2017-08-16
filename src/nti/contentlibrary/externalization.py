@@ -43,6 +43,8 @@ from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
 
+from nti.contentlibrary.utils import operate_content
+
 from nti.contentlibrary.wref import contentunit_wref_to_missing_ntiid
 
 from nti.externalization.interfaces import IExternalObject
@@ -292,7 +294,9 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
     def toExternalObject(self, **kwargs):
         result = super(_EditableContentPackageExporter, self).toExternalObject(**kwargs)
         # export data as b64 gzip
-        data = base64.b64encode(zlib.compress(self.package.contents or b''))
+        contents = self.package.contents or b''
+        contents = operate_content(self.package, contents)
+        data = base64.b64encode(zlib.compress(contents))
         result['contents'] = data
         result['contentType'] = self.package.contentType
         # remove unrequired

@@ -34,7 +34,7 @@ from nti.contentlibrary.index import IX_SITE
 from nti.contentlibrary.index import IX_MIMETYPE
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
-from nti.contentlibrary.interfaces import IContentUnit
+from nti.contentlibrary.interfaces import IContentUnit, IContentOperator
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentVendorInfo
 from nti.contentlibrary.interfaces import IEditableContentPackage
@@ -334,6 +334,13 @@ def get_content_vendor_info(context, create=True):
         except AttributeError:
             pass
     return result
+
+
+def operate_content(context, content):
+    operators = list(component.subscribers((context,), IContentOperator))
+    for operator in operators:
+        content = operator.operate(content, context)
+    return content
 
 
 def export_content_package(package, backup=False, salt=None, filer=None):
