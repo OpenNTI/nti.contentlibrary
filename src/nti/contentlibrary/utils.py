@@ -346,7 +346,11 @@ def operate_content(content, context):
 def export_content_package(package, backup=False, salt=None, filer=None):
     ext_obj = to_external_object(package,
                                  name="exporter",
-                                 decorate=False)
+                                 decorate=False,
+                                 # ext params,
+                                 salt=salt,
+                                 filer=filer,
+                                 backup=backup)
     if not backup:
         ext_obj.pop(OID, None)
         for name in (NTIID, NTIID.lower()):
