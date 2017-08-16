@@ -12,8 +12,6 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
-import zlib
-import base64
 import urllib
 import numbers
 import collections
@@ -43,7 +41,7 @@ from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 from nti.contentlibrary.interfaces import ILegacyCourseConflatedContentPackage
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
 
-from nti.contentlibrary.utils import operate_content
+from nti.contentlibrary.utils import operate_encode_content
 
 from nti.contentlibrary.wref import contentunit_wref_to_missing_ntiid
 
@@ -295,8 +293,7 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
         result = super(_EditableContentPackageExporter, self).toExternalObject(**kwargs)
         # export data as b64 gzip
         contents = self.package.contents or b''
-        contents = operate_content(contents, self.package)
-        data = base64.b64encode(zlib.compress(contents))
+        data = operate_encode_content(contents, self.package)
         result['contents'] = data
         result['contentType'] = self.package.contentType
         # remove unrequired

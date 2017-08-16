@@ -13,6 +13,8 @@ import os
 import re
 import six
 import time
+import zlib
+import base64
 import shutil
 import zipfile
 import tempfile
@@ -342,6 +344,11 @@ def operate_content(content, context):
     for operator in component.subscribers((context,), IContentOperator):
         content = operator.operate(content, context)
     return content
+
+
+def operate_encode_content(content, context):
+    content = operate_content(content, context)
+    return base64.b64encode(zlib.compress(content or b''))
 
 
 def export_content_package(package, backup=False, salt=None, filer=None):
