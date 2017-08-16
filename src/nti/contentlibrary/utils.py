@@ -340,14 +340,14 @@ def get_content_vendor_info(context, create=True):
     return result
 
 
-def operate_content(content, context):
+def operate_content(content, context, **kwargs):
     for operator in component.subscribers((context,), IContentOperator):
-        content = operator.operate(content, context)
+        content = operator.operate(content, context, **kwargs)
     return content
 
 
-def operate_encode_content(content, context):
-    content = operate_content(content, context)
+def operate_encode_content(content, context, **kwargs):
+    content = operate_content(content, context, **kwargs)
     return base64.b64encode(zlib.compress(content or b''))
 
 

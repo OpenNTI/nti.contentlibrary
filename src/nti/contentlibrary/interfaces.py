@@ -1516,10 +1516,11 @@ class IContentOperator(interface.Interface):
     Marker interface for a content operator subscribers
     """
 
-    def operate(content, context):
+    def operate(content, context, **kwargs):
         """
         :param content: The content to operate
         :param context: :class:`IContentUnit` object
+        :param kwargs: Optional parameters
         :return manipulated content
         """
 
