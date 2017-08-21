@@ -28,6 +28,7 @@ from zope.intid.interfaces import IIntIds
 
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
+from nti.contentlibrary import NTI
 from nti.contentlibrary import HTML
 from nti.contentlibrary import BUNDLE
 from nti.contentlibrary import ALL_CONTENT_PACKAGE_MIME_TYPES
@@ -69,7 +70,6 @@ from nti.site.site import get_component_hierarchy_names
 from nti.zodb.containers import time_to_64bit_int
 
 #: Default NTIID provider
-NTI = u'NTI'
 OID = StandardExternalFields.OID
 NTIID = StandardExternalFields.NTIID
 
