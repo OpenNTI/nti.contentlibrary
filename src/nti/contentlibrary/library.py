@@ -799,12 +799,20 @@ class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
     on every startup.
     """
 
+    def _mark_global(self, package):
+        if not IGlobalContentPackage.providedBy(package):
+            interface.alsoProvides(package, IGlobalContentPackage)
+
     def _get_contentPackages(self):
         result = super(GlobalContentPackageLibrary, self)._get_contentPackages()
         for package in result.values():
-            if not IGlobalContentPackage.providedBy(package):
-                interface.alsoProvides(package, IGlobalContentPackage)
+            self._mark_global(package)
         return result
+
+    def _do_addContentPackages(self, added, *args, **kwargs):
+        for package in added or ():
+            self._mark_global(package)
+        return super(GlobalContentPackageLibrary, self)._do_addContentPackages(added, *args, **kwargs)
 
     def removeInvalidContentUnits(self):
         return dict()
