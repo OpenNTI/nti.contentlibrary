@@ -1214,9 +1214,15 @@ class IPersistentFilesystemContentPackageLibrary(IPersistentContentPackageLibrar
     pass
 
 
-class IGlobalContentPackage(interface.Interface):
+class IGlobalContentUnit(interface.Interface):
     """
-    A marker interface for a package in the global library
+    A marker interface for a content unit in the global library
+    """
+
+
+class IGlobalContentPackage(IGlobalContentUnit):
+    """
+    A marker interface for a content package in the global library
     """
 
 
