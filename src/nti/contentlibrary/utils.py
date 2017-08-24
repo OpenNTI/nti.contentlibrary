@@ -75,6 +75,7 @@ NTIID = StandardExternalFields.NTIID
 
 INTERNAL_NTIID = StandardInternalFields.NTIID
 
+
 def get_content_packages(sites=(), mime_types=None):
     """
     Return a list of :class:`.IContentPackage` objects
@@ -102,14 +103,13 @@ def get_content_packages(sites=(), mime_types=None):
             if      IContentPackage.providedBy(context) \
                 and context.ntiid not in result:
                 result[context.ntiid] = context
-
     return list(result.values())
 
 
 def _include_record(record, publish_time):
     # Only want records before our timestamp and that
     # changed the package contents.
-    return record.created <= publish_time \
+    return  record.created <= publish_time \
         and record.attributes \
         and 'contents' in record.attributes
 
@@ -236,8 +236,6 @@ def make_content_package_bundle_ntiid(bundle=None, provider=NTI, base=None, extr
 def get_content_package_site(context):
     folder = IHostPolicyFolder(IContentUnit(context, None), None)
     return folder.__name__ if folder is not None else None  # folder name
-
-
 get_content_package_site_name = get_content_package_site
 
 
