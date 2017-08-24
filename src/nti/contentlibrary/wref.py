@@ -43,8 +43,10 @@ class ContentUnitWeakRef(object):
     def __call__(self):
         # We're not a caching weak ref, we need to pick
         # up on changes that happen in the library
-        lib = component.getUtility(IContentPackageLibrary)
-        return lib.get(self._ntiid)
+        lib = component.queryUtility(IContentPackageLibrary)
+        if lib is not None:
+            return lib.get(self._ntiid)
+        return None
 
     def __lt__(self, other):
         return self._ntiid < other._ntiid
