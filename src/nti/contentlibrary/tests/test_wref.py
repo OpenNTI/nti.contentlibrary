@@ -9,6 +9,7 @@ __docformat__ = "restructuredtext en"
 
 from hamcrest import is_
 from hamcrest import assert_that
+from hamcrest import has_properties
 
 import os
 
@@ -50,9 +51,13 @@ class TestWref(ContentlibraryLayerTest):
     def test_wref(self):
         lib = component.getUtility(interfaces.IContentPackageLibrary)
 
-        unit = lib['tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.']
+        ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
+        unit = lib[ntiid]
 
         wref = IWeakRef(unit)
+        assert_that(wref, 
+                    has_properties('ntiid', is_(ntiid),
+                                   '_ntiid', is_(ntiid)))
         assert_that(wref(), is_(unit))
 
         wref2 = pickle.loads(pickle.dumps(wref))

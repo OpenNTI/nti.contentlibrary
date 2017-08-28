@@ -21,6 +21,8 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 from nti.ntiids.ntiids import validate_ntiid_string
 
+from nti.property.property import alias
+
 from nti.schema.eqhash import EqHash
 
 from nti.wref.interfaces import IWeakRef
@@ -33,8 +35,10 @@ from nti.wref.interfaces import IWeakRef
 @component.adapter(IContentUnit)
 @interface.implementer(IWeakRef)
 class ContentUnitWeakRef(object):
-
+    
     __slots__ = ('_ntiid',)
+
+    ntiid = alias('_ntiid')
 
     def __init__(self, contentunit):
         self._ntiid = contentunit.ntiid
@@ -49,7 +53,10 @@ class ContentUnitWeakRef(object):
         return None
 
     def __lt__(self, other):
-        return self._ntiid < other._ntiid
+        try:
+            return self.ntiid < other.ntiid
+        except AttributeError:
+            return NotImplemented
 
     def __getstate__(self):
         return (1, self._ntiid)
