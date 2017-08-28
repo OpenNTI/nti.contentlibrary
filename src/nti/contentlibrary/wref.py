@@ -58,6 +58,12 @@ class ContentUnitWeakRef(object):
         except AttributeError:
             return NotImplemented
 
+    def __gt__(self, other):
+        try:
+            return self.ntiid > other.ntiid
+        except AttributeError:
+            return NotImplemented
+
     def __getstate__(self):
         return (1, self._ntiid)
 
