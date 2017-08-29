@@ -26,6 +26,8 @@ from zope import component
 
 from zope.intid.interfaces import IIntIds
 
+from nti.base._compat import bytes_
+
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.contentlibrary import NTI
@@ -338,13 +340,25 @@ def get_content_vendor_info(context, create=True):
     return result
 
 
-def operate_content(content, context, **kwargs):
+def decode_content(content, safe=False):
+    result = content
+    try:
+        if result:
+            decoded = base64.b64decode(result)
+            result = bytes_(zlib.decompress(decoded))
+    except Exception:
+        if not safe:
+            raise
+    return result
+
+
+def operate_content(content, context=None, **kwargs):
     for operator in component.subscribers((context,), IContentOperator):
         content = operator.operate(content, context, **kwargs)
     return content
 
 
-def operate_encode_content(content, context, **kwargs):
+def operate_encode_content(content, context=None, **kwargs):
     content = operate_content(content, context, **kwargs)
     return base64.b64encode(zlib.compress(content or b''))
 

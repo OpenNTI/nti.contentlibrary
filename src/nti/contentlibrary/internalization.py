@@ -9,9 +9,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import zlib
-import base64
-
 from zope import component
 from zope import interface
 
@@ -25,6 +22,8 @@ from nti.contentlibrary.interfaces import IDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
+
+from nti.contentlibrary.utils import decode_content
 
 from nti.externalization.datastructures import InterfaceObjectIO
 
@@ -63,8 +62,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
             raise ValueError("Cannot set icon to a hierarchy item")
         result = super(_EditableContentUnitUpdater, self).updateFromExternalObject(parsed,*args, **kwargs)
         if 'contents' in parsed:
-            decoded = base64.b64decode(parsed['contents'])
-            self._ext_self.contents = zlib.decompress(decoded)
+            self._ext_self.contents = decode_content(parsed['contents'])
         if 'contentType' in parsed:
             self._ext_self.contentType = bytes_(parsed['contentType'])
         return result
