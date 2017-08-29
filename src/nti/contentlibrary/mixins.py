@@ -10,12 +10,14 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import copy
-import time
 
 from zope import component
 from zope import lifecycleevent
 
 from zope.cachedescriptors.property import readproperty
+
+from nti.base._compat import text_
+from nti.base._compat import bytes_
 
 from nti.contentlibrary import RST_MIMETYPE
 
@@ -35,6 +37,8 @@ from nti.contentlibrary.validators import validate_content_package
 
 from nti.externalization.internalization import find_factory_for
 from nti.externalization.internalization import update_from_external_object
+
+from nti.externalization.proxy import removeAllProxies
 
 from nti.intid.common import addIntId
 
@@ -64,10 +68,11 @@ class ContentPackageImporterMixin(object):
         return getattr(obj, 'ntiid', None)
 
     def is_new(self, obj, unused_course=None):
+        result = None
         ntiid = self.get_ntiid(obj)
         if ntiid:
-            return find_object_with_ntiid(ntiid)
-        return None
+            result = find_object_with_ntiid(ntiid)
+        return removeAllProxies(result) if result is not None else None
 
     def validate_content_package(self, package):
         error = validate_content_package(package)
@@ -79,22 +84,30 @@ class ContentPackageImporterMixin(object):
         result = the_object
         stored = self.is_new(the_object)
         if stored is not None:
-            result = stored  # replace
-            assert IEditableContentPackage.providedBy(result)
-            # copy all new content package attributes
-            copy_attributes(the_object, result, IContentPackage.names())
-            # copy content unit attributes
-            attributes = set(IContentUnit.names()) - {'children', 'ntiid'}
-            copy_attributes(the_object, result, attributes)
-            # copy contents
-            result.contents = the_object.contents
-            result.contentType = the_object.contentType or self.DEFAULT_MIME_TYPE
+            if stored is not result: # replace
+                result = stored
+                assert IEditableContentPackage.providedBy(result)
+                # copy all new content package attributes
+                copy_attributes(the_object, result, IContentPackage.names())
+                # copy content unit attributes
+                attributes = set(IContentUnit.names()) - {'children', 'ntiid'}
+                copy_attributes(the_object, result, attributes)
+                # copy contents
+                result.contents = the_object.contents
+                result.contentType = the_object.contentType or self.DEFAULT_MIME_TYPE
+            else:
+                for key in ('contents', 'contentType'):
+                    if source.get(key):
+                        setattr(result, key, bytes_(source.get(key)))
+                for key in ('title', 'description'):
+                    if source.get(key):
+                        setattr(result, key, text_(source.get(key)))
             # record trx
             record_transaction(result, type_=TRX_TYPE_IMPORT,
                                ext_value={
                                    u'contents': result.contents,
                                    u'contentType': result.contentType,
-                                   u'version': str(int(time.time()))
+                                   u'version': text_(result.contents_last_modified)
                                })
         else:
             if context is None:
