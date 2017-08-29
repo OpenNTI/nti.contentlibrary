@@ -380,4 +380,8 @@ def export_content_package(package, backup=False, salt=None, filer=None):
     for decorator in component.subscribers((package,), 
                                            IContentPackageExporterDecorator):
         decorator.decorateExternalObject(package, ext_obj, backup, salt, filer)
+    if 'backup' not in ext_obj:
+        ext_obj['backup'] = backup
+    if 'salt' not in ext_obj:
+        ext_obj['salt'] = salt
     return ext_obj
