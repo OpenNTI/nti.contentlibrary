@@ -164,6 +164,7 @@ class PersistentContentUnit(RecordableMixin,
     getContentType = get_content_type
 
     def set_content_type(self, contentType):
+        self.contents_last_modified = time.time()
         self.contents_key.contentType = contentType
     setContentType = set_content_type
 
