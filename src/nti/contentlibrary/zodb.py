@@ -175,7 +175,7 @@ class PersistentContentUnit(RecordableMixin,
 
     @readproperty
     def version(self):
-        return text_(str(self.ContentsLastModified))
+        return text_(self.ContentsLastModified)
 
     def publish(self, *args, **kwargs):
         # Override our mixin to allow continuous publishes.
