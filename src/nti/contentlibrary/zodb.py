@@ -217,31 +217,33 @@ class RenderableContentUnit(PersistentContentUnit):
 
     @property
     def has_key(self):
-        return IContentRendered.providedBy(self) and self.key
+        return IContentRendered.providedBy(self) and self.key is not None
 
     def read_contents(self):
         if self.has_key:
-            return IDelimitedHierarchyEntry(self.key).read_contents()
+            entry = IDelimitedHierarchyEntry(self.key, None)
+            return entry.read_contents() if entry is not None else None
         return super(RenderableContentUnit, self).read_contents()
 
     def get_parent_key(self):
         if self.has_key:
-            return IDelimitedHierarchyEntry(self.key).get_parent_key()
+            entry = IDelimitedHierarchyEntry(self.key, None)
+            return entry.get_parent_key() if entry is not None else None
 
     def make_sibling_key(self, sibling_name):
         if self.has_key:
-            entry = IDelimitedHierarchyEntry(self.key)
-            return entry.make_sibling_key(sibling_name)
+            entry = IDelimitedHierarchyEntry(self.key, None)
+            return entry is not None and entry.make_sibling_key(sibling_name)
 
     def read_contents_of_sibling_entry(self, sibling_name):
         if self.has_key:
-            entry = IDelimitedHierarchyEntry(self.key)
-            return entry.read_contents_of_sibling_entry(sibling_name)
+            entry = IDelimitedHierarchyEntry(self.key, None)
+            return entry is not None and entry.read_contents_of_sibling_entry(sibling_name)
 
     def does_sibling_entry_exist(self, sibling_name):
         if self.has_key:
-            entry = IDelimitedHierarchyEntry(self.key)
-            return entry.does_sibling_entry_exist(sibling_name)
+            entry = IDelimitedHierarchyEntry(self.key, None)
+            return entry is not None and entry.does_sibling_entry_exist(sibling_name)
 
 
 @interface.implementer(IRenderableContentPackage,
