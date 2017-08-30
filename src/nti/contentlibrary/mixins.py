@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import copy
+import time
 
 from zope import component
 from zope import lifecycleevent
@@ -103,6 +104,7 @@ class ContentPackageImporterMixin(object):
                     if source.get(key):
                         setattr(result, key, text_(source.get(key)))
             # record trx
+            result.contents_last_modified = time.time()
             record_transaction(result, type_=TRX_TYPE_IMPORT,
                                ext_value={
                                    u'contents': result.contents,
