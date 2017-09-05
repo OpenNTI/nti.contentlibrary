@@ -6,7 +6,7 @@ Container implementations.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -51,8 +51,8 @@ class IndexedDataContainer(PersistentCreatedAndModifiedTimeObject):
 
     def __init__(self, unit, sites=None):
         self.sites = sites or get_component_hierarchy_names()
-        self.ntiid =   getattr(unit, 'ntiid', None) \
-                    or getattr(unit, 'NTIID', None) or u''
+        self.ntiid = getattr(unit, 'ntiid', None) \
+                  or getattr(unit, 'NTIID', None) or u''
 
     @Lazy
     def catalog(self):
@@ -140,6 +140,7 @@ class TimelineIndexedDataContainer(IndexedDataContainer):
 @interface.implementer(ISlideDeckIndexedDataContainer)
 class SlideDeckIndexedDataContainer(IndexedDataContainer):
     type = INTISlideDeck.__name__
+
 
 from zope.deprecation import deprecated
 

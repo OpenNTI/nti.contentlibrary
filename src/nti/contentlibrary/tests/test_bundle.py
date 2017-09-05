@@ -18,6 +18,8 @@ from hamcrest import has_property
 
 from nti.testing.matchers import verifiably_provides
 
+from nti.testing.time import time_monotonically_increases
+
 import os
 
 from zope import component
@@ -39,8 +41,6 @@ from nti.externalization.internalization import find_factory_for
 from nti.externalization.internalization import update_from_external_object
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
-
-from nti.testing.time import time_monotonically_increases
 
 
 class TestBundle(ContentlibraryLayerTest):
@@ -108,7 +108,7 @@ class TestBundle(ContentlibraryLayerTest):
                                 'MimeType', 'application/vnd.nextthought.contentpackagebundle',
                                 'NTIID', 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle',
                                 'title', 'A Title',
-                                'root', u'/ABundle/',
+                                'root', '/ABundle/',
                                 'PlatformPresentationResources', has_length(3)))
 
         ext_obj['ContentPackages'] = [u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.']

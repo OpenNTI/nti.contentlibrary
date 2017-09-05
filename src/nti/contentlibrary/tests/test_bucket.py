@@ -12,8 +12,12 @@ from hamcrest import assert_that
 from hamcrest import has_property
 from hamcrest import is_not as does_not
 
-import cPickle
 import unittest
+
+try:
+    from six.moves import cPickle as pickle
+except ImportError:
+    import pickle
 
 from nti.contentlibrary.bucket import AbstractKey
 
@@ -25,9 +29,9 @@ class TestBucketPickle(unittest.TestCase):
         key._v_test = 1
         key.a = 42
 
-        s = cPickle.dumps(key)
+        s = pickle.dumps(key)
 
-        key2 = cPickle.loads(s)
+        key2 = pickle.loads(s)
 
         assert_that(key2.__dict__,
                     does_not(has_key('_v_test')))

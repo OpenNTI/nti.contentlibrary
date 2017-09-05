@@ -15,6 +15,8 @@ from hamcrest import assert_that
 from hamcrest import has_property
 from hamcrest import same_instance
 
+from nti.testing.matchers import validly_provides
+
 import gzip
 from six import StringIO
 
@@ -30,8 +32,6 @@ from nti.contentlibrary.boto_s3 import BotoS3ContentUnit
 from nti.contentlibrary.boto_s3 import _read_key as read_key
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
-
-from nti.testing.matchers import validly_provides
 
 
 class TestBotoS3(ContentlibraryLayerTest):
