@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -93,13 +93,12 @@ class SiteIndex(RawSetIndex):
 
 class ValidatingSiteName(object):
 
-    __slots__ = (b'site',)
+    __slots__ = ('site',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         if IHostPolicyFolder.providedBy(obj):
             self.site = obj.__name__
         elif isinstance(obj, six.string_types):
-            # TODO: Validate?
             self.site = text_(obj)
         else:
             self.site = getSite().__name__
@@ -141,7 +140,7 @@ class ValidatingNTIID(object):
 
     NTIID = alias('ntiid')
 
-    def __init__(self, obj, default):
+    def __init__(self, obj, unused_default):
         self.ntiid = getattr(obj, "NTIID", None) or getattr(obj, "ntiid", None)
 
     def __reduce__(self):
@@ -158,7 +157,7 @@ class ValidatingTarget(object):
     The "interface" we adapt to to find the target ntiid
     """
 
-    def __init__(self, obj, default):
+    def __init__(self, obj, unused_default):
         self.target = getattr(obj, "target", None)
 
     def __reduce__(self):
@@ -314,7 +313,7 @@ class ContainedObjectCatalog(Persistent):
         if doc_id is None:
             return False
 
-        if namespace is not None:  # TODO: do we need this check?
+        if namespace is not None:
             namespace = getattr(namespace, '__name__', namespace)
 
         for index, value in ((self._type_index, item),
