@@ -6,7 +6,7 @@ Objects for creating IContentLibrary objects based on the filesystem.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -126,7 +126,7 @@ class _FilesystemTime(object):
         if not cache:
             self.cache = cache
 
-    def __get__(self, inst, klass):
+    def __get__(self, inst, unused_klass):
         if inst is None:
             return self
 
@@ -150,6 +150,7 @@ class _FilesystemTime(object):
         # Should we allow set?
         pass
 
+
 from zope.dublincore.interfaces import IDCTimes
 
 from nti.base.interfaces import ILastModified
@@ -170,7 +171,7 @@ class _AbsolutePathMixin(object):
                                 self.__name__)
         raise ValueError("Not yet", self.__parent__, pabspath, self.__name__)
 
-    def exists(self, *args, **kwargs):
+    def exists(self, *unused_args, **unused_kwargs):
         return os.path.exists(self.absolute_path)
 
 
@@ -188,6 +189,7 @@ class _FilesystemTimesMixin(object):
     # Here we cache the datetime object based on the timestamp
     modified = TimeProperty('lastModified', writable=False, cached=True)
     created = TimeProperty('createdTime', writable=False, cached=True)
+
 
 from lxml import etree
 etree_parse = getattr(etree, 'parse')
@@ -362,8 +364,7 @@ class AbstractFilesystemLibrary(library.AbstractContentPackageLibrary):
 
     def __init__(self, root='', **kwargs):
         if 'paths' in kwargs:
-            raise TypeError(
-                "DynamicFilesystemLibrary does not accept paths, just root")
+            raise TypeError("DynamicFilesystemLibrary does not accept paths, just root")
 
         root = root or kwargs.pop('root')
         enumeration = self._create_enumeration(root)
@@ -441,7 +442,7 @@ class FilesystemContentUnit(_FilesystemTimesMixin,
     def _set_key(self, nk):
         if isinstance(nk, basestring):
             raise TypeError("Should provide a real key")
-        self.__dict__[str('key')] = nk
+        self.__dict__['key'] = nk
     key = property(_get_key, _set_key)
 
     @property
@@ -525,6 +526,7 @@ class FilesystemContentPackage(ContentPackage, FilesystemContentUnit):
 # Order matters, we must inherit Persistent FIRST to get the right __getstate__,etc,
 # behaviour
 
+
 from persistent import Persistent
 
 
@@ -586,7 +588,7 @@ class _GlobalFilesystemLibraryEnumeration(_FilesystemLibraryEnumeration):
 
     _enumeration_factory = _PersistentFilesystemLibraryEnumeration
 
-    def __reduce__(self, *args):
+    def __reduce__(self, *unused_args):
         return _GlobalFilesystemLibraryEnumerationUnpickle, (self.__parent__,)
     __reduce_ex__ = __reduce__
 
@@ -626,9 +628,10 @@ class GlobalFilesystemContentPackageLibrary(library.GlobalContentPackageLibrary,
     def _create_enumeration(cls, root):
         return _GlobalFilesystemLibraryEnumeration(root)
 
-    def __reduce__(self, *args):
+    def __reduce__(self, *unused_args):
         return _GlobalFilesystemUnpickle, (self.__name__,)
     __reduce_ex__ = __reduce__
+
 
 # A measure of BWC
 EnumerateOnceFilesystemLibrary = GlobalFilesystemContentPackageLibrary
@@ -662,6 +665,7 @@ class PersistentFilesystemLibrary(AbstractFilesystemLibrary,
         except ConnectionStateError:
             return object.__repr__(self)
 
+
 from nti.contentlibrary.interfaces import ISiteLibraryFactory
 
 from nti.externalization.persistence import NoPickle
@@ -676,10 +680,8 @@ class GlobalFilesystemSiteLibraryFactory(object):
         self.context = context
 
     def library_for_site_named(self, name):
-        enumeration = IDelimitedHierarchyContentPackageEnumeration(
-            self.context)
-        site_enumeration = enumeration.childEnumeration(
-            'sites').childEnumeration(name)
+        enumeration = IDelimitedHierarchyContentPackageEnumeration(self.context)
+        site_enumeration = enumeration.childEnumeration('sites').childEnumeration(name)
         # whether or not it exists we return it so that
         # it can be registered for the future.
         return PersistentFilesystemLibrary(site_enumeration)

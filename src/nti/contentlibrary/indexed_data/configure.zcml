@@ -6,7 +6,6 @@
 
 	<include package="zope.component" file="meta.zcml" />
 	<include package="zope.component" />
-	<include package="zope.location" />
 
 	<adapter factory=".container.AudioIndexedDataContainer"
 			 for="..interfaces.IContentUnit"

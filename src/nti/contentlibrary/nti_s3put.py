@@ -27,7 +27,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -202,6 +202,7 @@ def s3_upload_file(key, fullpath, cb=None, num_cb=None, policy=None,
 
     return headers
 _upload_file = s3_upload_file
+
 
 def main():
     try:
