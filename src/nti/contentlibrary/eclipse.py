@@ -229,7 +229,7 @@ def EclipseContentPackage(toc_entry,
         if info:  # sigh
             content_package.courseInfoSrc = _node_get(info[0], 'src')
         elif content_package.does_sibling_entry_exist('course_info.json'):
-            content_package.courseInfoSrc = 'course_info.json'
+            content_package.courseInfoSrc = u'course_info.json'
 
     if content_package.does_sibling_entry_exist(ARCHIVE_FILENAME):
         content_package.archive = ARCHIVE_FILENAME
