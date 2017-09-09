@@ -34,12 +34,12 @@ from nti.ntiids.ntiids import is_valid_ntiid_string
 TOC_FILENAME = u'eclipse-toc.xml'
 
 #: A possibly-missing ZIP file containing the downloadable content.
-ARCHIVE_FILENAME = 'archive.zip'
+ARCHIVE_FILENAME = u'archive.zip'
 
 #: A glossary file applicable to the entire content.
 #: .. todo:: In the future, if we need to, we can add a node property
 #: for sub-glossaries specific to just portions of the content
-MAIN_CSV_CONTENT_GLOSSARY_FILENAME = 'nti_content_glossary.csv'
+MAIN_CSV_CONTENT_GLOSSARY_FILENAME = u'nti_content_glossary.csv'
 
 _toc_item_attrs = ('NTIRelativeScrollHeight', 'label', 'ntiid', 'href')
 
