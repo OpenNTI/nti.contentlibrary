@@ -21,15 +21,16 @@ def _read(fname):
     with codecs.open(fname, encoding='utf-8') as f:
         return f.read()
 
+
 setup(
     name='nti.contentlibrary',
     version=_read('version.txt').strip(),
     author='Jason Madden',
     author_email='jason@nextthought.com',
-    description="NTI contentlibrary",
+    description="NTI content library",
     long_description=_read('README.rst'),
     license='Apache',
-    keywords='contentlibrary',
+    keywords='content library',
     classifiers=[
         'Intended Audience :: Developers',
         'Natural Language :: English',
@@ -38,6 +39,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
+    url="https://github.com/NextThought/nti.contentlibrary",
     zip_safe=True,
     packages=find_packages('src'),
     package_dir={'': 'src'},
