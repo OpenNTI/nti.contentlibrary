@@ -6,7 +6,7 @@ Objects for working with Eclipse index representations of content packages.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # This module is badly named now
@@ -31,7 +31,7 @@ from nti.ntiids.ntiids import is_valid_ntiid_string
 ##
 #: The main XML file found inside the content package, giving the
 #: layout of the topics and sections.
-TOC_FILENAME = 'eclipse-toc.xml'
+TOC_FILENAME = u'eclipse-toc.xml'
 
 #: A possibly-missing ZIP file containing the downloadable content.
 ARCHIVE_FILENAME = 'archive.zip'
@@ -79,7 +79,7 @@ def _href_for_sibling_key(href):
 
     # NOTE: This implementation makes it impossible to have an actual / in a
     # href, even though they are technically legal in unix filenames
-    path = '/'.join(parts)
+    path = u'/'.join(parts)
     return path
 
 
@@ -109,14 +109,14 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
             # it needs to deal with multi-level keys, either
             # by creating a hierarchy of keys (filesystem)
             # or by simply string appending (boto)
-            setattr(tocItem, str(i), 
+            setattr(tocItem, str(i),
                     toc_entry.make_sibling_key(_href_for_sibling_key(val)))
 
     children = tocItem.children_iterable_factory()
     for ordinal, child in enumerate(node.iterchildren(tag='topic'), 1):
-        child = _tocItem(child, 
-                         toc_entry, 
-                         factory=child_factory, 
+        child = _tocItem(child,
+                         toc_entry,
+                         factory=child_factory,
                          child_factory=child_factory)
         child.__parent__ = tocItem
         child.ordinal = ordinal
@@ -132,9 +132,6 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
             continue
 
         if not is_valid_ntiid_string(ntiid):
-            # logger.log(TRACE,
-            #            "Ignoring ill-formed object NTIID (%s); please fix the rendering for %s",
-            #            ntiid, tocItem)
             continue
 
         if ntiid not in embeddedContainerNTIIDs:
@@ -147,6 +144,7 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
 
 # Cache for content packages
 # should be done at a higher level.
+
 
 etree_Error = getattr(etree, 'Error')
 
@@ -193,7 +191,7 @@ def EclipseContentPackage(toc_entry,
     content_package.root = toc_entry.get_parent_key()
     content_package.index = toc_entry.key
     content_package.index_last_modified = toc_last_modified
-    
+
     toc_jsonp = TOC_FILENAME + '.jsonp'
     content_package.index_jsonp = toc_entry.does_sibling_entry_exist(toc_jsonp)
 
@@ -209,13 +207,12 @@ def EclipseContentPackage(toc_entry,
         else:
             isCourse = as_str in ('1', 'true', 'yes', 'y', 't')
     if isCourse:
-        interface.alsoProvides(content_package, 
+        interface.alsoProvides(content_package,
                                ILegacyCourseConflatedContentPackage)
         content_package.isCourse = isCourse
         courses = root.xpath('/toc/course')
         if not courses or len(courses) != 1:
-            raise ValueError(
-                "Invalid course: 'isCourse' is true, but wrong 'course' node")
+            raise ValueError("Invalid course: 'isCourse' is true, but wrong 'course' node")
         course = courses[0]
         courseTitle = _node_get(course, 'label')
         courseName = _node_get(course, 'courseName')
@@ -229,7 +226,7 @@ def EclipseContentPackage(toc_entry,
         # practice is also always the value of info[@src].
         # Take whatever we can get.
         info = course.xpath('info')
-        if info: # sigh
+        if info:  # sigh
             content_package.courseInfoSrc = _node_get(info[0], 'src')
         elif content_package.does_sibling_entry_exist('course_info.json'):
             content_package.courseInfoSrc = 'course_info.json'
@@ -238,9 +235,9 @@ def EclipseContentPackage(toc_entry,
         content_package.archive = ARCHIVE_FILENAME
         content_package.installable = True
         content_package.archive_unit = \
-                        unit_factory(key=content_package.make_sibling_key(ARCHIVE_FILENAME),
-                                     href=ARCHIVE_FILENAME,
-                                     title='Content Archive')
+            unit_factory(key=content_package.make_sibling_key(ARCHIVE_FILENAME),
+                         href=ARCHIVE_FILENAME,
+                         title=u'Content Archive')
         content_package.archive_unit.__parent__ = content_package
 
     read_dublincore_from_named_key(content_package, content_package.root)

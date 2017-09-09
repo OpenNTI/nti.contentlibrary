@@ -6,7 +6,7 @@ Support for reading and setting Dublin Core metadata.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -30,11 +30,13 @@ DCMETA_FILENAME = 'dc_metadata.xml'
 # upper case and as-is (although in the XML it will come in as Contributor).
 # So we have a partial mapping to fix this (the things in zope.dublincore.dcterms
 # aren't sufficient)
-_xml_to_attr = {'Creator': 'creators',
-                'Contributor': 'contributors',
-                'Subject': 'subjects',
-                'Title': 'title',
-                'Description': 'description'}
+_xml_to_attr = {
+    'Creator': 'creators',
+    'Contributor': 'contributors',
+    'Subject': 'subjects',
+    'Title': 'title',
+    'Description': 'description'
+}
 _scalars = {'Title', 'Description'}
 
 
@@ -85,7 +87,7 @@ def read_dublincore_from_source(dublin_object, source, lastModified=None):
 def read_dublincore_from_named_key(dublin_object, bucket,
                                    filename=DCMETA_FILENAME,
                                    force=False):
-    dublin_key = bucket.getChildNamed(DCMETA_FILENAME)
+    dublin_key = bucket.getChildNamed(filename)
     if not IDelimitedHierarchyKey.providedBy(dublin_key):
         return
 
@@ -98,10 +100,11 @@ def read_dublincore_from_named_key(dublin_object, bucket,
         return
 
     source = dublin_key.readContents()
-    result = read_dublincore_from_source(dublin_object, 
-                                         source, 
+    result = read_dublincore_from_source(dublin_object,
+                                         source,
                                          dublin_key.lastModified)
     return result
+
 
 #: A standard adapter for the content packages and bundles
 #: defined in this package (things that implement IDisplayableContent)
@@ -125,7 +128,7 @@ class _SequenceDirectProperty(object):
         self.__name__ = name
         self.__attrname = str(attrname)
 
-    def __get__(self, inst, klass):
+    def __get__(self, inst, unused_klass):
         if inst is None:
             return self
         context = inst._ZDCPartialAnnotatableAdapter__context
@@ -142,6 +145,7 @@ class _SequenceDirectProperty(object):
         if oldvalue != value:
             setattr(context, self.__attrname, value)
 
+
 for x in map(str, ['creators', 'subjects', 'contributors']):
     prop = _SequenceDirectProperty(x, x)
     setattr(DisplayableContentZopeDublinCoreAdapter, x, prop)
@@ -149,8 +153,7 @@ for x in map(str, ['creators', 'subjects', 'contributors']):
 #: A standard adapter for things that are just descriptive properties
 #: but also annotatable
 DescriptivePropertiesZopeDublinCoreAdapter = partialAnnotatableAdapterFactory(
-    map(str,
-        ['title', 'description']))
+    map(str, ['title', 'description']))
 
 # Both of them need a way to store last Modified, since the object is created on demand
 # (only the mapping is persistent)
@@ -161,13 +164,14 @@ class _LastModifiedProperty(object):
     def __init__(self):
         pass
 
-    def __get__(self, inst, klass):
+    def __get__(self, inst, unused_klass):
         if inst is None:
             return self
         return getattr(inst._mapping, 'lastModified', 0)
 
     def __set__(self, inst, value):
         inst._mapping.lastModified = value
+
 
 DisplayableContentZopeDublinCoreAdapter.lastModified = _LastModifiedProperty()
 DescriptivePropertiesZopeDublinCoreAdapter.lastModified = _LastModifiedProperty()

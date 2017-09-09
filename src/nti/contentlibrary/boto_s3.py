@@ -6,7 +6,7 @@ Generic implementations of IContentUnit functions
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -64,13 +64,14 @@ class _WithName:  # NOTE: Not new-style
 
 class _WithExists:  # NOTE: Not new-style
 
-    def exists(self, *args, **kwargs):
+    def exists(self, *unused_args, **unused_kwargs):
         try:
             # if we can list anything we exists
             self.get_all_keys(max_keys=1)
             return True
-        except Exception: # connection errors?
+        except Exception:  # connection errors?
             return False
+
 
 boto.s3.bucket.Bucket.__bases__ += (_WithName, _WithExists)
 boto.s3.bucket.Bucket.__parent__ = alias('connection')
@@ -152,6 +153,7 @@ def key_last_modified(key):
         result = time.mktime(result.timetuple())
     return result
 
+
 from nti.contentlibrary.contentunit import _exist_cache
 from nti.contentlibrary.contentunit import _content_cache
 
@@ -183,14 +185,15 @@ class _KeyDelimitedHierarchyEntry(object):
     def make_sibling_key(self, sibling_name):
         split = self.key.name.split('/')
         split[-1] = sibling_name
-        new_key = type(self.key)(bucket=self.key.bucket, name='/'.join(split))
+        new_key = type(self.key)(bucket=self.key.bucket,
+                                name=u'/'.join(split))
         return new_key
 
     def get_parent_key(self):
         split = self.key.name.split('/')
         parent_part = split[0:-1]
-        new_key = type(self.key)(bucket=self.key.bucket, 
-                                 name='/'.join(parent_part))
+        new_key = type(self.key)(bucket=self.key.bucket,
+                                 name=u'/'.join(parent_part))
         return new_key
 
     def read_contents(self):
@@ -304,6 +307,8 @@ def boto_s3_package_factory(key, _package_factory=None, _unit_factory=None):
         return eclipse.EclipseContentPackage(temp_entry,
                                              _package_factory,
                                              _unit_factory)
+
+
 package_factory = _package_factory = boto_s3_package_factory
 
 
@@ -352,5 +357,5 @@ class BotoS3BucketContentLibrary(library.GlobalContentPackageLibrary):
     """
 
     def __init__(self, bucket):
-        library.GlobalContentPackageLibrary.__init__(
-            self, _BotoS3BucketContentLibraryEnumeration(bucket))
+        clazz = library.GlobalContentPackageLibrary
+        clazz.__init__(self, _BotoS3BucketContentLibraryEnumeration(bucket))
