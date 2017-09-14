@@ -53,7 +53,7 @@ from nti.publishing.mixins import PublishableMixin
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
-from nti.externalization.oids import to_external_ntiid_oid
+from nti.ntiids.oids import to_external_ntiid_oid
 
 from nti.property.property import alias
 
