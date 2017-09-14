@@ -136,8 +136,6 @@ class AbstractKey(_AbstractDelimitedHierarchyObject):
         # this is faster than deep copying, and about the same as
         # pickling, which are semantically equivalent:
 
-        # In [47]: %timeit anyjson.loads(json_s)
-        # 100000 loops, best of 3: 5.58 us per loop
         # In [52]: %timeit simplejson.loads(json_s)
         # 100000 loops, best of 3: 4.45 us per loop
         # In [48]: %timeit copy.deepcopy(data)

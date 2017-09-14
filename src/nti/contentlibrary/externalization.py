@@ -17,7 +17,7 @@ import numbers
 import collections
 from urlparse import urljoin
 
-import anyjson as json
+import simplejson as json
 
 from zope import component
 from zope import interface

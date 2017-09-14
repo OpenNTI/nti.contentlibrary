@@ -24,10 +24,10 @@ from hamcrest import contains_inanyorder
 from hamcrest import greater_than_or_equal_to
 
 import os.path
-import anyjson as json
+import simplejson as json
 
 try:
-    from six.moves import cPickle as pickle
+    import cPickle as pickle
 except ImportError:
     import pickle
 
