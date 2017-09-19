@@ -39,8 +39,9 @@ from nti.contentlibrary.index import IX_SITE
 from nti.contentlibrary.index import IX_MIMETYPE
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
-from nti.contentlibrary.interfaces import IContentUnit, IContentOperator
+from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentOperator
 from nti.contentlibrary.interfaces import IContentVendorInfo
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
@@ -48,10 +49,9 @@ from nti.contentlibrary.interfaces import IContentPackageExporterDecorator
 
 from nti.contentlibrary.vendorinfo import VENDOR_INFO_KEY
 
-from nti.externalization.externalization import to_external_object
-
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import StandardInternalFields
+from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.ntiids.ntiids import hash_ntiid
 from nti.ntiids.ntiids import make_ntiid
@@ -364,13 +364,16 @@ def operate_encode_content(content, context=None, **kwargs):
 
 
 def export_content_package(package, backup=False, salt=None, filer=None):
-    ext_obj = to_external_object(package,
-                                 name="exporter",
-                                 decorate=False,
-                                 # export params,
-                                 salt=salt,
-                                 filer=filer,
-                                 backup=backup)
+    exporter = component.getAdapter(package, 
+                                    IInternalObjectExternalizer, 
+                                    name="exporter")
+    externals = {
+        'salt': salt,
+        'filer': filer,
+        'backup': backup
+    }
+    ext_obj = exporter.toExternalObject(decorate=False,
+                                        externals=externals)
     if not backup:
         ext_obj.pop(OID, None)
         for name in (NTIID, INTERNAL_NTIID):

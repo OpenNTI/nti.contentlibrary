@@ -51,7 +51,6 @@ from nti.externalization.interfaces import StandardExternalFields
 
 from nti.externalization.datastructures import InterfaceObjectIO
 
-from nti.externalization.externalization import get_externals
 from nti.externalization.externalization import toExternalObject
 from nti.externalization.externalization import to_standard_external_dictionary
 
@@ -290,13 +289,15 @@ class _ContentPackageExporter(_ContentPackageExternal):
 @component.adapter(IEditableContentPackage)
 class _EditableContentPackageExporter(_EditableContentPackageExternal):
 
-    def externals(self):
-        return get_externals()
+    def get_externals(self, externals=None):
+        return dict() if externals is None else externals
 
-    def toExternalObject(self, **kwargs):
+    def toExternalObject(self, externals=None, **kwargs):
         result = super(_EditableContentPackageExporter, self).toExternalObject(**kwargs)
         contents = self.package.contents or b''
-        data = operate_encode_content(contents, self.package, **self.externals())
+        data = operate_encode_content(contents, 
+                                      self.package, 
+                                      **self.get_externals(externals))
         result['contents'] = data
         result['contentType'] = self.package.contentType
         # remove unrequired
