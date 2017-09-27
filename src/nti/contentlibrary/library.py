@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import time
 import numbers
@@ -68,6 +67,8 @@ from nti.intid.common import removeIntId
 from nti.property.property import alias
 
 from nti.site.localutility import queryNextUtility
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @interface.implementer(IContentPackageEnumeration)
@@ -239,7 +240,7 @@ class AbstractContentPackageLibrary(object):
     __name__ = u'Library'
     __parent__ = None
 
-    def __init__(self, enumeration, prefix=u'', **kwargs):
+    def __init__(self, enumeration, prefix=u'', **unused_kwargs):
         self._enumeration = enumeration
         enumeration.__parent__ = self
         assert enumeration is not None
@@ -308,6 +309,7 @@ class AbstractContentPackageLibrary(object):
             # remove from intid facility
             if unregister:
                 unregister_content_units(old)
+                logger.info("Content package %s has been removed", old.ntiid)
             # record in sync results
             if lib_sync_results is not None:
                 lib_sync_results.removed(old.ntiid)
