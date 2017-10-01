@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -20,7 +21,7 @@ from zope import component
 from zope import interface
 
 from zope.configuration import config
-from zope.configuration import xmlconfig 
+from zope.configuration import xmlconfig
 
 from nti.contentlibrary.interfaces import IS3Key
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -45,7 +46,6 @@ HEAD_ZCML_STRING = u"""
 
         <include package="zope.component" />
         <include package="zope.annotation" />
-        <include package="z3c.baseregistry" file="meta.zcml" />
         <include package="." file="meta.zcml" />
 
 """
