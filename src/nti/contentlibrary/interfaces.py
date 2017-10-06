@@ -1403,10 +1403,12 @@ class ContentBundleUpdatedEvent(ObjectModifiedFromExternalEvent):
     @property
     def added_packages(self):
         return self.kwargs.get('added') or self.kwargs.get('added_packages')
-
+    added = added_packages
+    
     @property
     def removed_packages(self):
         return self.kwargs.get('removed') or self.kwargs.get('removed_packages')
+    removed = removed_packages
 
 
 class IContentPackageLibraryModifiedOnSyncEvent(IObjectModifiedEvent):
