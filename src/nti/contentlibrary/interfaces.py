@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import schema
 from zope import component
@@ -49,6 +48,9 @@ from nti.coremetadata.interfaces import IVersioned
 from nti.coremetadata.interfaces import IShouldHaveTraversablePath
 
 from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
+
+from nti.externalization.interfaces import ObjectModifiedFromExternalEvent
+from nti.externalization.interfaces import IObjectModifiedFromExternalEvent
 
 from nti.ntiids.schema import ValidNTIID
 
@@ -1378,6 +1380,32 @@ class ContentPackageBundleLibraryModifiedOnSyncEvent(ObjectModifiedEvent):
     """
     Content package bundle synced event.
     """
+
+
+class IContentBundleUpdatedEvent(IObjectModifiedFromExternalEvent):
+    """
+    An event that is sent, when a content bundle is updated
+    """
+
+    added_packages = interface.Attribute("Packages added")
+    removed_packages = interface.Attribute("Packages removed")
+
+
+@interface.implementer(IContentBundleUpdatedEvent)
+class ContentBundleUpdatedEvent(ObjectModifiedFromExternalEvent):
+
+    def __init__(self, obj, *descriptions, **kwargs):
+        super(ContentBundleUpdatedEvent, self).__init__(obj, *descriptions, **kwargs)
+        self.external_value = kwargs.get('external_value') \
+                           or kwargs.get('externalValue')
+
+    @property
+    def added_packages(self):
+        return self.kwargs.get('added') or self.kwargs.get('added_packages')
+
+    @property
+    def removed_packages(self):
+        return self.kwargs.get('removed') or self.kwargs.get('removed_packages')
 
 
 class IContentPackageLibraryModifiedOnSyncEvent(IObjectModifiedEvent):
