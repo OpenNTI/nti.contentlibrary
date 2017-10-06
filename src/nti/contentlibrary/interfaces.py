@@ -1396,8 +1396,9 @@ class ContentBundleUpdatedEvent(ObjectModifiedFromExternalEvent):
 
     def __init__(self, obj, *descriptions, **kwargs):
         super(ContentBundleUpdatedEvent, self).__init__(obj, *descriptions, **kwargs)
-        self.external_value = kwargs.get('external_value') \
-                           or kwargs.get('externalValue')
+        self.external_value = kwargs.get('external') \
+                           or kwargs.get('externalValue') \
+                           or kwargs.get('external_value')
 
     @property
     def added_packages(self):
