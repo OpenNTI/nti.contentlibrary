@@ -6,16 +6,15 @@ Support for externalizing portions of the library.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import six
 import urllib
 import numbers
 import collections
-from urlparse import urljoin
+from six.moves import urllib_parse
 
 import simplejson as json
 
@@ -59,6 +58,8 @@ from nti.mimetype.externalization import decorateMimeType
 MIMETYPE = StandardExternalFields.MIMETYPE
 LAST_MODIFIED = StandardExternalFields.LAST_MODIFIED
 
+logger = __import__('logging').getLogger(__name__)
+
 
 @interface.implementer(IExternalObject)
 @component.adapter(IContentPackageLibrary)
@@ -87,7 +88,7 @@ def _path_join(root_url, path=''):
     if path is None:
         return None
     path = _path_maybe_quote(path)
-    return urljoin(root_url, path)
+    return urllib_parse.urljoin(root_url, path)
 
 
 def _root_url_of_key(key):
