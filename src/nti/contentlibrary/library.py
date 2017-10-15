@@ -405,7 +405,7 @@ class AbstractContentPackageLibrary(object):
             raise Exception("No packages to update were found")
         return result
 
-    def syncContentPackages(self, params=None, results=None):
+    def syncContentPackages(self, params=None, results=None, do_notify=True):
         """
         Fires created, added, modified, or removed events for each
         content package, as appropriate.
@@ -521,7 +521,8 @@ class AbstractContentPackageLibrary(object):
         self._do_completeSyncPackages(unmodified,
                                       lib_sync_results,
                                       params,
-                                      results)
+                                      results,
+                                      do_notify)
         return lib_sync_results
 
     def _checkSync(self):
