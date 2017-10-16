@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import re
@@ -46,6 +45,9 @@ from nti.contentlibrary.interfaces import IContentVendorInfo
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageExporterDecorator
+from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
+
+from nti.contentlibrary.presentationresource import get_platform_presentation_resources
 
 from nti.contentlibrary.vendorinfo import VENDOR_INFO_KEY
 
@@ -76,6 +78,8 @@ OID = StandardExternalFields.OID
 NTIID = StandardExternalFields.NTIID
 
 INTERNAL_NTIID = StandardInternalFields.NTIID
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def get_content_packages(sites=(), mime_types=None):
@@ -246,9 +250,10 @@ def get_content_package_site_registry(context):
     return folder.getSiteManager() if folder is not None else None
 
 
-def is_valid_presentation_assets_source(source):
+def is_valid_presentation_assets_source(source, versions=None):
     tmpdirs = []
     result = False
+    versions = list() if versions is None else versions
     try:
         if hasattr(source, "read"):
             tmpdir = tempfile.mkdtemp()
@@ -280,13 +285,12 @@ def is_valid_presentation_assets_source(source):
                     # validate target
                     target = os.path.join(source, name)
                     if not os.path.isdir(target):
-                        logger.error(
-                            "%s is not valid target directory", target)
+                        logger.error("%s is not valid target directory", 
+                                     target)
                         result = False
                         break
                     targets.append(target)
                 # inside each target check versions
-                versions = []
                 if result:
                     for path in targets:
                         for name in os.listdir(path):
@@ -322,6 +326,22 @@ def is_valid_presentation_assets_source(source):
     finally:
         for path in tmpdirs:
             shutil.rmtree(path, ignore_errors=True)
+
+
+def create_display_resources(source):
+    bucket = source
+    # check local directory
+    if      isinstance(source, six.string_types) \
+        and os.path.exists(source) \
+        and os.path.isdir(source):
+        # avoud circular imports
+        from nti.contentlibrary.filesystem import FilesystemBucket
+        bucket = FilesystemBucket(name='source')
+        bucket.absolute_path = source
+    # validate bucket
+    if IEnumerableDelimitedHierarchyBucket.providedBy(bucket):
+        return get_platform_presentation_resources(bucket)
+    return ()
 
 
 def get_content_vendor_info(context, create=True):

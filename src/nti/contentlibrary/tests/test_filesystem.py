@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -23,13 +24,10 @@ from hamcrest import is_not as does_not
 from hamcrest import contains_inanyorder
 from hamcrest import greater_than_or_equal_to
 
+import pickle
 import os.path
-import simplejson as json
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import simplejson as json
 
 from zope import component
 

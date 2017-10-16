@@ -6,10 +6,9 @@ Objects for creating IContentLibrary objects based on the filesystem.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 from os.path import join as path_join
@@ -22,16 +21,26 @@ from zope.cachedescriptors.method import cachedIn
 from zope.cachedescriptors.property import readproperty
 from zope.cachedescriptors.property import CachedProperty
 
+from zope.dublincore.interfaces import IDCTimes
+
 from ZODB.POSException import ConnectionStateError
+
+from persistent import Persistent
+
+from nti.base.interfaces import ILastModified
 
 from nti.contentlibrary import eclipse
 from nti.contentlibrary import library
+
+from nti.contentlibrary.bucket import AbstractKey
+from nti.contentlibrary.bucket import AbstractBucket
 
 from nti.contentlibrary.contentunit import ContentUnit
 from nti.contentlibrary.contentunit import ContentPackage
 
 from nti.contentlibrary.interfaces import IFilesystemKey
 from nti.contentlibrary.interfaces import IFilesystemBucket
+from nti.contentlibrary.interfaces import ISiteLibraryFactory
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IFilesystemContentUnit
 from nti.contentlibrary.interfaces import IDelimitedHierarchyEntry
@@ -45,6 +54,12 @@ from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
 from nti.contentlibrary.interfaces import IGlobalFilesystemContentPackageLibrary
 from nti.contentlibrary.interfaces import IPersistentFilesystemContentPackageLibrary
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
+
+from nti.dublincore.time_mixins import TimeProperty
+
+from nti.externalization.persistence import NoPickle
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def _TOCPath(path):
@@ -149,16 +164,6 @@ class _FilesystemTime(object):
     def __set__(self, inst, val):
         # Should we allow set?
         pass
-
-
-from zope.dublincore.interfaces import IDCTimes
-
-from nti.base.interfaces import ILastModified
-
-from nti.contentlibrary.bucket import AbstractKey
-from nti.contentlibrary.bucket import AbstractBucket
-
-from nti.dublincore.time_mixins import TimeProperty
 
 
 class _AbsolutePathMixin(object):
@@ -523,11 +528,9 @@ class FilesystemContentPackage(ContentPackage, FilesystemContentUnit):
         """
         return max(self.index_last_modified, self._directory_last_modified)
 
+
 # Order matters, we must inherit Persistent FIRST to get the right __getstate__,etc,
 # behaviour
-
-
-from persistent import Persistent
 
 
 @interface.implementer(IPersistentFilesystemContentUnit)
@@ -664,11 +667,6 @@ class PersistentFilesystemLibrary(AbstractFilesystemLibrary,
             return super(PersistentFilesystemLibrary, self).__repr__()
         except ConnectionStateError:
             return object.__repr__(self)
-
-
-from nti.contentlibrary.interfaces import ISiteLibraryFactory
-
-from nti.externalization.persistence import NoPickle
 
 
 @NoPickle
