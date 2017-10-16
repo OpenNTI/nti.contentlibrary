@@ -422,7 +422,7 @@ class ISyncableContentPackageLibrary(IContentPackageLibrary):
         "The enumeration we will use when asked to sync content packages")
     enumeration.setTaggedValue('_ext_excluded_out', True)
 
-    def syncContentPackages(params=None):
+    def syncContentPackages(params=None, results=None, do_notify=True):
         """
         Do whatever is necessary to sync content packages.
 
@@ -432,6 +432,8 @@ class ISyncableContentPackageLibrary(IContentPackageLibrary):
         events for individual content packages will have been fired.
 
         :param params: Synchronization parameters
+        :param results: Synchronization results
+        :param do_notify: Notify synchronization completion flag
         :return  Synchronization results
         """
 
