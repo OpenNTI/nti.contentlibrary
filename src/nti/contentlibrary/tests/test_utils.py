@@ -10,14 +10,12 @@ from __future__ import absolute_import
 
 from hamcrest import is_
 from hamcrest import is_not
-from hamcrest import has_length
 from hamcrest import assert_that
 
 import os
 import shutil
 import tempfile
 
-from nti.contentlibrary.utils import create_display_resources
 from nti.contentlibrary.utils import is_valid_presentation_assets_source
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
@@ -48,9 +46,3 @@ class TestUtils(ContentlibraryLayerTest):
         
         result = is_valid_presentation_assets_source(None)
         assert_that(result, is_(False))
-
-    def test_create_display_resources_from_disk(self):
-        path = os.path.join(os.path.dirname(__file__),
-                            'TestFilesystem')
-        resources = create_display_resources(path)
-        assert_that(resources, has_length(3))

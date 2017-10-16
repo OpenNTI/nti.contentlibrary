@@ -45,9 +45,6 @@ from nti.contentlibrary.interfaces import IContentVendorInfo
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageExporterDecorator
-from nti.contentlibrary.interfaces import IEnumerableDelimitedHierarchyBucket
-
-from nti.contentlibrary.presentationresource import get_platform_presentation_resources
 
 from nti.contentlibrary.vendorinfo import VENDOR_INFO_KEY
 
@@ -326,22 +323,6 @@ def is_valid_presentation_assets_source(source, versions=None):
     finally:
         for path in tmpdirs:
             shutil.rmtree(path, ignore_errors=True)
-
-
-def create_display_resources(source):
-    bucket = source
-    # check local directory
-    if      isinstance(source, six.string_types) \
-        and os.path.exists(source) \
-        and os.path.isdir(source):
-        # avoud circular imports
-        from nti.contentlibrary.filesystem import FilesystemBucket
-        bucket = FilesystemBucket(name='source')
-        bucket.absolute_path = source
-    # validate bucket
-    if IEnumerableDelimitedHierarchyBucket.providedBy(bucket):
-        return get_platform_presentation_resources(bucket)
-    return ()
 
 
 def get_content_vendor_info(context, create=True):
