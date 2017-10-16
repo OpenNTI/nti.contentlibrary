@@ -11,7 +11,6 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import six
-import urllib
 import numbers
 import collections
 from six.moves import urllib_parse
@@ -80,7 +79,7 @@ def _path_maybe_quote(path):
         # Generally, we don't want to quote the path portion: it should already
         # have been quoted with the TOC file was written. However, for
         # hand-edited TOCs, it is convenient if we do quote it.
-        path = urllib.quote(path)
+        path = urllib_parse.quote(path)
     return path
 
 

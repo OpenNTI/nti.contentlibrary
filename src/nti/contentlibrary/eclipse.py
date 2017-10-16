@@ -6,15 +6,13 @@ Objects for working with Eclipse index representations of content packages.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # This module is badly named now
 
-logger = __import__('logging').getLogger(__name__)
-
-from urllib import unquote
-from urlparse import urlparse
+from six.moves import urllib_parse
 
 from lxml import etree
 
@@ -47,6 +45,8 @@ _toc_item_attrs = ('NTIRelativeScrollHeight', 'label', 'ntiid', 'href')
 # set a 'key' property for BWC
 _toc_item_key_attrs = ('icon', 'thumbnail')
 
+logger = __import__('logging').getLogger(__name__)
+
 
 def _node_get(node, name, default=None):
     # LXML defaults to returning ASCII attributes as byte strings
@@ -63,7 +63,7 @@ def _href_for_sibling_key(href):
     assert not href.startswith('/')
 
     # Strip any fragment
-    path = urlparse(href).path
+    path = urllib_parse.urlparse(href).path
     path = path.decode('utf-8') if isinstance(path, bytes) else path
 
     # Just in case they send url-encoded things, decode them
@@ -74,7 +74,7 @@ def _href_for_sibling_key(href):
     # If we get a multi-segment path, we need to deconstruct it
     # into bucket parts to be sure that it externalizes
     # correctly.
-    parts = [unquote(x) for x in path.split('/')]
+    parts = [urllib_parse.unquote(x) for x in path.split('/')]
     parts = [x.decode('utf-8') if isinstance(x, bytes) else x for x in parts]
 
     # NOTE: This implementation makes it impossible to have an actual / in a
