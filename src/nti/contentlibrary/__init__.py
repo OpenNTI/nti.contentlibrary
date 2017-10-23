@@ -23,6 +23,9 @@ BUNDLE = u'Bundle'
 #: Named prefix to distinguish API created content
 AUTHORED_PREFIX = u"_authored"
 
+#: Deleted directory marker
+DELETED_MARKER = u"__nti_deleted_marker__"
+
 #: Named prefix to distinguish API rendered content
 RENDERED_PREFIX = u"_rendered"
 

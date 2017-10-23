@@ -34,12 +34,14 @@ from persistent import Persistent
 
 from BTrees.OOBTree import OOBTree
 
+from nti.contentlibrary import DELETED_MARKER
 from nti.contentlibrary import AUTHORED_PREFIX
 
 from nti.contentlibrary.interfaces import INoAutoSync
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IDelimitedHierarchyKey
 from nti.contentlibrary.interfaces import IPersistentContentUnit
 from nti.contentlibrary.interfaces import ContentPackageAddedEvent
 from nti.contentlibrary.interfaces import ContentPackageRemovedEvent
@@ -124,9 +126,16 @@ class AbstractDelimitedHiercharchyContentPackageEnumeration(AbstractContentPacka
 
     root = None
 
+    def _is_deleted(self, bucket):
+        try:
+            key = bucket.getChildNamed(DELETED_MARKER)
+            return IDelimitedHierarchyKey.providedBy(key)
+        except AttributeError:  # pragma: no cover
+            return False
+
     def _include(self, bucket):
-        # Exclude any authored content on disk from consideration
-        return not bucket.name.startswith(AUTHORED_PREFIX)
+        # Exclude any authored and deleted content on disk from consideration
+        return not (bucket.name.startswith(AUTHORED_PREFIX) or self._is_deleted(bucket))
 
     def _possible_content_packages(self):
         """
