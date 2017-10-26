@@ -6,10 +6,9 @@ Adapter implementations.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import time
 
@@ -22,13 +21,17 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
 
+from nti.recorder.interfaces import ITransactionManager
 from nti.recorder.interfaces import ITransactionRecordHistory
 
+from nti.recorder.adapters import DefaultTransactionManager
 from nti.recorder.adapters import TransactionRecordContainer
 
 from nti.site.interfaces import IHostPolicyFolder
 
 from nti.traversal.traversal import find_interface
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @component.adapter(IContentUnit)
@@ -64,10 +67,21 @@ def enumeration_from_library(library):
 def trx_recorder_history_factory(package):
     try:
         result = package._package_trx_record_history
-        return result
     except AttributeError:
         result = package._package_trx_record_history = TransactionRecordContainer()
         result.createdTime = time.time()
         result.__parent__ = package
         result.__name__ = u'_package_trx_record_history'
-        return result
+    return result
+
+
+@component.adapter(IEditableContentPackage)
+@interface.implementer(ITransactionManager)
+class ContentPackageTransactionManager(DefaultTransactionManager):
+
+    def has_transactions(self):
+        try:
+            result = self.context._package_trx_record_history
+            return bool(result)
+        except AttributeError:
+            return False
