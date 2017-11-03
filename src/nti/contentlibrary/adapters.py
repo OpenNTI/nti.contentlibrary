@@ -79,6 +79,13 @@ def trx_recorder_history_factory(package):
 @interface.implementer(ITransactionManager)
 class ContentPackageTransactionManager(DefaultTransactionManager):
 
+    def get_transactions(self):
+        try:
+            history = self.context._package_trx_record_history
+            return history.records()
+        except AttributeError:
+            return ()
+        
     def has_transactions(self):
         try:
             result = self.context._package_trx_record_history
