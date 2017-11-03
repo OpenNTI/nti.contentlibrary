@@ -247,9 +247,28 @@ def get_content_package_site_registry(context):
     return folder.getSiteManager() if folder is not None else None
 
 
-def is_valid_presentation_assets_source(source, versions=None):
-    tmpdirs = []
+def check_image_directory(path):
+    result = True
+    for name in os.listdir(path):
+        if name.startswith('.') or name.startswith('__'):
+            continue
+        name = os.path.join(path, name)
+        if os.path.isdir(name): #e.g. instructor-photos
+            result = result and check_image_directory(name)
+        else:
+            try:
+                Image.open(name)
+            except Exception:
+                result = False
+                logger.error("%s is not a valid image file",
+                             name)
+                break
+    return result
+        
+
+def is_valid_presentation_assets_source(source, versions=None, tmpdirs=None):
     result = False
+    tmpdirs = list() if tmpdirs is None else tmpdirs
     versions = list() if versions is None else versions
     try:
         if hasattr(source, "read"):
@@ -277,7 +296,7 @@ def is_valid_presentation_assets_source(source, versions=None):
                 targets = []
                 result = source
                 for name in os.listdir(source):
-                    if name.startswith('.'):
+                    if name.startswith('.') or name.startswith('__'):
                         continue
                     # validate target
                     target = os.path.join(source, name)
@@ -291,7 +310,7 @@ def is_valid_presentation_assets_source(source, versions=None):
                 if result:
                     for path in targets:
                         for name in os.listdir(path):
-                            if name.startswith('.'):
+                            if name.startswith('.') or name.startswith('__'):
                                 continue
                             if not re.match('v\d+$', name):
                                 result = False
@@ -308,17 +327,8 @@ def is_valid_presentation_assets_source(source, versions=None):
                 # if no error check asset directories
                 if result:
                     for path in versions:
-                        for name in os.listdir(path):
-                            if name.startswith('.'):
-                                continue
-                            name = os.path.join(path, name)
-                            try:
-                                Image.open(name)
-                            except Exception:
-                                result = False
-                                logger.error("%s is not a valid image file",
-                                             name)
-                                break
+                        if not check_image_directory(path):
+                            result = False
         return result
     finally:
         for path in tmpdirs:

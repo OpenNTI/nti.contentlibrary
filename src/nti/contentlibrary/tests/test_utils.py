@@ -30,16 +30,19 @@ class TestUtils(ContentlibraryLayerTest):
         result = is_valid_presentation_assets_source(path)
         assert_that(result, is_(path))
 
+        tmps = []
         tmpdir = tempfile.mkdtemp()
         try:
+            tmps.append(tmpdir)
             filename = os.path.join(tmpdir, "source")
             filename = shutil.make_archive(filename, 'zip', path)
-            result = is_valid_presentation_assets_source(filename)
+            result = is_valid_presentation_assets_source(filename, tmpdirs=tmps)
             assert_that(result, is_not(path))
             assert_that(os.path.isdir(result), is_(True))
             shutil.rmtree(result, ignore_errors=True)
         finally:
-            shutil.rmtree(tmpdir, ignore_errors=True)
+            for tmpdir in tmps:
+                shutil.rmtree(tmpdir, ignore_errors=True)
 
         result = is_valid_presentation_assets_source(os.path.dirname(__file__))
         assert_that(result, is_(False))
