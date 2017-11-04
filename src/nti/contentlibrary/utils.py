@@ -289,7 +289,11 @@ def is_valid_presentation_assets_source(source, versions=None, tmpdirs=None):
                     if files and len(files) == 1:
                         source = os.path.join(tmpdir, files[0])
                     else:
-                        source = tmpdir
+                        for name in files or ():
+                            if name.startswith('__'):
+                                continue
+                            source = os.path.join(tmpdir, name)
+                            break  # first found
             if not os.path.isdir(source):
                 tmpdirs.append(tmpdir) if tmpdir else ()
             else:  # directory
