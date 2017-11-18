@@ -6,10 +6,9 @@ Generic implementations of IContentUnit functions
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import interface
 
@@ -34,6 +33,8 @@ from nti.schema.fieldproperty import createFieldProperties
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.schema.schema import PermissiveSchemaConfigured
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @interface.implementer(IContentUnit)
@@ -79,8 +80,8 @@ class ContentUnit(PermissiveSchemaConfigured,
         # object defines neither getstate or setstate, but subclasses may
         # mixin a superclass, Persistent, that does. If they do so, they must
         # put it BEFORE this object in the MRO
-        return {k: v for
-                k, v in self.__dict__.iteritems()
+        return {k: v
+                for k, v in self.__dict__.iteritems()
                 if not k.startswith('_v')}
 
     def __setstate__(self, state):
@@ -143,6 +144,7 @@ class ContentPackage(ContentUnit,
     def __getitem__(self, ntiid):
         return self._v_references[ntiid]
 
+
 # TODO: We need to do caching of does_sibling_entry_exist and read_contents.
 # does_exist is used by appserver/censor_policies on every object creation/edit
 # which quickly adds up.
@@ -156,10 +158,12 @@ _exist_cache = repoze.lru.ExpiringLRUCache(100000, default_timeout=600)
 # this one is smaller because each entry is bigger
 _content_cache = repoze.lru.ExpiringLRUCache(1000, default_timeout=600)
 
-
-def _clear_caches():
-    _exist_cache.clear()
-    _content_cache.clear()
-
-import zope.testing.cleanup
-zope.testing.cleanup.addCleanUp(_clear_caches)
+try:
+    import zope.testing.cleanup
+except ImportError:  # pragma: no cover
+    pass
+else:
+    def _clear_caches():
+        _exist_cache.clear()
+        _content_cache.clear()
+    zope.testing.cleanup.addCleanUp(_clear_caches)
