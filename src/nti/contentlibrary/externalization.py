@@ -20,7 +20,8 @@ import simplejson as json
 from zope import component
 from zope import interface
 
-from nti.contentlibrary.interfaces import IS3Key
+from nti.contentlibrary.interfaces import IS3Key 
+from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IFilesystemKey
 from nti.contentlibrary.interfaces import IS3ContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
@@ -53,6 +54,8 @@ from nti.externalization.externalization import toExternalObject
 from nti.externalization.externalization import to_standard_external_dictionary
 
 from nti.mimetype.externalization import decorateMimeType
+
+from nti.wref.interfaces import IWeakRef
 
 MIMETYPE = StandardExternalFields.MIMETYPE
 LAST_MODIFIED = StandardExternalFields.LAST_MODIFIED
@@ -346,12 +349,15 @@ class ContentBundleIO(InterfaceObjectIO):
         library = component.queryUtility(IContentPackageLibrary)
         if items is not None: # empty is allowed
             packages = []
-            for ntiid in items:
-                package = self.resolve(ntiid, library)
-                if self.validate_packages and package is None:
-                    raise KeyError("Cannot find content package", ntiid)
+            for context in items:
+                if IContentUnit.providedBy(context):
+                    package = IWeakRef(context)
                 else:
-                    package = contentunit_wref_to_missing_ntiid(ntiid)
+                    package = self.resolve(context, library)
+                    if self.validate_packages and package is None:
+                        raise KeyError("Cannot find content package", context)
+                    else:
+                        package = contentunit_wref_to_missing_ntiid(context)
                 packages.append(package)
             self._ext_self.ContentPackages = packages
             result = True
