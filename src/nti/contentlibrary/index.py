@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 
@@ -37,7 +36,6 @@ from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
 
 from nti.zope_catalog.string import StringTokenNormalizer
 
-
 # library catalog
 
 
@@ -49,6 +47,8 @@ IX_CREATOR = 'creator'
 IX_MIMETYPE = 'mimeType'
 IX_CHILDREN = 'children'
 IX_PUBLISH_LASTMODIFIED = 'publishLastModified'
+
+logger = __import__('logging').getLogger(__name__)
 
 
 class ValidatingSiteName(object):
@@ -185,6 +185,7 @@ CONTENT_BUNDLES_CATALOG_NAME = 'nti.dataserver.++etc++contentbundles.catalog'
 IX_TITLE = 'title'
 IX_PACKAGES = 'packages'
 IX_RESTRICTED_ACCESS = 'restrictedAccess'
+
 
 class ContentBundleTitleIndex(ValueIndex):
     default_field_name = 'title'

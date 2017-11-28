@@ -6,10 +6,9 @@ Event listeners.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 
@@ -33,6 +32,8 @@ from nti.site.localutility import install_utility_on_registration
 from nti.site.localutility import uninstall_utility_on_unregistration
 
 _LIBRARY_NAME = '++etc++library'
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def install_site_content_library(local_site_manager, _=None):

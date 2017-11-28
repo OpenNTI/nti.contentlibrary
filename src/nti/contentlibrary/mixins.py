@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import copy
 import time
@@ -49,6 +48,8 @@ from nti.recorder.interfaces import TRX_TYPE_IMPORT
 
 from nti.recorder.utils import record_transaction
 
+logger = __import__('logging').getLogger(__name__)
+
 
 def copy_attributes(source, target, names):
     for name in names or ():
@@ -85,7 +86,7 @@ class ContentPackageImporterMixin(object):
         result = the_object
         stored = self.is_new(the_object)
         if stored is not None:
-            if stored is not result: # replace
+            if stored is not result:  # replace
                 result = stored
                 assert IEditableContentPackage.providedBy(result)
                 # copy all new content package attributes
@@ -155,7 +156,8 @@ class ContentPackageImporterMixin(object):
             the_object = factory()  # create object
             assert IEditableContentPackage.providedBy(the_object)
             update_from_external_object(the_object, ext_obj, notify=False)
-            package, is_new = self.handle_package(the_object, source, context, **kwargs)
+            package, is_new = self.handle_package(the_object, source, 
+                                                  context, **kwargs)
             if is_new:
                 added.append(package)
             else:

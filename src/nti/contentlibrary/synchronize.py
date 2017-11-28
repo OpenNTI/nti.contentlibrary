@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import interface
 
@@ -26,11 +25,13 @@ from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-CONTENT_REMOVAL_ERROR_CODE = 001
-MISSING_NTIID_ERROR_CODE = 010
+CONTENT_REMOVAL_ERROR_CODE = 1
+MISSING_NTIID_ERROR_CODE = 10
 DUPLICATE_PACAKGES_ERROR_CODE = 100
 UNMATCHED_ROOT_NTTID_ERROR_CODE = 105
 MISSING_PACAKGE_REFERENCE_ERROR_CODE = 110
+
+logger = __import__('logging').getLogger(__name__)
 
 
 class SynchronizationException(Exception):

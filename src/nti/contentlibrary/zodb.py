@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import time
 
@@ -61,6 +60,8 @@ from nti.recorder.mixins import RecordableMixin
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
+logger = __import__('logging').getLogger(__name__)
+
 
 @interface.implementer(IDCTimes)
 class TimesMixin(PersistentCreatedModDateTrackingObject):
@@ -113,6 +114,7 @@ class PersistentHierarchyBucket(TimesMixin,
     def __delitem__(self, key):
         OrderedContainer.__delitem__(self, key)
         self.updateLastMod()
+
 
 _marker = object()
 

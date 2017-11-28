@@ -27,10 +27,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # TODO: Port to argparse
 usage_string = """
@@ -124,6 +123,9 @@ IGNORED_DOTFILES = ('.svn', '.git', '.DS_Store', '.coverage', '.noseids',
                     '.dir_locals.el', '.installed.cfg')
 
 
+logger = __import__('logging').getLogger(__name__)
+
+
 def usage():
     print(usage_string)
     sys.exit()
@@ -146,11 +148,11 @@ def set_log_formatter():
 
 
 def s3_upload_file(key, fullpath, cb=None, num_cb=None, policy=None,
-                   reduced_redundancy=None, headers=None, 
+                   reduced_redundancy=None, headers=None,
                    gzip_types=GZIP_TYPES, gz_ext_exclude=NOT_GZIP_EXT):
     """
     Upload a file to s3
-    
+
     :param key - S3 key
     :param fullpath - file to upload
     :param cb - callback
@@ -314,7 +316,7 @@ def main():
                         if not no_op:
                             k = b.new_key(key_name)
                             file_headers = _upload_file(k, fullpath,
-                                                        cb=cb, 
+                                                        cb=cb,
                                                         policy=grant,
                                                         num_cb=num_cb,
                                                         headers=headers,
@@ -331,7 +333,7 @@ def main():
             copy_file = True
             key_name = get_key_name(path, prefix)
             if no_overwrite:
-                if b.get_key(key_name): # FIXME: maybe none
+                if b.get_key(key_name):  # FIXME: maybe none
                     copy_file = False
                     if not quiet:
                         print('Skipping %s as it exists in s3' % path)

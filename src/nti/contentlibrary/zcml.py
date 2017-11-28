@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os.path
 import functools
@@ -35,6 +34,8 @@ from nti.contentlibrary.filesystem import GlobalFilesystemContentPackageLibrary
 from nti.contentlibrary.externalization import map_all_buckets_to
 
 from nti.schema.field import ValidTextLine
+
+logger = __import__('logging').getLogger(__name__)
 
 
 class IFilesystemLibrary(interface.Interface):
@@ -74,7 +75,7 @@ def registerFilesystemLibrary(_context, directory=None, prefix=""):
         prefix = prefix + '/'
 
     factory = functools.partial(GlobalFilesystemContentPackageLibrary,
-                                root=text_(directory), 
+                                root=text_(directory),
                                 prefix=text_(prefix))
     utility(_context, factory=factory, provides=IContentPackageLibrary)
 register_filesystem_library = registerFilesystemLibrary
@@ -107,7 +108,7 @@ def registerS3Library(_context, bucket, cdn_name=None):
         boto_bucket = conn.get_bucket(bucket)
         library = BotoS3BucketContentLibrary(boto_bucket)
         getSiteManager().registerUtility(library,
-                                         provided=IContentPackageLibrary, 
+                                         provided=IContentPackageLibrary,
                                          info=info)
 
     # Use the same discriminator as normally registering a utility
