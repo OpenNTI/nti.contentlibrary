@@ -75,6 +75,7 @@ setup(
         'PyYAML',
         'repoze.lru',
         'six',
+        'WebOb',
         'zc.catalog',
         'ZODB',
         'zope.annotation',
