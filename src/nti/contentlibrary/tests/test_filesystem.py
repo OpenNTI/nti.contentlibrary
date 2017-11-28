@@ -24,6 +24,9 @@ from hamcrest import is_not as does_not
 from hamcrest import contains_inanyorder
 from hamcrest import greater_than_or_equal_to
 
+from nti.testing.matchers import validly_provides
+from nti.testing.matchers import verifiably_provides
+
 import pickle
 import os.path
 
@@ -35,14 +38,12 @@ from zope.dublincore.interfaces import IWriteZopeDublinCore
 
 from nti.contentlibrary import filesystem
 from nti.contentlibrary import interfaces
-from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
-from nti.externalization.externalization import to_external_object
+from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
 
-from nti.testing.matchers import validly_provides
-from nti.testing.matchers import verifiably_provides
+from nti.externalization.externalization import to_external_object
 
 
 class TestFilesystem(ContentlibraryLayerTest):

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -14,6 +15,8 @@ from hamcrest import assert_that
 from hamcrest import has_property
 from hamcrest import same_instance
 
+from nti.testing.matchers import validly_provides
+
 import os
 import unittest
 
@@ -23,8 +26,6 @@ from nti.contentlibrary import presentationresource
 from nti.contentlibrary.bucket import _AbstractDelimitedHierarchyObject
 
 from nti.contentlibrary.interfaces import IDisplayablePlatformPresentationResources
-
-from nti.testing.matchers import validly_provides
 
 
 class TestPresentationResource(unittest.TestCase):

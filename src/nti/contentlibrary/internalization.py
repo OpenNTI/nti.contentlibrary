@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 from zope import interface
@@ -35,16 +34,18 @@ from nti.publishing.interfaces import IPublishable
 NTIID = StandardExternalFields.NTIID
 MIME_TYPE = StandardExternalFields.MIMETYPE
 
+logger = __import__('logging').getLogger(__name__)
+
 
 @component.adapter(IEditableContentUnit)
 @interface.implementer(IInternalObjectUpdater)
 class _EditableContentUnitUpdater(InterfaceObjectIO):
 
-    ALLOWED_KEYS =  tuple(IPublishable.names()) + \
-                    tuple(IDCExtended.names())  + \
-                    tuple(IDCDescriptiveProperties.names()) + \
-                    ('icon', 'contentType', 'contents', 'ntiid', 
-                     'version', NTIID, MIME_TYPE)
+    ALLOWED_KEYS = tuple(IPublishable.names()) + \
+                   tuple(IDCExtended.names()) + \
+                   tuple(IDCDescriptiveProperties.names()) + \
+                   ('icon', 'contentType', 'contents', 'ntiid',
+                    'version', NTIID, MIME_TYPE)
 
     _ext_iface_upper_bound = IEditableContentUnit
 
@@ -60,7 +61,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
         parsed = self._clean_input(parsed)
         if IDelimitedHierarchyKey.providedBy(parsed.get('icon')):
             raise ValueError("Cannot set icon to a hierarchy item")
-        result = super(_EditableContentUnitUpdater, self).updateFromExternalObject(parsed,*args, **kwargs)
+        result = super(_EditableContentUnitUpdater, self).updateFromExternalObject(parsed, *args, **kwargs)
         if 'contents' in parsed:
             self._ext_self.contents = decode_content(parsed['contents'])
         if 'contentType' in parsed:
@@ -73,7 +74,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
 class _EditableContentPackageUpdater(_EditableContentUnitUpdater):
 
     ALLOWED_KEYS = _EditableContentUnitUpdater.ALLOWED_KEYS + \
-                    ('index_last_modified', 'indexLastModified')
+        ('index_last_modified', 'indexLastModified')
 
     def _clean_input(self, parsed):
         parsed = super(_EditableContentPackageUpdater, self)._clean_input(parsed)

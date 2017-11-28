@@ -6,10 +6,9 @@ Basic key and bucket implementations.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import interface
 
@@ -21,6 +20,8 @@ from nti.contentlibrary.interfaces import IDelimitedHierarchyBucket
 from nti.property.property import alias
 
 from nti.schema.eqhash import EqHash
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @EqHash('bucket', 'name')
@@ -109,6 +110,7 @@ class _AbstractDelimitedHierarchyObject(object):
 class AbstractBucket(_AbstractDelimitedHierarchyObject):
     pass
 
+
 from zope import component
 
 from lxml import etree
@@ -146,7 +148,8 @@ class AbstractKey(_AbstractDelimitedHierarchyObject):
         # A simple copy is faster, but not equivalent
         # In [49]: %timeit copy.copy(data)
         # 1000000 loops, best of 3: 984 ns per loop
-        reader = component.getUtility(IExternalRepresentationReader, name='json')
+        reader = component.getUtility(IExternalRepresentationReader, 
+                                      name='json')
         value = reader.load(json_text)
         return value
     read_contents_as_json = readContentsAsJson
@@ -158,7 +161,8 @@ class AbstractKey(_AbstractDelimitedHierarchyObject):
 
     def _do_readContentsAsYaml(self, stream):
         try:
-            reader = component.getUtility(IExternalRepresentationReader, name='yaml')
+            reader = component.getUtility(IExternalRepresentationReader, 
+                                          name='yaml')
             return reader.load(stream)
         except ScannerError:
             # most of our use cases for this are transitioning

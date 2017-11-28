@@ -22,11 +22,11 @@ from nti.contentlibrary import interfaces
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
+from nti.contentlibrary.tests import ContentlibraryLayerTest
+
 from nti.contentlibrary.wref import ContentUnitWeakRef
 
 from nti.wref.interfaces import IWeakRef
-
-from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 
 class TestWref(ContentlibraryLayerTest):

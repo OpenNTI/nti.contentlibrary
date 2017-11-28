@@ -6,10 +6,9 @@ Support for reading and setting Dublin Core metadata.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import time
 
@@ -38,6 +37,8 @@ _xml_to_attr = {
     'Description': 'description'
 }
 _scalars = {'Title', 'Description'}
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def read_dublincore_from_source(dublin_object, source, lastModified=None):

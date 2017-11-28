@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -52,9 +53,9 @@ from nti.contentlibrary import subscribers
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
-from nti.zodb.minmax import NumericMaximum
-
 from nti.contentlibrary.tests import ContentlibraryLayerTest
+
+from nti.zodb.minmax import NumericMaximum
 
 
 class TestSubscribers(ContentlibraryLayerTest):
@@ -166,13 +167,15 @@ class TestSubscribers(ContentlibraryLayerTest):
             filter=lambda e: interfaces.IContentPackageBundle.providedBy(getattr(e, 'object', None)))
 
         assert_that(events, has_length(2))
-        evt = next(x for x in events if x.newName == 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle')
+        evt = next(x for x in events if x.newName ==
+                   'tag:nextthought.com,2011-10:NTI-Bundle-ABundle')
         assert_that(evt, has_property('object',
                                       has_property('ContentPackages', has_length(1))))
 
         bundle = evt.object
         bundles = [x.object for x in events]
-        assert_that(list(bundle_lib.getBundles()), contains_inanyorder(*bundles))
+        assert_that(list(bundle_lib.getBundles()),
+                    contains_inanyorder(*bundles))
         assert_that(bundle_lib.get(bundle.ntiid), is_(bundle))
         assert_that(bundle_lib.get('missing', 1), is_(1))
 
@@ -181,7 +184,8 @@ class TestSubscribers(ContentlibraryLayerTest):
         restricted_ntiid = u'tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle'
         restricted_bundle = bundle_lib[restricted_ntiid]
         assert_that(restricted_bundle, not_none())
-        assert_that(restricted_bundle, validly_provides(interfaces.IContentPackageBundle))
+        assert_that(restricted_bundle, 
+                    validly_provides(interfaces.IContentPackageBundle))
         assert_that(restricted_bundle,
                     externalizes(has_entries('Class', 'ContentPackageBundle',
                                              'ContentPackages', has_length(1),
@@ -221,13 +225,12 @@ class TestSubscribers(ContentlibraryLayerTest):
                                                      'href',
                                                      '/TestFilesystem/presentation-assets/webapp/v1/'),
                                                  has_entry('href', '/TestFilesystem/presentation-assets/shared/v1/')))
-                                         ))
+                                 ))
 
         # test update existing object
         bundle.lastModified = 0
         eventtesting.clearEvents()
-        interfaces.ISyncableContentPackageBundleLibrary(
-            bundle_lib).syncFromBucket(bundle_bucket)
+        interfaces.ISyncableContentPackageBundleLibrary(bundle_lib).syncFromBucket(bundle_bucket)
 
         evts = eventtesting.getEvents(IObjectModifiedEvent)
 
@@ -247,8 +250,7 @@ class TestSubscribers(ContentlibraryLayerTest):
 
         # we can do it again, and nothing changes
         eventtesting.clearEvents()
-        interfaces.ISyncableContentPackageBundleLibrary(
-            bundle_lib).syncFromBucket(bundle_bucket)
+        interfaces.ISyncableContentPackageBundleLibrary(bundle_lib).syncFromBucket(bundle_bucket)
 
         evts = eventtesting.getEvents(IObjectModifiedEvent)
         assert_that(evts, has_length(0))

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -31,9 +32,9 @@ from nti.contentlibrary import boto_s3
 from nti.contentlibrary import filesystem
 from nti.contentlibrary import interfaces
 
-from nti.externalization.interfaces import IExternalObject
-
 from nti.contentlibrary.tests import ContentlibraryLayerTest
+
+from nti.externalization.interfaces import IExternalObject
 
 
 class TestExternalization(ContentlibraryLayerTest):
@@ -42,7 +43,7 @@ class TestExternalization(ContentlibraryLayerTest):
         bucket = filesystem.FilesystemBucket(name=u"prealgebra",
                                              bucket=rootFolder())
         bucket.__parent__.absolute_path = u'/'
-        key = filesystem.FilesystemKey(bucket=bucket, 
+        key = filesystem.FilesystemKey(bucket=bucket,
                                        name=u'index.html')
         unit = filesystem.FilesystemContentPackage(
             key=key,
@@ -132,7 +133,7 @@ class TestExternalization(ContentlibraryLayerTest):
                                        index=None)
 
     def test_escape_if_needed_filesystem_full_path(self):
-    
+
         def factory(**kwargs):
             r = filesystem.FilesystemContentPackage(**kwargs)
             r.archive_unit = filesystem.FilesystemContentUnit(key=r.make_sibling_key(u'archive.zip'),
@@ -177,7 +178,8 @@ class TestExternalization(ContentlibraryLayerTest):
         assert_that(child_name_with_spaces,
                     is_('Sample_2_chFixedinc.html'))
         # ...finally producing the key
-        child_key_with_spaces = package.make_sibling_key(child_name_with_spaces)
+        child_key_with_spaces = package.make_sibling_key(
+            child_name_with_spaces)
         assert_that(child_key_with_spaces.name,
                     is_('Sample_2_chFixedinc.html'))
 

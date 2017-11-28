@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -21,6 +22,8 @@ from nti.contentlibrary.bucket import AbstractKey
 
 from nti.contentlibrary.interfaces import IContentPackageVendorInfo
 
+from nti.contentlibrary.tests import ContentlibraryLayerTest
+
 from nti.contentlibrary.utils import export_content_package
 
 from nti.contentlibrary.zodb import RenderableContentPackage
@@ -29,8 +32,6 @@ from nti.externalization.internalization import find_factory_for
 from nti.externalization.internalization import update_from_external_object
 
 from nti.recorder.adapters import ITransactionRecordHistory
-
-from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 
 class TestZODB(ContentlibraryLayerTest):
@@ -83,26 +84,26 @@ class TestZODB(ContentlibraryLayerTest):
                     has_property('contents', is_(b'foo')))
         assert_that(package,
                     has_property('contentType', is_('text/x-rst')))
-        
+
     def test_icon(self):
         package = RenderableContentPackage()
         package.icon = u'foo'
         package.icon = AbstractKey(name=u'ichigo')
-        
+
     def test_recorder(self):
         package = RenderableContentPackage()
         recorder = ITransactionRecordHistory(package, None)
         assert_that(recorder, is_not(none()))
-        assert_that(package, 
+        assert_that(package,
                     has_property('_package_trx_record_history', is_(recorder)))
-    
+
     def test_vendorinfo(self):
         package = RenderableContentPackage()
         info = IContentPackageVendorInfo(package, None)
         assert_that(info, is_not(none()))
-        assert_that(package, 
+        assert_that(package,
                     has_property('_package_vendor_info', is_(info)))
         assert_that(info, validly_provides(IContentPackageVendorInfo))
         assert_that(info, verifiably_provides(IContentPackageVendorInfo))
-        assert_that(info, 
+        assert_that(info,
                     has_property('__parent__', is_(package)))

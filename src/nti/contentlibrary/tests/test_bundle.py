@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -24,6 +25,10 @@ import os
 
 from zope import component
 
+from nti.contentlibrary.bundle import _ContentBundleMetaInfo
+from nti.contentlibrary.bundle import sync_bundle_from_json_key
+from nti.contentlibrary.bundle import PersistentContentPackageBundle
+
 from nti.contentlibrary.filesystem import FilesystemBucket
 from nti.contentlibrary.filesystem import GlobalFilesystemContentPackageLibrary
 
@@ -31,16 +36,12 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageBundleVendorInfo
 
-from nti.contentlibrary.bundle import _ContentBundleMetaInfo
-from nti.contentlibrary.bundle import sync_bundle_from_json_key
-from nti.contentlibrary.bundle import PersistentContentPackageBundle
+from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 from nti.externalization.externalization import to_external_object
 
 from nti.externalization.internalization import find_factory_for
 from nti.externalization.internalization import update_from_external_object
-
-from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 
 class TestBundle(ContentlibraryLayerTest):
@@ -62,7 +63,8 @@ class TestBundle(ContentlibraryLayerTest):
         assert_that(bundle, verifiably_provides(IEditableContentPackageBundle))
         vendor = IContentPackageBundleVendorInfo(bundle, None)
         assert_that(vendor, is_not(none()))
-        assert_that(vendor, verifiably_provides(IContentPackageBundleVendorInfo))
+        assert_that(vendor, 
+                    verifiably_provides(IContentPackageBundleVendorInfo))
         assert_that(vendor,
                     has_property('__parent__', is_(bundle)))
 
@@ -93,7 +95,8 @@ class TestBundle(ContentlibraryLayerTest):
         empty_meta = _ContentBundleMetaInfo(key, self.global_library)
         empty_meta.lastModified = -1
         del empty_meta._ContentPackages_wrefs
-        sync_bundle_from_json_key(key, bundle, self.global_library, _meta=empty_meta)
+        sync_bundle_from_json_key(key, bundle, 
+                                  self.global_library, _meta=empty_meta)
         assert_that(bundle, has_property('lastModified', greater_than(lm)))
         lm = bundle.lastModified
 
@@ -111,7 +114,9 @@ class TestBundle(ContentlibraryLayerTest):
                                 'root', '/ABundle/',
                                 'PlatformPresentationResources', has_length(3)))
 
-        ext_obj['ContentPackages'] = [u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.']
+        ext_obj['ContentPackages'] = [
+            u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
+        ]
         factory = find_factory_for(ext_obj)
         assert_that(factory, is_not(none()))
 
@@ -138,7 +143,6 @@ class TestBundle(ContentlibraryLayerTest):
         meta.lastModified = -1
         sync_bundle_from_json_key(key, bundle, self.global_library, _meta=meta)
         assert_that(bundle, has_property('RestrictedAccess', is_(True)))
-
 
     @time_monotonically_increases
     def test_missing_package(self):

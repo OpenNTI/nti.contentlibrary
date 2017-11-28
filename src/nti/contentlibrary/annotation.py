@@ -19,11 +19,11 @@ parent site annotations.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
-
+import six
 import functools
 
 from zope import component
@@ -44,6 +44,8 @@ from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentUnitAnnotationUtility
 
 from nti.externalization.persistence import NoPickle
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @NoPickle
@@ -78,7 +80,7 @@ def _to_id(func):
 
 
 def _im_func(obj):
-    return getattr(obj, 'im_func', None)
+    return six.get_method_function(obj)
 
 
 @interface.implementer(IContentUnitAnnotationUtility,

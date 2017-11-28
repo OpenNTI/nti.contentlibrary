@@ -15,6 +15,8 @@ from hamcrest import assert_that
 from hamcrest import has_property
 does_not = is_not
 
+from nti.testing.matchers import verifiably_provides
+
 import fudge
 
 from zope import component
@@ -32,11 +34,10 @@ from nti.contentlibrary.boto_s3 import BotoS3BucketContentLibrary
 
 from nti.contentlibrary.filesystem import EnumerateOnceFilesystemLibrary
 
-from nti.externalization.externalization import to_external_object
-
 from nti.contentlibrary.tests import ContentlibraryLayerTest
 
-from nti.testing.matchers import verifiably_provides
+from nti.externalization.externalization import to_external_object
+
 
 HEAD_ZCML_STRING = u"""
         <configure xmlns="http://namespaces.zope.org/zope"

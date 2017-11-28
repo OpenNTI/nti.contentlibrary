@@ -10,10 +10,9 @@ of this package.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import time
 
@@ -26,6 +25,8 @@ from nti.contentlibrary.interfaces import IGlobalContentPackageLibrary
 
 # catalog
 CATALOG_INDEX_NAME = '++etc++contentlibrary.container_index'
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def get_library_catalog():

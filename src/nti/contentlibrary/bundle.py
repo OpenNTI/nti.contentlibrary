@@ -6,10 +6,9 @@ Implementations of content bundles.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import time
 
@@ -77,6 +76,8 @@ from nti.zodb.persistentproperty import PersistentPropertyHolder
 
 DEFAULT_BUNDLE_MIME_TYPE = 'application/vnd.nextthought.contentpackagebundle'
 PUBLISHABLE_BUNDLE_MIME_TYPE = 'application/vnd.nextthought.publishablecontentpackagebundle'
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @WithRepr
@@ -195,7 +196,6 @@ class PersistentContentPackageBundle(ContentPackageBundle,
             return super(PersistentContentPackageBundle, self).__str__()
         except ConnectionStateError:
             return object.__str__(self)
-
     __unicode__ = __str__
 
 
@@ -283,6 +283,7 @@ class ContentPackageBundleLibrary(CheckingLastModifiedBTreeContainer):
             seen_ids.add(bundle.__name__)
             yield bundle
 
+
 #: The name of the file that identifies a directory
 #: as a content bundle
 _BUNDLE_META_NAME = "bundle_meta_info.json"
@@ -323,10 +324,12 @@ def get_package_for_bundle(package, library=None):
 class IContentBundleMetaInfo(IContentPackageBundle):
 
     ContentPackages = IndexedIterable(
-            title=u"An iterable of NTIIDs of sub-containers embedded via reference in this content",
-            value_type=ValidNTIID(title=u"The embedded NTIID"),
-            unique=True,
-            default=())
+        title=u"An iterable of NTIIDs of sub-containers embedded via reference in this content",
+        value_type=ValidNTIID(title=u"The embedded NTIID"),
+        unique=True,
+        default=())
+
+
 _IContentBundleMetaInfo = IContentBundleMetaInfo  # alias
 
 
@@ -536,7 +539,7 @@ def synchronize_bundle(data_source, bundle,
     return modified
 
 
-def sync_bundle_from_json_key(data_key, bundle, 
+def sync_bundle_from_json_key(data_key, bundle,
                               content_library=None,
                               dc_meta_name=DCMETA_FILENAME,
                               excluded_keys=(),

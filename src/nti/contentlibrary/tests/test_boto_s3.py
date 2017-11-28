@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -42,7 +43,7 @@ class TestBotoS3(ContentlibraryLayerTest):
         class Bucket(object):
             name = __name__ = u'bucket'
 
-            def get_key(self, k):
+            def get_key(self, unused_k):
                 return object()
 
         @interface.implementer(interfaces.IS3Key)
@@ -85,7 +86,7 @@ class TestBotoS3(ContentlibraryLayerTest):
         class Bucket(object):
             name = __name__ = u'bucket'
 
-            def get_key(self, k):
+            def get_key(self, unused_k):
                 return object()
 
         factory = interfaces.IEclipseContentPackageFactory(Bucket(), None)
@@ -95,7 +96,7 @@ class TestBotoS3(ContentlibraryLayerTest):
         @interface.implementer(interfaces.IS3Bucket)
         class Bucket(object):
 
-            def get_key(self, k):
+            def get_key(self, unused_k):
                 return object()
 
         @interface.implementer(interfaces.IS3Key)
@@ -119,7 +120,7 @@ class TestBotoS3(ContentlibraryLayerTest):
         unit = BotoS3ContentUnit(key=key)
 
         assert_that(unit.does_sibling_entry_exist('baz'), is_(not_none()))
-        assert_that(unit.does_sibling_entry_exist('baz'), 
+        assert_that(unit.does_sibling_entry_exist('baz'),
                     is_(same_instance(unit.does_sibling_entry_exist('baz'))))
 
         assert_that(unit.does_sibling_entry_exist('bar'),
@@ -129,7 +130,7 @@ class TestBotoS3(ContentlibraryLayerTest):
         @interface.implementer(interfaces.IS3Bucket)
         class Bucket(object):
 
-            def get_key(self, k):
+            def get_key(self, unused_k):
                 return object()
 
         @interface.implementer(interfaces.IS3Key)
@@ -158,7 +159,7 @@ class TestBotoS3(ContentlibraryLayerTest):
         class Bucket(object):
             name = None
 
-            def get_key(self, k):
+            def get_key(self, unused_k):
                 return object()
 
         @interface.implementer(interfaces.IS3Key)

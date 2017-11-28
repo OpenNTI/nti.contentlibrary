@@ -16,9 +16,9 @@ import os
 import shutil
 import tempfile
 
-from nti.contentlibrary.utils import is_valid_presentation_assets_source
-
 from nti.contentlibrary.tests import ContentlibraryLayerTest
+
+from nti.contentlibrary.utils import is_valid_presentation_assets_source
 
 
 class TestUtils(ContentlibraryLayerTest):
