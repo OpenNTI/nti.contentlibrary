@@ -11,6 +11,7 @@ TESTS_REQUIRE = [
     'fudge',
     'nti.testing',
     'zope.dottedname',
+    'zope.formlib',
     'zope.testrunner',
 ]
 
@@ -97,7 +98,7 @@ setup(
         'zope.schema',
         'zope.security',
         'zope.site',
-        'zope.traversing'
+        'zope.traversing',
     ],
     extras_require={
         'test': TESTS_REQUIRE,
