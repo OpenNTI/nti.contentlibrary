@@ -15,3 +15,7 @@ recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include src *.zcml
+recursive-include src *.json
+recursive-include src *.html
+recursive-include src *.xml
+recursive-include src *.png
