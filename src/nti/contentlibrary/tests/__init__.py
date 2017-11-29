@@ -6,7 +6,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
-# pylint: disable=W0212,R0904
+# pylint: disable=W0212,R0904,W0221
 
 import os
 import shutil
@@ -23,17 +23,18 @@ from nti.contentlibrary.interfaces import IContentUnitAnnotationUtility
 from nti.testing.layers import ZopeComponentLayer
 from nti.testing.layers import ConfiguringLayerMixin
 
+
 class ContentlibraryTestLayer(ZopeComponentLayer,
                               ConfiguringLayerMixin):
 
-    set_up_packages = ( 'nti.containers', 
-                        'nti.contentlibrary', 
-                        'nti.externalization', 
-                        'nti.contenttypes.presentation')
+    set_up_packages = ('nti.containers',
+                       'nti.contentlibrary',
+                       'nti.externalization',
+                       'nti.contenttypes.presentation')
 
     @classmethod
     def setUp(cls):
-        setHooks() # in case something already tore this down
+        setHooks()  # in case something already tore this down
         cls.setUpPackages()
         cls.old_data_dir = os.getenv('DATASERVER_DATA_DIR')
         cls.new_data_dir = tempfile.mkdtemp(dir="/tmp")
@@ -57,12 +58,15 @@ class ContentlibraryTestLayer(ZopeComponentLayer,
     def testTearDown(cls):
         pass
 
+
 import unittest
 
-from nti.testing.base import AbstractTestBase
+from nti.testing.base import AbstractConfiguringObject
+
 
 class ContentlibraryLayerTest(unittest.TestCase):
 
     layer = ContentlibraryTestLayer
 
-    get_configuration_package = AbstractTestBase.get_configuration_package.__func__
+    def get_configuration_package(self):
+        return AbstractConfiguringObject.get_configuration_package_for_class(self.__class__)
