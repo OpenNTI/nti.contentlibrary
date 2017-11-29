@@ -10,13 +10,22 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+# pylint: disable=E1101,E1121,W0232,W0703
+
+import six
 import sys
 import gzip
 import time
-import rfc822
 import numbers
 import datetime
 from six import StringIO
+
+try:
+    from rfc822 import mktime_tz
+    from rfc822 import parsedate_tz
+except ImportError:  # pragma: no cover
+    from email.utils import mktime_tz
+    from email.utils import parsedate_tz
 
 import webob.datetime_utils
 
@@ -59,11 +68,11 @@ interface.classImplements(boto.s3.bucket.Bucket, IS3Bucket)
 logger = __import__('logging').getLogger(__name__)
 
 
-class _WithName:  # NOTE: Not new-style
+class _WithName:  # Not new-style
     __name__ = alias('name')
 
 
-class _WithExists:  # NOTE: Not new-style
+class _WithExists:  # Not new-style
 
     def exists(self, *unused_args, **unused_kwargs):
         try:
@@ -138,12 +147,11 @@ def key_last_modified(key):
 
     :return: A float, or None.
     """
-    __traceback_info__ = key, key.last_modified
     if isinstance(key.last_modified, numbers.Number):
         return key.last_modified  # Mainly for tests
-    result = rfc822.parsedate_tz(key.last_modified)
+    result = parsedate_tz(key.last_modified)
     if result is not None:
-        result = rfc822.mktime_tz(result)
+        result = mktime_tz(result)
         # This is supposed to be coming in rfc822 format (see boto.s3.key)
         # But it doesn't always. So try to parse it ourself if we have to
     elif key.last_modified:
@@ -215,7 +223,7 @@ class _KeyDelimitedHierarchyEntry(object):
             return bucket.get_key(sib_key)
         except AttributeError:  # seen when we are not connected
             exc_info = sys.exc_info()
-            raise AWSConnectionError("No connection"), None, exc_info[2]
+            six.reraise(AWSConnectionError("No connection"), None, exc_info[2])
 
 
 @NoPickle
@@ -291,7 +299,7 @@ class BotoS3ContentPackage(ContentPackage, BotoS3ContentUnit):
 
     TRANSIENT_EXCEPTIONS = (AWSConnectionError,)
 
-    # XXX: Note that this needs the same lastModified fixes as
+    # Note that this needs the same lastModified fixes as
     # the filesystem version
 
 
@@ -308,8 +316,6 @@ def boto_s3_package_factory(key, _package_factory=None, _unit_factory=None):
         return eclipse.EclipseContentPackage(temp_entry,
                                              _package_factory,
                                              _unit_factory)
-
-
 package_factory = _package_factory = boto_s3_package_factory
 
 
@@ -321,8 +327,8 @@ class _EclipseContentPackageFactory(object):
     def __init__(self, *args):
         pass
 
-    def new_instance(self, item, package_factory=None, unit_factory=None):
-        return boto_s3_package_factory(item, package_factory, unit_factory)
+    def new_instance(self, item, pkg_factory=None, unit_factory=None):
+        return boto_s3_package_factory(item, pkg_factory, unit_factory)
 
 
 @NoPickle
