@@ -10,6 +10,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+# pylint: disable=E1101,E1121
+
 from zope import component
 
 from zope.component.hooks import site
@@ -152,7 +154,7 @@ def sync_bundles_when_library_synched(library, _):
     site_manager = component.getSiteManager(library)
     if library.__parent__ is not site_manager:
         msg = "Expected to find persistent library in its own site; refusing to sync"
-        logger.warn(msg)
+        logger.warning(msg)
         return
 
     bundle_library = site_manager.getUtility(IContentPackageBundleLibrary)
@@ -181,9 +183,9 @@ def sync_bundles_when_library_synched(library, _):
 
 
 @component.adapter(IHostPolicyFolder, IObjectCreatedEvent)
-def on_site_created(site, _):
+def on_site_created(folder, unused):
     if ICreated.providedBy(site):
-        site_manager = site.getSiteManager()
+        site_manager = folder.getSiteManager()
         install_site_content_library(site_manager)
         install_utility(ContentPackageBundleLibrary(),
                         _BUNDLE_LIBRARY_NAME,

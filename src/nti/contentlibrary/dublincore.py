@@ -12,6 +12,7 @@ from __future__ import absolute_import
 
 # pylint: disable=E1137,W0212
 
+import six
 import time
 
 from zope.dublincore import xmlmetadata
@@ -140,7 +141,7 @@ class _SequenceDirectProperty(object):
         # Match what the normal SequencProperty does
         value = tuple(value)
         for v in value:
-            if not isinstance(v, unicode):
+            if not isinstance(v, six.text_type):
                 raise TypeError("Elements must be unicode")
         context = inst._ZDCPartialAnnotatableAdapter__context
         oldvalue = getattr(context, self.__attrname, None)

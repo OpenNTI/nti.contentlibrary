@@ -12,13 +12,11 @@ from __future__ import absolute_import
 
 # pylint: disable=E1101,E1121,W0232,W0703
 
-import six
-import sys
 import gzip
 import time
 import numbers
 import datetime
-from six import StringIO
+from six import BytesIO
 
 try:
     from rfc822 import mktime_tz
@@ -170,7 +168,7 @@ def _read_key(key):
     if key:
         data = key.get_contents_as_string()
         if key.content_encoding == 'gzip':
-            stream = StringIO(data)
+            stream = BytesIO(data)
             gzip_stream = gzip.GzipFile(fileobj=stream, mode='rb')
             data = gzip_stream.read()
             gzip_stream.close()
@@ -191,7 +189,7 @@ class _KeyDelimitedHierarchyEntry(object):
         split = self.key.name.split('/')
         split[-1] = sibling_name
         new_key = type(self.key)(bucket=self.key.bucket,
-                                name=u'/'.join(split))
+                                 name=u'/'.join(split))
         return new_key
 
     def get_parent_key(self):
@@ -218,8 +216,7 @@ class _KeyDelimitedHierarchyEntry(object):
         try:
             return bucket.get_key(sib_key)
         except AttributeError:  # seen when we are not connected
-            exc_info = sys.exc_info()
-            six.reraise(AWSConnectionError("No connection"), None, exc_info[2])
+            raise AWSConnectionError("No connection")
 
 
 @NoPickle

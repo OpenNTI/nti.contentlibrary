@@ -19,7 +19,7 @@ from hamcrest import same_instance
 from nti.testing.matchers import validly_provides
 
 import gzip
-from six import StringIO
+from six import BytesIO
 
 import boto.exception
 
@@ -219,11 +219,11 @@ class TestBotoS3(ContentlibraryLayerTest):
 
         key = Key()
         key.content_encoding = 'gzip'
-        strio = StringIO()
-        gzipped = gzip.GzipFile(fileobj=strio, mode='wb')
-        gzipped.write('The contents')
+        bytesio = BytesIO()
+        gzipped = gzip.GzipFile(fileobj=bytesio, mode='w')
+        gzipped.write(b'The contents')
         gzipped.close()
-        data = strio.getvalue()
+        data = bytesio.getvalue()
         key.contents = data
 
-        assert_that(read_key(key), is_('The contents'))
+        assert_that(read_key(key), is_(b'The contents'))

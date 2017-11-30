@@ -53,7 +53,7 @@ class TestZODB(ContentlibraryLayerTest):
                                 'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
                                 'NTIID', 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.',
                                 'title', is_('Cohen vs California'),
-                                'contents', is_('eJxzzs9IzVMoK1ZwTszJTMsvystMBABEIAcP')))
+                                'contents', is_(b'eJxzzs9IzVMoK1ZwTszJTMsvystMBABEIAcP')))
 
         factory = find_factory_for(ext_obj)
         assert_that(factory, is_not(none()))
@@ -73,9 +73,9 @@ class TestZODB(ContentlibraryLayerTest):
         assert_that(new_package,
                     has_property('contents_key', is_not(none())))
         assert_that(new_package,
-                    has_property('contents', is_('Cohen vs California')))
+                    has_property('contents', is_(b'Cohen vs California')))
         assert_that(new_package,
-                    has_property('contentType', is_('text/x-rst')))
+                    has_property('contentType', is_(b'text/x-rst')))
 
     def test_renderable_contents(self):
         package = RenderableContentPackage()
@@ -83,7 +83,7 @@ class TestZODB(ContentlibraryLayerTest):
         assert_that(package,
                     has_property('contents', is_(b'foo')))
         assert_that(package,
-                    has_property('contentType', is_('text/x-rst')))
+                    has_property('contentType', is_(b'text/x-rst')))
 
     def test_icon(self):
         package = RenderableContentPackage()

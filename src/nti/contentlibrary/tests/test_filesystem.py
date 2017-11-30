@@ -6,7 +6,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
-# pylint: disable=W0212,R0904
+# pylint: disable=W0212,R0904,E1121
 
 from hamcrest import is_
 from hamcrest import none
@@ -20,13 +20,14 @@ from hamcrest import greater_than
 from hamcrest import has_property
 from hamcrest import same_instance
 from hamcrest import empty as is_empty
-from hamcrest import is_not as does_not
 from hamcrest import contains_inanyorder
 from hamcrest import greater_than_or_equal_to
+does_not = is_not
 
 from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
 
+import six
 import pickle
 import os.path
 
@@ -85,9 +86,9 @@ class TestFilesystem(ContentlibraryLayerTest):
 
         assert_that(as_json, is_(as_yaml))
         assert_that(list(as_json.keys())[0],
-                    is_(unicode))
+                    is_(six.text_type))
         assert_that(list(as_yaml.keys())[0],
-                    is_(unicode))
+                    is_(six.text_type))
 
     def test_from_filesystem(self):
         absolute_path = os.path.join(os.path.dirname(__file__),
