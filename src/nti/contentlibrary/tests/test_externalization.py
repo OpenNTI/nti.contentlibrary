@@ -6,7 +6,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
-# pylint: disable=W0212,R0904
+# pylint: disable=W0212,R0904,E1121
 
 from hamcrest import is_
 from hamcrest import is_not
@@ -20,8 +20,6 @@ from hamcrest import greater_than_or_equal_to
 from nti.testing.matchers import validly_provides
 
 import fudge
-
-import boto.s3.key
 
 from zope import interface
 
@@ -86,6 +84,7 @@ class TestExternalization(ContentlibraryLayerTest):
 
         # This is a legacy code path for boto, which is not yet updated
         if archive_unit:
+            print(unit)
             unit.archive_unit = archive_unit
             unit.archive_unit.__parent__ = unit
             if not archive_unit.key.__parent__:
@@ -214,6 +213,6 @@ class TestExternalization(ContentlibraryLayerTest):
             key=key,
             index=index,
             prefix=u'http://content.nextthought.com',
-            archive_unit=boto_s3.BotoS3ContentUnit(key=boto.s3.key.Key(bucket=bucket,
-                                                                       name=u'prealgebra/archive.zip')),
+            archive_unit=boto_s3.BotoS3ContentUnit(key=boto_s3.NameEqualityKey(bucket=bucket,
+                                                                               name=u'prealgebra/archive.zip')),
             installable=True)

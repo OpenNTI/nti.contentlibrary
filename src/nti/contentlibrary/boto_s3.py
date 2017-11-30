@@ -67,26 +67,18 @@ interface.classImplements(boto.s3.bucket.Bucket, IS3Bucket)
 
 logger = __import__('logging').getLogger(__name__)
 
-
-class _WithName:  # Not new-style
-    __name__ = alias('name')
-
-
-class _WithExists:  # Not new-style
-
-    def exists(self, *unused_args, **unused_kwargs):
-        try:
-            # if we can list anything we exists
-            self.get_all_keys(max_keys=1)
-            return True
-        except Exception:  # connection errors?
-            return False
+def _exists(self, *unused_args, **unused_kwargs):
+    try:
+        # if we can list anything we exists
+        self.get_all_keys(max_keys=1)
+        return True
+    except Exception:  # connection errors?
+        return False
 
 
-boto.s3.bucket.Bucket.__bases__ += (_WithName, _WithExists)
+boto.s3.bucket.Bucket.exists = _exists
 boto.s3.bucket.Bucket.__parent__ = alias('connection')
 
-boto.s3.key.Key.__bases__ += _WithName,
 boto.s3.key.Key.__parent__ = alias('bucket')
 
 
@@ -101,6 +93,8 @@ class NameEqualityKey(boto.s3.key.Key):
             hence is somewhat dangerous. Only use it if there will be one
             set of credentials in use.
     """
+
+    __name__ = alias('name')
 
     # Not taking the connection into account because I don't have time to
     # verify its equality conditions.
@@ -124,6 +118,8 @@ class NameEqualityBucket(boto.s3.bucket.Bucket):
             hence is somewhat dangerous. Only use it if there will be one
             set of credentials in use.
     """
+
+    __name__ = alias('name')
 
     def __init__(self, connection=None, name=None, key_class=NameEqualityKey):
         super(NameEqualityBucket, self).__init__(connection=connection,
