@@ -75,13 +75,13 @@ class _AbstractDelimitedHierarchyObject(object):
     def __getstate__(self):
         # object defines neither getstate or setstate
         return {k: v for
-                k, v in self.__dict__.iteritems()
+                k, v in self.__dict__.items()
                 if not k.startswith('_v')}
 
     def __setstate__(self, state):
         # older pickles may have _v properties in them
         self_dict = self.__dict__
-        for k, v in state.iteritems():
+        for k, v in state.items():
             if not k.startswith('_v'):
                 self_dict[str(k)] = v
 

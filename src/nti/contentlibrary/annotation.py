@@ -55,7 +55,7 @@ class _WithId(object):
     principalannotations.
     """
 
-    __slots__ = (b'id',)
+    __slots__ = ('id',)
 
     def __init__(self, unit):
         # Because for various included items, the content units NTIID

@@ -10,6 +10,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+# pylint: disable=E1137,W0212
+
 import time
 
 from zope.dublincore import xmlmetadata
@@ -111,16 +113,15 @@ def read_dublincore_from_named_key(dublin_object, bucket,
 #: defined in this package (things that implement IDisplayableContent)
 #: and thus have their own attributes
 DisplayableContentZopeDublinCoreAdapter = partialAnnotatableAdapterFactory(
-    map(str,
-        # IDCDescriptiveProperties
-        ['title', 'description',
-         # IDCExtended.
-         'publisher'
-         # Sadly, the sequence properties aren't supported directly
-         # for some reason, so we do that ourself.
-         # TODO: Submit pull request
-         # 'creators', 'subjects', 'contributors'
-         ]))
+    # IDCDescriptiveProperties
+    ['title', 'description',
+    # IDCExtended.
+    'publisher'
+    # Sadly, the sequence properties aren't supported directly
+    # for some reason, so we do that ourself.
+    # Need to Submit pull request
+    # 'creators', 'subjects', 'contributors'
+    ])
 
 
 class _SequenceDirectProperty(object):
@@ -147,14 +148,14 @@ class _SequenceDirectProperty(object):
             setattr(context, self.__attrname, value)
 
 
-for x in map(str, ['creators', 'subjects', 'contributors']):
+for x in ('creators', 'subjects', 'contributors'):
     prop = _SequenceDirectProperty(x, x)
     setattr(DisplayableContentZopeDublinCoreAdapter, x, prop)
 
 #: A standard adapter for things that are just descriptive properties
 #: but also annotatable
 DescriptivePropertiesZopeDublinCoreAdapter = partialAnnotatableAdapterFactory(
-    map(str, ['title', 'description']))
+    ['title', 'description'])
 
 # Both of them need a way to store last Modified, since the object is created on demand
 # (only the mapping is persistent)
