@@ -10,8 +10,12 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+# pylint: disable=E1121,E1135,E1136,E1137,W0212
+
 import os
 from os.path import join as path_join
+
+import six
 
 from zope import component
 from zope import interface
@@ -101,6 +105,7 @@ def _package_factory(item, _package_factory=None, _unit_factory=None):
                                             _package_factory,
                                             _unit_factory)
 
+    # pylint: disable=W0612
     __traceback_info__ = directory, bucket, key, temp_entry, package
     assert package.key.bucket == bucket
     assert package is not temp_entry
@@ -219,7 +224,8 @@ class FilesystemKey(AbstractKey,
 
     def readContents(self):
         return self._contents
-
+    read_contents = readContents
+     
     @cachedIn('_v_readContentsAsText')
     def _do_readContentsAsText(self, contents, encoding):
         if contents is not None:
@@ -229,7 +235,6 @@ class FilesystemKey(AbstractKey,
         return self._do_readContentsAsText(self._contents, encoding)
 
     def readContentsAsETree(self):
-        # TODO: Pass the base_url?
         root = etree_parse(self.absolute_path).getroot()
         return root
 
@@ -445,7 +450,7 @@ class FilesystemContentUnit(_FilesystemTimesMixin,
         return self.__dict__.get('key', None)
 
     def _set_key(self, nk):
-        if isinstance(nk, basestring):
+        if isinstance(nk, six.string_types):
             raise TypeError("Should provide a real key")
         self.__dict__['key'] = nk
     key = property(_get_key, _set_key)
@@ -472,7 +477,6 @@ class FilesystemContentUnit(_FilesystemTimesMixin,
     def make_sibling_key(self, sibling_name):
         # Because keys cache things like dates and contents, it is useful
         # to return the same instance
-        __traceback_info__ = self.filename, sibling_name
         entry = IDelimitedHierarchyEntry(self.key)
         return entry.make_sibling_key(sibling_name)
 

@@ -19,6 +19,7 @@ from hamcrest import greater_than_or_equal_to
 
 from nti.testing.matchers import validly_provides
 
+import six
 import fudge
 
 from zope import interface
@@ -62,7 +63,7 @@ class TestExternalization(ContentlibraryLayerTest):
                                   archive_unit=None,
                                   prefix=u'',
                                   installable=True):
-        if isinstance(key, basestring):
+        if isinstance(key, six.string_types):
             parts = key.split('/')
             parent = rootFolder()
             parent.absolute_path = '/'

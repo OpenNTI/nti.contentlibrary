@@ -10,6 +10,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+# pylint: disable=E1101,E1136
+
 from zope import interface
 
 from zope.cachedescriptors.property import CachedProperty
@@ -58,7 +60,7 @@ class ContentUnit(PermissiveSchemaConfigured,
     createFieldProperties(IContentUnit)
 
     # These things need to override the field properties
-    # XXX: JAM: This isn't really correct. The __name__ needs to be unique
+    # JAM: This isn't really correct. The __name__ needs to be unique
     # within the container, but that isn't guaranteed for the title (?)
     # Unit-test failures can often be found if __name__ is allowed
     # to be a field property; those should be changed to title...
@@ -145,7 +147,7 @@ class ContentPackage(ContentUnit,
         return self._v_references[ntiid]
 
 
-# TODO: We need to do caching of does_sibling_entry_exist and read_contents.
+# We need to do caching of does_sibling_entry_exist and read_contents.
 # does_exist is used by appserver/censor_policies on every object creation/edit
 # which quickly adds up.
 # Right now, our policy for does_exist is a very simple, very dumb cache that we share

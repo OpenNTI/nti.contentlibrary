@@ -27,14 +27,14 @@ except ImportError:  # pragma: no cover
     from email.utils import mktime_tz
     from email.utils import parsedate_tz
 
-import webob.datetime_utils
+import repoze.lru
 
 from zope import component
 from zope import interface
 
 from zope.cachedescriptors.property import Lazy
 
-import repoze.lru
+import webob.datetime_utils
 
 from nti.contentlibrary import eclipse
 from nti.contentlibrary import library
