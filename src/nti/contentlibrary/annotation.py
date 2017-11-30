@@ -23,9 +23,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import six
-import functools
-
 from zope import component
 from zope import interface
 
@@ -44,6 +41,8 @@ from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentUnitAnnotationUtility
 
 from nti.externalization.persistence import NoPickle
+
+from nti.site.localutility import queryNextUtility
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -72,24 +71,17 @@ class _WithId(object):
             pass
 
 
-def _to_id(func):
-    @functools.wraps(func)
-    def _with_id(self, content_unit):
-        return func(self, _WithId(content_unit))
-    return _with_id
-
-
-def _im_func(obj):
-    return six.get_method_function(obj)
-
-
 @interface.implementer(IContentUnitAnnotationUtility,
                        IAttributeAnnotatable)
 class ContentUnitAnnotationUtility(PrincipalAnnotationUtility):
 
-    # These two methods are the only ones that depend on the id attribute
-    getAnnotations = _to_id(_im_func(PrincipalAnnotationUtility.getAnnotations))
-    hasAnnotations = _to_id(_im_func(PrincipalAnnotationUtility.hasAnnotations))
+    def getAnnotations(self, principal):
+        context = _WithId(principal)
+        return super(ContentUnitAnnotationUtility, self).getAnnotations(context)
+
+    def hasAnnotations(self, principal):
+        context = _WithId(principal)
+        return super(ContentUnitAnnotationUtility, self).hasAnnotations(context)
 
     def getAnnotationsById(self, principalId):
         """
@@ -103,9 +95,6 @@ class ContentUnitAnnotationUtility(PrincipalAnnotationUtility):
             notes.__parent__ = self
             notes.__name__ = principalId
         return notes
-
-
-from nti.site.localutility import queryNextUtility
 
 
 class ContentUnitAnnotations(Annotations):
