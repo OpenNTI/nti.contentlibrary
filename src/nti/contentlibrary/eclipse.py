@@ -58,7 +58,7 @@ def _node_get(node, name, default=None):
 
 
 def _href_for_sibling_key(href):
-    __traceback_info__ = href
+    __traceback_info__ = href  # pylint: disable=unused-variable
     assert bool(href)
     assert not href.startswith('/')
 
@@ -74,6 +74,7 @@ def _href_for_sibling_key(href):
     # If we get a multi-segment path, we need to deconstruct it
     # into bucket parts to be sure that it externalizes
     # correctly.
+    # pylint: disable=too-many-function-args
     parts = [urllib_parse.unquote(x) for x in path.split('/')]
     parts = [x.decode('utf-8') if isinstance(x, bytes) else x for x in parts]
 
@@ -85,6 +86,7 @@ def _href_for_sibling_key(href):
 
 def _tocItem(node, toc_entry, factory=None, child_factory=None):
     tocItem = factory()
+    # pylint: disable=protected-access
     tocItem._v_toc_node = node  # for testing and secret stuff
     for i in _toc_item_attrs:
         val = _node_get(node, i, i)
@@ -138,6 +140,7 @@ def _tocItem(node, toc_entry, factory=None, child_factory=None):
             embeddedContainerNTIIDs.append(ntiid)
 
     if embeddedContainerNTIIDs:
+        # pylint: disable=unused-variable
         __traceback_info__ = embeddedContainerNTIIDs
         tocItem.embeddedContainerNTIIDs = tuple(embeddedContainerNTIIDs)
     return tocItem
@@ -185,7 +188,7 @@ def EclipseContentPackage(toc_entry,
                                factory=package_factory,
                                child_factory=unit_factory)
     # NOTE: assuming only one level of hierarchy (or at least the accessibility given just the parent)
-    # TODO: root and index should probably be replaced with IDelimitedHierarchyEntry objects.
+    # root and index should probably be replaced with IDelimitedHierarchyEntry objects.
     # NOTE: IDelimitedHierarchyEntry is specified as '/' delimited. This means that when we are working with
     # filesystem objects we have path-dependencies. We won't work on windows
     content_package.root = toc_entry.get_parent_key()
@@ -212,7 +215,8 @@ def EclipseContentPackage(toc_entry,
         content_package.isCourse = isCourse
         courses = root.xpath('/toc/course')
         if not courses or len(courses) != 1:
-            raise ValueError("Invalid course: 'isCourse' is true, but wrong 'course' node")
+            raise ValueError("Invalid course: 'isCourse' is true, "
+                             "but wrong 'course' node")
         course = courses[0]
         courseTitle = _node_get(course, 'label')
         courseName = _node_get(course, 'courseName')

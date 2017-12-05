@@ -129,9 +129,10 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
         them. This should simplify things for the clients.
         """
         ours = super(ContentPackageBundle, self).PlatformPresentationResources
-        if ours:
+        if ours:  # pylint: disable=using-constant-test
             return ours
 
+        # pylint: disable=no-member
         for package in self.ContentPackages or ():
             theirs = package.PlatformPresentationResources
             if theirs:
@@ -362,7 +363,7 @@ class ContentBundleMetaInfo(object):
         else:
             json_value = key_or_source
 
-        # TODO: If there is no NTIID, we should derive one automatically
+        # If there is no NTIID, we should derive one automatically
         # from the key name
         if require_ntiid and 'ntiid' not in json_value:
             raise MissingContentBundleNTIIDException("Missing ntiid",
@@ -437,6 +438,7 @@ def _set_bundle_packages(bundle, meta):
     def cannot_remove(package):
         return IEditableContentPackage.providedBy(package)
 
+    # pylint: disable=protected-access
     new_wrefs = list(meta._ContentPackages_wrefs)
     try:
         old_wrefs = set(bundle._ContentPackages_wrefs)
@@ -505,6 +507,7 @@ def synchronize_bundle(data_source, bundle,
     # Be careful to only update fields that have changed
     modified = False
     for k in fields_to_update:
+        # pylint: disable=no-value-for-parameter
         if not bundle_iface.get(k):
             # not an interface field, ignore
             continue
@@ -513,6 +516,7 @@ def synchronize_bundle(data_source, bundle,
             # weak references; if everything was *missing*, the ContentPackages
             # could come back as empty both places
             try:
+                # pylint: disable=protected-access
                 needs_copy = not _are_package_refs_equal(bundle._ContentPackages_wrefs,
                                                          meta._ContentPackages_wrefs)
             except AttributeError:
@@ -648,7 +652,7 @@ class _ContentPackageBundleLibrarySynchronizer(object):
             for meta in things_to_update:
                 bundle = self.context[meta.ntiid]
                 _update_bundle(bundle, meta)
-                # TODO: make update_bundle return the changed attributes?
+                # make update_bundle return the changed attributes?
                 lifecycleevent.modified(bundle)
 
         if need_event:

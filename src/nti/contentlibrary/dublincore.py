@@ -10,7 +10,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-# pylint: disable=E1137,W0212
+# pylint: disable=protected-access
+# pylint: disable=unsupported-assignment-operation
 
 import six
 import time
