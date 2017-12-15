@@ -20,7 +20,7 @@ import simplejson as json
 from zope import component
 from zope import interface
 
-from nti.contentlibrary.interfaces import IS3Key 
+from nti.contentlibrary.interfaces import IS3Key
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IFilesystemKey
 from nti.contentlibrary.interfaces import IS3ContentUnit
@@ -298,15 +298,16 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
     def toExternalObject(self, externals=None, **kwargs):
         result = super(_EditableContentPackageExporter, self).toExternalObject(**kwargs)
         contents = self.package.contents or b''
-        data = operate_encode_content(contents, 
-                                      self.package, 
+        data = operate_encode_content(contents,
+                                      self.package,
                                       **self.get_externals(externals))
         result['contents'] = data
         result['contentType'] = self.package.contentType
         # remove unrequired
         for name in ('href', 'root', 'index', 'archive', 'index_jsonp',
                      'installable', 'renderVersion', 'PresentationProperties',
-                     'PlatformPresentationResources',):            
+                     'PlatformPresentationResources', 'version',
+                     'indexLastModified', 'publishLastModified'):
             result.pop(name, None)
         # standard fields
         if MIMETYPE not in result:
@@ -321,7 +322,7 @@ class ContentBundleIO(InterfaceObjectIO):
     _ext_iface_upper_bound = IContentPackageBundle
 
     _excluded_in_ivars_ = getattr(InterfaceObjectIO,'_excluded_in_ivars_').union(
-        {'root', 'PlatformPresentationResources', 'ContentPackages', 
+        {'root', 'PlatformPresentationResources', 'ContentPackages',
          'contributors', 'subjects', 'creators'}
     )
 

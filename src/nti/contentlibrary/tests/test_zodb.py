@@ -11,9 +11,11 @@ from __future__ import absolute_import
 from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
+from hamcrest import has_item
 from hamcrest import assert_that
 from hamcrest import has_entries
 from hamcrest import has_property
+does_not = is_not
 
 from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
@@ -45,15 +47,19 @@ class TestZODB(ContentlibraryLayerTest):
         package.contents = b'Cohen vs California'
         package.publishLastModified = 10000
         package.index_last_modified = 80000
+        package.contents_last_modified = 99999
+        assert_that(package.version, is_('99999'))
+
         ext_obj = export_content_package(package, backup=True)
         assert_that(ext_obj,
                     has_entries('isPublished', is_(False),
-                                'publishLastModified', is_(10000),
-                                'indexLastModified', is_(80000),
                                 'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
                                 'NTIID', 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.',
                                 'title', is_('Cohen vs California'),
                                 'contents', is_(b'eJxzzs9IzVMoK1ZwTszJTMsvystMBABEIAcP')))
+        assert_that(ext_obj, does_not(has_item('version')))
+        assert_that(ext_obj, does_not(has_item('indexLastModified')))
+        assert_that(ext_obj, does_not(has_item('publishLastModified')))
 
         factory = find_factory_for(ext_obj)
         assert_that(factory, is_not(none()))
@@ -67,15 +73,14 @@ class TestZODB(ContentlibraryLayerTest):
         assert_that(new_package,
                     has_property('description', 'Cohen vs California'))
         assert_that(new_package,
-                    has_property('publishLastModified', is_(10000)))
-        assert_that(new_package,
-                    has_property('index_last_modified', is_(80000)))
-        assert_that(new_package,
                     has_property('contents_key', is_not(none())))
         assert_that(new_package,
                     has_property('contents', is_(b'Cohen vs California')))
         assert_that(new_package,
                     has_property('contentType', is_(b'text/x-rst')))
+        assert_that(new_package.version, is_(str(new_package.contents_last_modified)))
+        new_package.contents_last_modified = 111111
+        assert_that(new_package.version, is_(str(new_package.contents_last_modified)))
 
     def test_renderable_contents(self):
         package = RenderableContentPackage()

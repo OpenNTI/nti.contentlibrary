@@ -45,7 +45,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
                    tuple(IDCExtended.names()) + \
                    tuple(IDCDescriptiveProperties.names()) + \
                    ('icon', 'contentType', 'contents', 'ntiid',
-                    'version', NTIID, MIME_TYPE)
+                    NTIID, MIME_TYPE)
 
     _ext_iface_upper_bound = IEditableContentUnit
 

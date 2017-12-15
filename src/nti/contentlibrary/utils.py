@@ -391,7 +391,7 @@ def export_content_package(package, backup=False, salt=None, filer=None):
             ntiid = ext_obj.get(name)
             if ntiid:
                 ext_obj[name] = hash_ntiid(ntiid, salt)
-    for decorator in component.subscribers((package,), 
+    for decorator in component.subscribers((package,),
                                            IContentPackageExporterDecorator):
         decorator.decorateExternalObject(package, ext_obj, backup, salt, filer)
     if 'backup' not in ext_obj:
