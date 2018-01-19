@@ -8,6 +8,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+# pylint: disable=inherit-non-class
+
 from zope import schema
 from zope import component
 from zope import interface
@@ -71,9 +73,9 @@ from nti.schema.field import Iterable
 from nti.schema.field import ValidTextLine
 from nti.schema.field import UniqueIterable
 from nti.schema.field import IndexedIterable
-from nti.schema.field import ValidTextLine as TextLine
+from nti.schema.field import DecodingValidTextLine as TextLine
 
-# pylint: disable=I0011,E0213,E0211
+# pylint: disable=locally-disabled,no-self-argument,no-method-argument
 
 # Disable pylint warnings about undefined variables, because it catches
 # all the __setitem__ and __parent__ in the interfaces.
@@ -81,7 +83,7 @@ from nti.schema.field import ValidTextLine as TextLine
 
 # ## Hierarchy abstraction
 
-# TODO: I'm not happy with the way paths are handled. How can the 'relative'
+# I'm not happy with the way paths are handled. How can the 'relative'
 # stuff be done better? This is mostly an issue with the IContentPackage and its 'root'
 # attribute. That's mostly confined to externalization.py now.
 
@@ -326,8 +328,7 @@ class IContentPackageLibrary(ILastModified,
         The number of content packages in this library
         """
 
-    contentPackages = Iterable(
-        title=u'Sequence of all known :class:`IContentPackage`')
+    contentPackages = Iterable(title=u'Sequence of all known :class:`IContentPackage`')
 
 
 class ISynchronizationParams(interface.Interface):
@@ -584,6 +585,16 @@ class ContentPackageRemovedEvent(ContentUnitRemovedEvent):
     pass
 
 
+class IContentPackageDeletedEvent(IObjectEvent):
+    """
+    An event fired when a content package has been deleted.
+    """
+
+@interface.implementer(IContentPackageDeletedEvent)
+class ContentPackageDeletedEvent(ObjectEvent):
+    pass
+
+
 class IContentPackageRenderedEvent(IObjectEvent):
     """
     Fired when a content package has been rendered
@@ -592,9 +603,7 @@ class IContentPackageRenderedEvent(IObjectEvent):
 
 @interface.implementer(IContentPackageRenderedEvent)
 class ContentPackageRenderedEvent(ObjectEvent):
-
-    def __init__(self, obj):
-        super(ContentPackageRenderedEvent, self).__init__(obj)
+    pass
 
 
 class IGlobalContentPackageLibrary(ISyncableContentPackageLibrary):
@@ -673,7 +682,7 @@ class IDisplayablePlatformPresentationResources(interface.Interface):
                   default=None)
     root.setTaggedValue('_ext_excluded_out', True)
 
-    # XXX: Fill in missing to match disk layout. Should we have pointers
+    # Fill in missing to match disk layout. Should we have pointers
     # to children?
 
 
@@ -1063,6 +1072,8 @@ class ILegacyCourseConflatedContentPackage(IPotentialLegacyCourseConflatedConten
                              required=True,
                              default=u'')
 
+
+# pylint: disable=inconsistent-mro 
 
 class IDelimitedHierarchyContentUnit(IContentUnit, IDelimitedHierarchyEntry):
     """
