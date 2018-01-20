@@ -10,7 +10,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-# pylint: disable=E1101,E1121,W0232,W0703
+# pylint: disable=no-member,too-many-function-args
 
 import gzip
 import time
@@ -70,7 +70,8 @@ def _exists(self, *unused_args, **unused_kwargs):
         # if we can list anything we exists
         self.get_all_keys(max_keys=1)
         return True
-    except Exception:  # connection errors?
+    except Exception:  # pylint disable=broad-except
+        # connection errors?
         return False
 
 

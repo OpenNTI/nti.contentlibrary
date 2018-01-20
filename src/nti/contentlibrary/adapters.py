@@ -57,7 +57,7 @@ def enumeration_from_library(library):
             with this interface. This may break in the future,
             in which case this adapter will raise an exception.
     """
-    e = library._enumeration  # pylint: disable=I0011,W0212
+    e = library._enumeration  # pylint: disable=locally-disabled,protected-access
     assert IDelimitedHierarchyContentPackageEnumeration.providedBy(e)
     return e
 
@@ -66,6 +66,7 @@ def enumeration_from_library(library):
 @interface.implementer(ITransactionRecordHistory)
 def trx_recorder_history_factory(package):
     try:
+        # pylint: disable=protected-access
         result = package._package_trx_record_history
     except AttributeError:
         result = package._package_trx_record_history = TransactionRecordContainer()
@@ -81,13 +82,15 @@ class ContentPackageTransactionManager(DefaultTransactionManager):
 
     def get_transactions(self):
         try:
+            # pylint: disable=protected-access
             history = self.context._package_trx_record_history
             return history.records()
         except AttributeError:
             return ()
-        
+
     def has_transactions(self):
         try:
+            # pylint: disable=protected-access
             result = self.context._package_trx_record_history
             return bool(result)
         except AttributeError:
