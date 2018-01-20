@@ -10,9 +10,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-# pylint: disable=protected-access
-# pylint: disable=unsupported-assignment-operation
-
 import six
 import time
 
@@ -70,6 +67,7 @@ def read_dublincore_from_source(dublin_object, source, lastModified=None):
                 val = val[0]
             setattr(dublin_properties, str(_xml_to_attr[k]), val)
         elif core_mapping is not None:
+            # pylint: disable=unsupported-assignment-operation
             core_mapping[k] = metadata[k]
         else:
             if k[0].isUpper():
@@ -80,6 +78,7 @@ def read_dublincore_from_source(dublin_object, source, lastModified=None):
     # after _changed is called, but we have to be sure we keep a modified
     # time
     try:
+        # pylint: disable=protected-access
         dublin_properties._changed()
         core_mapping.lastModified = lastModified
     except AttributeError:
@@ -135,6 +134,7 @@ class _SequenceDirectProperty(object):
     def __get__(self, inst, unused_klass):
         if inst is None:
             return self
+        # pylint: disable=protected-access
         context = inst._ZDCPartialAnnotatableAdapter__context
         return getattr(context, self.__attrname, ())
 
@@ -144,6 +144,7 @@ class _SequenceDirectProperty(object):
         for v in value:
             if not isinstance(v, six.text_type):
                 raise TypeError("Elements must be unicode")
+        # pylint: disable=protected-access
         context = inst._ZDCPartialAnnotatableAdapter__context
         oldvalue = getattr(context, self.__attrname, None)
         if oldvalue != value:
@@ -171,9 +172,11 @@ class _LastModifiedProperty(object):
     def __get__(self, inst, unused_klass):
         if inst is None:
             return self
+        # pylint: disable=protected-access
         return getattr(inst._mapping, 'lastModified', 0)
 
     def __set__(self, inst, value):
+        # pylint: disable=protected-access
         inst._mapping.lastModified = value
 
 

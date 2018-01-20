@@ -10,8 +10,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-# pylint: disable=E1101,E1136
-
 from zope import interface
 
 from zope.cachedescriptors.property import CachedProperty
@@ -72,6 +70,7 @@ class ContentUnit(PermissiveSchemaConfigured,
     label = alias('title')
 
     def __repr__(self):
+        # pylint: disable=no-member
         return "<%s.%s '%s' '%s' %s>" % (self.__class__.__module__,
                                          self.__class__.__name__,
                                          self.__name__,
@@ -144,6 +143,7 @@ class ContentPackage(ContentUnit,
         return result
 
     def __getitem__(self, ntiid):
+        # pylint: disable=unsubscriptable-object
         return self._v_references[ntiid]
 
 

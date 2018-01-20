@@ -151,6 +151,7 @@ class _ContentPackageExternal(object):
         result.__parent__ = self.package.__parent__
 
         root_url = _root_url_of_unit(self.package)
+        # pylint: disable=protected-access
         result._root_url = root_url
 
         icon = self.package.icon
@@ -295,7 +296,7 @@ class _EditableContentPackageExporter(_EditableContentPackageExternal):
     def get_externals(self, externals=None):
         return dict() if externals is None else externals
 
-    def toExternalObject(self, externals=None, **kwargs):
+    def toExternalObject(self, externals=None, **kwargs):  # pylint: disable=arguments-differ
         result = super(_EditableContentPackageExporter, self).toExternalObject(**kwargs)
         contents = self.package.contents or b''
         data = operate_encode_content(contents,
@@ -328,10 +329,11 @@ class ContentBundleIO(InterfaceObjectIO):
 
     validate_packages = True
 
-    def toExternalObject(self, *args, **kwargs):
+    def toExternalObject(self, *args, **kwargs):  # pylint: disable=arguments-differ
         result = InterfaceObjectIO.toExternalObject(self, *args, **kwargs)
         if self._ext_self.root is not None:
             root_url = _root_url_of_key(self._ext_self.root)
+            # pylint: disable=protected-access
             result._root_url = root_url
             result['root'] = root_url
         return result
@@ -378,15 +380,16 @@ class _DisplayablePlatformPresentationResourcesIO(InterfaceObjectIO):
 
     _ext_iface_upper_bound = IDisplayablePlatformPresentationResources
 
-    def toExternalObject(self, *args, **kwargs):
+    def toExternalObject(self, *args, **kwargs):  # pylint: disable=arguments-differ
         result = InterfaceObjectIO.toExternalObject(self, *args, **kwargs)
         root_url = _root_url_of_key(self._ext_self.root)
         root_url = _path_maybe_quote(root_url)
+        # pylint: disable=protected-access
         result._root_url = root_url
         result['href'] = root_url
         return result
 
-    def updateFromExternalObject(self, *args, **kwargs):
+    def updateFromExternalObject(self, *args, **kwargs):  # pylint: disable=arguments-differ
         raise NotImplementedError()
 
 
@@ -457,7 +460,7 @@ class _FilesystemBucketHrefMapper(object):
 
             if      hasattr(p, 'parent_enumeration') \
                 and p.parent_enumeration is not None:
-                # XXX: Tight coupling. We're passing here into
+                # Tight coupling. We're passing here into
                 # the layers of libraries and how they are set up.
                 # We expect a relationship like this:
                 # GlobalLibrary/
@@ -466,7 +469,7 @@ class _FilesystemBucketHrefMapper(object):
                 #     bucket/...
                 # This path is only partly tested in this code base,
                 # but see nti.app.products.courseware.tests.test_workspaces
-                # TODO: Test this case in this code base.
+                # 1): Test this case in this code base.
                 # Ideally we can do something more elegant, maybe implement
                 # ILocationInfo?
                 parents.append(p.root.__name__)
