@@ -152,6 +152,7 @@ class AbstractDelimitedHiercharchyContentPackageEnumeration(AbstractContentPacka
 def add_to_connection(context, obj):
     connection = IConnection(context, None)
     if connection is not None and IConnection(obj, None) is None:
+        # pylint: disable=too-many-function-args
         connection.add(obj)
         return True
     return False
@@ -346,7 +347,7 @@ class AbstractContentPackageLibrary(object):
             self._unrecord_units_by_ntiid(old)
             self._record_units_by_ntiid(new)
             new.__parent__ = self  # ownership
-            # XXX CS/JZ, 2-04-15 DO NEITHER call lifecycleevent.created nor
+            # CS/JZ, 2-04-15 DO NEITHER call lifecycleevent.created nor
             # lifecycleevent.added on 'new' objects as modified events subscribers
             # are expected to handle any change
             register_content_units(self, new)
@@ -476,7 +477,7 @@ class AbstractContentPackageLibrary(object):
             # CS/JZ, 1-29-15 We need this before event firings because some code
             # (at least question_map.py used to) relies on getting the new content units
             # via pathToNtiid.
-            # TODO: Verify nothing else is doing so.
+            # Verify nothing else is doing so.
             self._enumeration_last_modified = enumeration_last_modified
 
             if not never_synced:
@@ -494,8 +495,8 @@ class AbstractContentPackageLibrary(object):
             # (only matters if we are not preloading).
             # Do this in greenlets/parallel. This can radically speed up
             # S3 loading when we need the network.
-            # XXX: Does order matter?
-            # XXX: Note that we are not doing it in parallel, because if we need
+            # 1) Does order matter?
+            # 2) Note that we are not doing it in parallel, because if we need
             # ZODB site access, we can have issues. Also not we're not
             # randomizing because we expect to be preloaded.
             self._do_removeContentPackages(removed,
@@ -625,7 +626,7 @@ class AbstractContentPackageLibrary(object):
         # When we are uncached to force re-enumeration,
         # we need to send the corresponding object removed events
         # so that people that care can clean up.
-        # TODO: What's the right order for this, before or after
+        # What's the right order for this, before or after
         # we do the delete?
         if self._contentPackages:
             for title in self._contentPackages.values():
@@ -697,11 +698,11 @@ class AbstractContentPackageLibrary(object):
     def __delitem__(self, key):
         raise TypeError("deletion not supported")
 
-    def __setitem__(self, key):
+    def __setitem__(self, key, value):
         raise TypeError("setting not supported")
 
     def __len__(self):
-        # XXX: This doesn't make much sense
+        # This doesn't make much sense
         return len(self._contentPackages)
 
     def __contains__(self, key):
@@ -731,6 +732,7 @@ class AbstractContentPackageLibrary(object):
             # Check our parent
             parent = queryNextUtility(self, IContentPackageLibrary)
             if parent is not None:
+                # pylint: disable=protected-access
                 result = parent._get_content_unit(key)
         return result
 
@@ -821,7 +823,7 @@ class GlobalContentPackageLibrary(AbstractContentPackageLibrary):
             self._mark_global(package)
         return result
 
-    def _do_addContentPackages(self, added, *args, **kwargs):
+    def _do_addContentPackages(self, added, *args, **kwargs):  # pylint: disable=arguments-differ
         for package in added or ():
             self._mark_global(package)
         return super(GlobalContentPackageLibrary, self)._do_addContentPackages(added, *args, **kwargs)
