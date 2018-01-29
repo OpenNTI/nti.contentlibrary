@@ -264,7 +264,7 @@ def check_image_directory(path):
                              name)
                 break
     return result
-        
+
 
 def is_valid_presentation_assets_source(source, versions=None, tmpdirs=None):
     result = False
@@ -301,7 +301,7 @@ def is_valid_presentation_assets_source(source, versions=None, tmpdirs=None):
                     # validate target
                     target = os.path.join(source, name)
                     if not os.path.isdir(target):
-                        logger.error("%s is not valid target directory", 
+                        logger.error("%s is not valid target directory",
                                      target)
                         result = False
                         break
@@ -333,6 +333,55 @@ def is_valid_presentation_assets_source(source, versions=None, tmpdirs=None):
     finally:
         for path in tmpdirs:
             shutil.rmtree(path, ignore_errors=True)
+
+
+DEFAULT_VERSION = 'v1'
+
+
+def make_presentation_asset_dir(catalog_background,
+                                catalog_promo,
+                                catalog_cover,
+                                catalog_thumbnail,
+                                version=DEFAULT_VERSION):
+    """
+    Given the required presentation asset files, create a tmp dir source to
+    hold these files, with all the appropriate structure.
+    """
+    if     catalog_background is None \
+        or catalog_promo is None \
+        or catalog_cover is None \
+        or catalog_thumbnail is None:
+        raise ValueError('Must supply all presentation asset arguments.')
+
+    tmpdir = os.path.join(tempfile.mkdtemp(), 'presentation-assets')
+    os.makedirs(tmpdir)
+    ipad_dir = os.path.join(tmpdir, 'iPad', version)
+    webapp_dir = os.path.join(tmpdir, 'webapp', version)
+    shared_dir = os.path.join(tmpdir, 'shared', version)
+    os.makedirs(ipad_dir)
+    os.makedirs(webapp_dir)
+    os.makedirs(shared_dir)
+
+    for source_file, filenames in ((catalog_background, ('background.png',)),
+                                   (catalog_promo, ('course-promo-large-16x9.png',)),
+                                   (catalog_cover, ('contentpackage-landing-232x170.png',
+                                                    'course-cover-232x170.png',
+                                                    'contentpackage-cover-256x156.png')),
+                                   (catalog_thumbnail, ('contentpackage-thumb-60x60.png',))):
+        for filename in filenames:
+            # Store the file in our shared directory
+            shared_dest = os.path.join(shared_dir, filename)
+            source_file.seek(0)
+            with open(shared_dest, 'wb') as target:
+                target.write(source_file.read())
+
+            # Now link in our client directories  Note: this may create files
+            # not needed by particular clients, but it's easiest.
+            for client_dir in (webapp_dir, ipad_dir):
+                rel_shared_dest = os.path.relpath(shared_dest, client_dir)
+                client_target = os.path.join(client_dir, filename)
+                os.symlink(rel_shared_dest, client_target)
+    return tmpdir
 
 
 def get_content_vendor_info(context, create=True):
@@ -375,8 +424,8 @@ def operate_encode_content(content, context=None, **kwargs):
 
 
 def export_content_package(package, backup=False, salt=None, filer=None):
-    exporter = component.getAdapter(package, 
-                                    IInternalObjectExternalizer, 
+    exporter = component.getAdapter(package,
+                                    IInternalObjectExternalizer,
                                     name="exporter")
     externals = {
         'salt': salt,
