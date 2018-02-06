@@ -338,7 +338,8 @@ def is_valid_presentation_assets_source(source, versions=None, tmpdirs=None):
 DEFAULT_VERSION = 'v1'
 
 
-def make_presentation_asset_dir(catalog_background,
+def make_presentation_asset_dir(catalog_source,
+                                catalog_background,
                                 catalog_promo,
                                 catalog_cover,
                                 catalog_thumbnail,
@@ -347,7 +348,8 @@ def make_presentation_asset_dir(catalog_background,
     Given the required presentation asset files, create a tmp dir source to
     hold these files, with all the appropriate structure.
     """
-    if     catalog_background is None \
+    if     catalog_source is None \
+        or catalog_background is None \
         or catalog_promo is None \
         or catalog_cover is None \
         or catalog_thumbnail is None:
@@ -362,7 +364,8 @@ def make_presentation_asset_dir(catalog_background,
     os.makedirs(webapp_dir)
     os.makedirs(shared_dir)
 
-    for source_file, filenames in ((catalog_background, ('background.png',)),
+    for source_file, filenames in ((catalog_source, ('client_image_source.png',)),
+                                   (catalog_background, ('background.png',)),
                                    (catalog_promo, ('course-promo-large-16x9.png',)),
                                    (catalog_cover, ('contentpackage-landing-232x170.png',
                                                     'course-cover-232x170.png',
