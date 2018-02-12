@@ -118,8 +118,8 @@ class DisplayableContentMixin(object):
 
     @CachedProperty('root', '_v_rootLastModified')
     def _v_PlatformPresentationResources(self):
-        return get_platform_presentation_resources(self._v_root)
+        return self.get_platform_presentation_resources(self._v_root)
 
-    @CachedProperty('root')
+    @property
     def PlatformPresentationResources(self):
-        return get_platform_presentation_resources(self._v_root)
+        return self._v_PlatformPresentationResources
