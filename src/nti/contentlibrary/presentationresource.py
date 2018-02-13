@@ -120,6 +120,4 @@ class DisplayableContentMixin(object):
     def _v_PlatformPresentationResources(self):
         return self.get_platform_presentation_resources(self._v_root)
 
-    @property
-    def PlatformPresentationResources(self):
-        return self._v_PlatformPresentationResources
+    PlatformPresentationResources = _v_PlatformPresentationResources
