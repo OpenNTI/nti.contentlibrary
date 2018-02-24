@@ -75,7 +75,7 @@ class _EditableContentUnitUpdater(InterfaceObjectIO):
 class _EditableContentPackageUpdater(_EditableContentUnitUpdater):
 
     ALLOWED_KEYS = _EditableContentUnitUpdater.ALLOWED_KEYS + \
-        ('index_last_modified', 'indexLastModified')
+                    ('index_last_modified', 'indexLastModified')
 
     def _clean_input(self, parsed):
         parsed = super(_EditableContentPackageUpdater, self)._clean_input(parsed)
