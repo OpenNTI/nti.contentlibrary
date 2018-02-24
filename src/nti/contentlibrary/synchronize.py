@@ -83,15 +83,18 @@ class LibrarySynchronizationResults(SchemaConfigured, Contained):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
     def added(self, ntiid):
+        # pylint: disable=attribute-defined-outside-init
         self.Added = [] if self.Added is None else self.Added
         self.Added.append(ntiid)
 
     def modified(self, ntiid):
+        # pylint: disable=attribute-defined-outside-init
         self.Modified = [] if self.Modified is None else self.Modified
         self.Modified.append(ntiid)
     updated = modified
 
     def removed(self, ntiid):
+        # pylint: disable=attribute-defined-outside-init
         self.Removed = [] if self.Removed is None else self.Removed
         self.Removed.append(ntiid)
     dropped = removed
@@ -119,6 +122,7 @@ class SynchronizationResults(SchemaConfigured, Contained):
 
     def add(self, item):
         assert item is not None
+        # pylint: disable=attribute-defined-outside-init
         self.Items = [] if self.Items is None else self.Items
         item.__parent__ = self
         self.Items.append(item)

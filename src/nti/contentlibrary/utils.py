@@ -17,9 +17,10 @@ import base64
 import shutil
 import zipfile
 import tempfile
-from PIL import Image
 from datetime import datetime
 from collections import namedtuple
+
+from PIL import Image
 
 from zope import component
 
@@ -253,12 +254,12 @@ def check_image_directory(path):
         if name.startswith('.') or name.startswith('__'):
             continue
         name = os.path.join(path, name)
-        if os.path.isdir(name): #e.g. instructor-photos
+        if os.path.isdir(name):  #e.g. instructor-photos
             result = result and check_image_directory(name)
         else:
             try:
                 Image.open(name)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 result = False
                 logger.error("%s is not a valid image file",
                              name)
@@ -291,6 +292,7 @@ def is_valid_presentation_assets_source(source, versions=None, tmpdirs=None):
                     else:
                         source = tmpdir
             if not os.path.isdir(source):
+                # pylint: disable=expression-not-assigned
                 tmpdirs.append(tmpdir) if tmpdir else ()
             else:  # directory
                 targets = []
@@ -312,7 +314,7 @@ def is_valid_presentation_assets_source(source, versions=None, tmpdirs=None):
                         for name in os.listdir(path):
                             if name.startswith('.') or name.startswith('__'):
                                 continue
-                            if not re.match('v\d+$', name):
+                            if not re.match(r'v\d+$', name):
                                 result = False
                                 logger.error("%s is not a valid version directory name",
                                              name)
@@ -394,6 +396,7 @@ def get_content_vendor_info(context, create=True):
     else:
         try:
             if IContentPackage.providedBy(context):
+                # pylint: disable=protected-access
                 result = context._package_vendor_info
             else:
                 annotations = context.__annotations__
@@ -409,7 +412,7 @@ def decode_content(content, safe=False):
         if result:
             decoded = base64.b64decode(result)
             result = bytes_(zlib.decompress(decoded))
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         if not safe:
             raise
     return result
