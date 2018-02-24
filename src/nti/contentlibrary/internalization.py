@@ -41,6 +41,7 @@ logger = __import__('logging').getLogger(__name__)
 @interface.implementer(IInternalObjectUpdater)
 class _EditableContentUnitUpdater(InterfaceObjectIO):
 
+    # pylint: disable=no-value-for-parameter
     ALLOWED_KEYS = tuple(IPublishable.names()) + \
                    tuple(IDCExtended.names()) + \
                    tuple(IDCDescriptiveProperties.names()) + \
