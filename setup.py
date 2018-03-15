@@ -57,6 +57,7 @@ setup(
         'nti.containers',
         'nti.contentfragments',
         'nti.contenttypes.presentation',
+        'nti.contenttypes.completion',
         'nti.coremetadata',
         'nti.dublincore',
         'nti.externalization',

@@ -46,6 +46,8 @@ from persistent.interfaces import IPersistent
 from nti.base.interfaces import ICreated
 from nti.base.interfaces import ILastModified
 
+from nti.contenttypes.completion.interfaces import ICompletableItem
+
 from nti.coremetadata.interfaces import IVersioned
 from nti.coremetadata.interfaces import IShouldHaveTraversablePath
 
@@ -772,6 +774,7 @@ class IDelimitedHierarchyEntry(interface.Interface, dub_interfaces.IDCTimes):
 
 
 class IContentUnit(IZContained,
+                   ICompletableItem,
                    IDCOptionalDescriptiveProperties,
                    IAnnotatable):
     """
@@ -1073,7 +1076,7 @@ class ILegacyCourseConflatedContentPackage(IPotentialLegacyCourseConflatedConten
                              default=u'')
 
 
-# pylint: disable=inconsistent-mro 
+# pylint: disable=inconsistent-mro
 
 class IDelimitedHierarchyContentUnit(IContentUnit, IDelimitedHierarchyEntry):
     """
@@ -1417,7 +1420,7 @@ class ContentBundleUpdatedEvent(ObjectModifiedFromExternalEvent):
     def added_packages(self):
         return self.kwargs.get('added') or self.kwargs.get('added_packages')
     added = added_packages
-    
+
     @property
     def removed_packages(self):
         return self.kwargs.get('removed') or self.kwargs.get('removed_packages')
