@@ -324,7 +324,7 @@ class ContentBundleIO(InterfaceObjectIO):
 
     _excluded_in_ivars_ = getattr(InterfaceObjectIO,'_excluded_in_ivars_').union(
         {'root', 'PlatformPresentationResources', 'ContentPackages',
-         'contributors', 'subjects', 'creators'}
+         'contributors', 'subjects'}
     )
 
     validate_packages = True
@@ -345,6 +345,8 @@ class ContentBundleIO(InterfaceObjectIO):
 
     def updateFromExternalObject(self, parsed, *unused_args, **unused_kwargs):
         items = parsed.pop('ContentPackages', None) or parsed.pop('Items', None)
+        if parsed.get('creators') is not None:
+            parsed['creators'] = tuple(parsed.get('creators'))
         if parsed:
             result = InterfaceObjectIO.updateFromExternalObject(self, parsed)
         else:
