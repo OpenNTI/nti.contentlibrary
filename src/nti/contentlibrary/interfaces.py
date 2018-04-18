@@ -48,6 +48,8 @@ from nti.base.interfaces import ILastModified
 
 from nti.contenttypes.completion.interfaces import ICompletableItem
 
+from nti.contenttypes.reports.interfaces import IReportContext
+
 from nti.coremetadata.interfaces import IVersioned
 from nti.coremetadata.interfaces import IShouldHaveTraversablePath
 
@@ -1256,6 +1258,7 @@ class IContentPackageBundle(IDisplayableContent,
                             ILastModified,
                             IShouldHaveTraversablePath,
                             dub_interfaces.IDCTimes,
+                            IReportContext,
                             IAnnotatable):
     """
     A (typically persistent) object representing a collection of one or more
