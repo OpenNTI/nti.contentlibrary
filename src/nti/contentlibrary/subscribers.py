@@ -184,7 +184,7 @@ def sync_bundles_when_library_synched(library, _):
 
 @component.adapter(IHostPolicyFolder, IObjectCreatedEvent)
 def on_site_created(folder, unused):
-    if ICreated.providedBy(site):
+    if ICreated.providedBy(folder):
         site_manager = folder.getSiteManager()
         install_site_content_library(site_manager)
         install_utility(ContentPackageBundleLibrary(),
