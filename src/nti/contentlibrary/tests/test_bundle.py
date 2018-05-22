@@ -63,7 +63,7 @@ class TestBundle(ContentlibraryLayerTest):
         assert_that(bundle, verifiably_provides(IEditableContentPackageBundle))
         vendor = IContentPackageBundleVendorInfo(bundle, None)
         assert_that(vendor, is_not(none()))
-        assert_that(vendor, 
+        assert_that(vendor,
                     verifiably_provides(IContentPackageBundleVendorInfo))
         assert_that(vendor,
                     has_property('__parent__', is_(bundle)))
@@ -95,7 +95,7 @@ class TestBundle(ContentlibraryLayerTest):
         empty_meta = _ContentBundleMetaInfo(key, self.global_library)
         empty_meta.lastModified = -1
         del empty_meta._ContentPackages_wrefs
-        sync_bundle_from_json_key(key, bundle, 
+        sync_bundle_from_json_key(key, bundle,
                                   self.global_library, _meta=empty_meta)
         assert_that(bundle, has_property('lastModified', greater_than(lm)))
         lm = bundle.lastModified
@@ -128,6 +128,11 @@ class TestBundle(ContentlibraryLayerTest):
                     has_property('title', 'A Title'))
         assert_that(bundle,
                     has_property('ContentPackages', has_length(1)))
+
+        # Remove packages
+        update_from_external_object(bundle, {'ContentPackages': []}, notify=False)
+        assert_that(bundle,
+                    has_property('ContentPackages', has_length(0)))
 
         # Validate restricted access
         bucket = FilesystemBucket()
