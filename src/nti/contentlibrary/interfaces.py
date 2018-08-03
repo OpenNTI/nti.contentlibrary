@@ -1304,6 +1304,9 @@ class IContentPackageBundle(IDisplayableContent,
                             default=False,
                             required=False)
 
+    byline = ValidTextLine(title=u"Displayable creator name",
+                           required=False)
+
 
 class IEditableContentPackageBundle(IContentPackageBundle):
     """
