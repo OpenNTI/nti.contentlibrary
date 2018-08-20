@@ -38,7 +38,7 @@
 	<adapter factory=".adapters.contentbundle_to_site" />
 	<adapter factory=".adapters.enumeration_from_library" />
 	<adapter factory=".adapters.trx_recorder_history_factory" />
-	
+
 	<adapter factory=".adapters.ContentPackageTransactionManager" />
 
 	<adapter factory=".bundle._ContentPackageBundleLibrarySynchronizer" />
@@ -161,6 +161,10 @@
 			 for=".interfaces.IRenderableContentPackage"
 			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
 
+    <adapter factory=".internalization._RenderableContentPackageUpdater"
+             for=".interfaces.IRenderableContentPackage"
+             provides="nti.externalization.interfaces.INamedExternalizedObjectFactoryFinder" />
+
 	<!-- Presentation assets -->
 	<include package=".indexed_data" />
 
@@ -172,5 +176,5 @@
 	<!-- Validators -->
 	<adapter factory=".vendorinfo.package_vendor_info_factory" />
 	<adapter factory=".vendorinfo.ContentPackageBundleVendorInfo" />
-		
+
 </configure>
