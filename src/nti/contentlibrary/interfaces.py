@@ -74,7 +74,6 @@ from nti.schema.field import Number
 from nti.schema.field import Object
 from nti.schema.field import Variant
 from nti.schema.field import Iterable
-from nti.schema.field import ValidTextLine
 from nti.schema.field import UniqueIterable
 from nti.schema.field import IndexedIterable
 from nti.schema.field import DecodingValidTextLine as TextLine
@@ -371,24 +370,24 @@ class ILibrarySynchronizationResults(IGenericSynchronizationResults):
 
 class IContentPackageSyncResults(IGenericSynchronizationResults):
 
-    Site = ValidTextLine(title=u"The site name", required=False)
+    Site = TextLine(title=u"The site name", required=False)
 
-    ContentPackageNTIID = ValidTextLine(title=u"uThe ContentPackage NTIID",
+    ContentPackageNTIID = TextLine(title=u"uThe ContentPackage NTIID",
                                         required=False)
 
-    AssessmentsUpdated = UniqueIterable(value_type=ValidTextLine(title=u"An asset NTIID"),
+    AssessmentsUpdated = UniqueIterable(value_type=TextLine(title=u"An asset NTIID"),
                                         title=u"The updated assessment NTIIDs",
                                         default=None, required=False)
 
-    AssessmentsSyncLocked = UniqueIterable(value_type=ValidTextLine(title=u"An asset NTIID"),
+    AssessmentsSyncLocked = UniqueIterable(value_type=TextLine(title=u"An asset NTIID"),
                                            title=u"The locked assessment NTIIDs",
                                            default=None, required=False)
 
-    AssetsUpdated = UniqueIterable(value_type=ValidTextLine(title=u"An asset NTIID"),
+    AssetsUpdated = UniqueIterable(value_type=TextLine(title=u"An asset NTIID"),
                                    title=u"The updated asset NTIIDs",
                                    default=None, required=False)
 
-    AssetsSyncLocked = UniqueIterable(value_type=ValidTextLine(title=u"An asset NTIID"),
+    AssetsSyncLocked = UniqueIterable(value_type=TextLine(title=u"An asset NTIID"),
                                       title=u"The locked asset NTIIDs",
                                       default=None, required=False)
 
@@ -1304,7 +1303,7 @@ class IContentPackageBundle(IDisplayableContent,
                             default=False,
                             required=False)
 
-    byline = ValidTextLine(title=u"Displayable creator name",
+    byline = TextLine(title=u"Displayable creator name",
                            required=False)
 
 
@@ -1554,7 +1553,7 @@ class IContentRendered(interface.Interface):
 
 
 class IContentValidationError(interface.Interface):
-    message = ValidTextLine(title=u"The error message.")
+    message = TextLine(title=u"The error message.")
 
 
 class IContentValidator(interface.Interface):
