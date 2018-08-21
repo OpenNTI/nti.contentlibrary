@@ -8,6 +8,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import BTrees
+
 from zope import component
 
 from zope.catalog.interfaces import ICatalog
@@ -15,8 +17,6 @@ from zope.catalog.interfaces import ICatalog
 from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
-
-import BTrees
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IEditableContentUnit
@@ -92,7 +92,7 @@ class ValidatingChildren(object):
         raise TypeError()
 
 
-class ChildrenIndex(AttributeSetIndex):
+class ChildrenIndex(AttributeSetIndex):  # pylint: disable=inconsistent-mro 
     default_field_name = 'children'
     interface = default_interface = ValidatingChildren
 
@@ -145,7 +145,7 @@ def get_contentlibrary_catalog(registry=component):
 
 def create_library_catalog(catalog=None, family=BTrees.family64):
     if catalog is None:
-        catalog = LibraryCatalog(family=family)
+        catalog = LibraryCatalog(family)
     for name, clazz in ((IX_SITE, SiteIndex),
                         (IX_NTIID, NTIIDIndex),
                         (IX_CREATOR, CreatorIndex),
@@ -238,7 +238,7 @@ class ValidatingContentPackages(object):
         raise TypeError()
 
 
-class ContentBundlePackagesIndex(AttributeSetIndex):
+class ContentBundlePackagesIndex(AttributeSetIndex):   # pylint: disable=inconsistent-mro 
     default_field_name = 'packages'
     default_interface = ValidatingContentPackages
 
@@ -277,7 +277,7 @@ def get_contentbundle_catalog(registry=component):
 
 def create_contentbundle_catalog(catalog=None, family=BTrees.family64):
     if catalog is None:
-        catalog = ContentBundleCatalog(family=family)
+        catalog = ContentBundleCatalog(family)
     for name, clazz in ((IX_SITE, ContentBundleSiteIndex),
                         (IX_NTIID, ContentBundleNTIIDIndex),
                         (IX_TITLE, ContentBundleTitleIndex),
