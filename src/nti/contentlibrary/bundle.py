@@ -93,8 +93,6 @@ class ContentPackageBundle(CreatedAndModifiedTimeMixin,
     __external_can_create__ = False
     __external_class_name__ = 'ContentPackageBundle'
 
-    _SET_CREATED_MODTIME_ON_INIT = False
-
     # Equality and hashcode not defined on purpose,
     # identity semantics for now!
 
