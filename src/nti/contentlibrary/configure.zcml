@@ -161,11 +161,9 @@
 			 for=".interfaces.IRenderableContentPackage"
 			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
 
-    <!-- Disable for nti.externalization update
     <adapter factory=".internalization._RenderableContentPackageUpdater"
              for=".interfaces.IRenderableContentPackage"
              provides="nti.externalization.interfaces.INamedExternalizedObjectFactoryFinder" />
-    -->
 
 	<!-- Presentation assets -->
 	<include package=".indexed_data" />
