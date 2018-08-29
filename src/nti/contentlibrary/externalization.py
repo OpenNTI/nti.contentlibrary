@@ -10,12 +10,13 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import six
 import numbers
 import collections
-from six.moves import urllib_parse
 
 import simplejson as json
+
+import six
+from six.moves import urllib_parse
 
 from zope import component
 from zope import interface
@@ -44,14 +45,14 @@ from nti.contentlibrary.utils import operate_encode_content
 
 from nti.contentlibrary.wref import contentunit_wref_to_missing_ntiid
 
-from nti.externalization.interfaces import IExternalObject
-from nti.externalization.interfaces import LocatedExternalDict
-from nti.externalization.interfaces import StandardExternalFields
-
 from nti.externalization.datastructures import InterfaceObjectIO
 
 from nti.externalization.externalization import toExternalObject
 from nti.externalization.externalization import to_standard_external_dictionary
+
+from nti.externalization.interfaces import IExternalObject
+from nti.externalization.interfaces import LocatedExternalDict
+from nti.externalization.interfaces import StandardExternalFields
 
 from nti.mimetype.externalization import decorateMimeType
 
@@ -96,6 +97,7 @@ def _path_join(root_url, path=''):
 def _root_url_of_key(key):
     href = IContentUnitHrefMapper(key).href
     # trailing slash is important for urljoin
+    # pylint: disable=no-member
     return href + ('' if href.endswith('/') else '/')
 
 
@@ -322,9 +324,10 @@ class ContentBundleIO(InterfaceObjectIO):
 
     _ext_iface_upper_bound = IContentPackageBundle
 
-    _excluded_in_ivars_ = getattr(InterfaceObjectIO,'_excluded_in_ivars_').union(
-        {'root', 'PlatformPresentationResources', 'ContentPackages',
-         'contributors', 'subjects'}
+    _excluded_in_ivars_ = frozenset(
+        getattr(InterfaceObjectIO,'_excluded_in_ivars_').union(
+            {'root', 'PlatformPresentationResources', 'ContentPackages',
+             'contributors', 'subjects'})
     )
 
     validate_packages = True
