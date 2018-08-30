@@ -12,9 +12,9 @@ from __future__ import absolute_import
 
 # This module is badly named now
 
-from six.moves import urllib_parse
-
 from lxml import etree
+
+from six.moves import urllib_parse
 
 from zope import interface
 

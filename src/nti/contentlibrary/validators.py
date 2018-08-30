@@ -50,6 +50,6 @@ def validate_content_package(package):
         try:
             contents = package.contents
             validator.validate(contents)
-        except Exception as e:
+        except Exception as e:  # pylint: disable:broad-except
             exc_info = sys.exc_info()
             return e, exc_info

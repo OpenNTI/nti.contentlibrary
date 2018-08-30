@@ -10,12 +10,14 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-# pylint: disable=E1121,E1135,E1136,E1137,W0212
-
 import os
 from os.path import join as path_join
 
+from persistent import Persistent
+
 import six
+
+from ZODB.POSException import ConnectionStateError
 
 from zope import component
 from zope import interface
@@ -26,10 +28,6 @@ from zope.cachedescriptors.property import readproperty
 from zope.cachedescriptors.property import CachedProperty
 
 from zope.dublincore.interfaces import IDCTimes
-
-from ZODB.POSException import ConnectionStateError
-
-from persistent import Persistent
 
 from nti.base.interfaces import ILastModified
 
@@ -163,7 +161,7 @@ class _FilesystemTime(object):
                 # Store only if we've changed.
                 inst.__dict__[self._name] = val
                 if hasattr(inst, '_p_changed'):
-                    inst._p_changed = True
+                    inst._p_changed = True  # pylint: disable=protected-access
             return val
 
     def __set__(self, inst, val):
@@ -278,18 +276,18 @@ class FilesystemBucket(AbstractBucket,
             if k.startswith('.'):
                 continue
 
-            if k not in cache:
+            if k not in cache:  # pylint: disable=unsupported-membership-test
                 absk = os.path.join(absolute_path, k)
                 if isinstance(absk, bytes):
                     k = k.decode('utf-8')
                     absk = absk.decode('utf-8')
-
+                # pylint: disable=unsupported-assignment-operation
                 if os.path.isdir(absk):
                     cache[k] = type(self)(self, k)
                 else:
                     cache[k] = self._key_type(self, k)
 
-            yield cache[k]
+            yield cache[k]  # pylint: disable=unsubscriptable-object
 
 
 @interface.implementer(ILastModified)
@@ -468,9 +466,11 @@ class FilesystemContentUnit(_FilesystemTimesMixin,
             return os.path.dirname(filename)
 
     def read_contents(self):
+        # pylint: disable=too-many-function-args
         return IDelimitedHierarchyEntry(self.key).read_contents()
 
     def get_parent_key(self):
+        # pylint: disable=too-many-function-args
         return IDelimitedHierarchyEntry(self.key).get_parent_key()
 
     @cachedIn('_v_make_sibling_keys')
@@ -478,10 +478,12 @@ class FilesystemContentUnit(_FilesystemTimesMixin,
         # Because keys cache things like dates and contents, it is useful
         # to return the same instance
         entry = IDelimitedHierarchyEntry(self.key)
+        # pylint: disable=too-many-function-args
         return entry.make_sibling_key(sibling_name)
 
     def _do_read_contents_of_sibling_entry(self, sibling_name):
         entry = IDelimitedHierarchyEntry(self.key)
+        # pylint: disable=too-many-function-args
         return entry.read_contents_of_sibling_entry(sibling_name)
 
     def read_contents_of_sibling_entry(self, sibling_name):
@@ -490,6 +492,7 @@ class FilesystemContentUnit(_FilesystemTimesMixin,
 
     def does_sibling_entry_exist(self, sibling_name):
         entry = IDelimitedHierarchyEntry(self.key)
+        # pylint: disable=too-many-function-args
         return entry.does_sibling_entry_exist(sibling_name)
 
     def __repr__(self):
@@ -682,6 +685,7 @@ class GlobalFilesystemSiteLibraryFactory(object):
         self.context = context
 
     def library_for_site_named(self, name):
+        # pylint: disable=too-many-function-args
         enumeration = IDelimitedHierarchyContentPackageEnumeration(self.context)
         site_enumeration = enumeration.childEnumeration('sites').childEnumeration(name)
         # whether or not it exists we return it so that

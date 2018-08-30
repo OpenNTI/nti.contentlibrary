@@ -10,12 +10,12 @@ from __future__ import absolute_import
 
 import time
 
+from persistent.mapping import PersistentMapping
+
 from zope import component
 from zope import interface
 
 from zope.annotation.factory import factory as an_factory
-
-from persistent.mapping import PersistentMapping
 
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentPackageBundle
@@ -40,8 +40,6 @@ class DefaultVendorInfo(PersistentMapping,
     # Leave these at 0 until they get set externally
     _SET_CREATED_MODTIME_ON_INIT = False
 
-    def __init__(self):
-        super(DefaultVendorInfo, self).__init__()
 
 
 @component.adapter(IContentPackage)
@@ -54,14 +52,14 @@ class DefaultContentPackageVendorInfo(DefaultVendorInfo):
 @interface.implementer(IContentPackageVendorInfo)
 def package_vendor_info_factory(package):
     try:
+        # pylint: disable=protected-access
         result = package._package_vendor_info
-        return result
     except AttributeError:
         result = package._package_vendor_info = DefaultContentPackageVendorInfo()
         result.createdTime = time.time()
         result.__parent__ = package
         result.__name__ = u'_package_vendor_info'
-        return result
+    return result
 
 
 @component.adapter(IContentPackageBundle)

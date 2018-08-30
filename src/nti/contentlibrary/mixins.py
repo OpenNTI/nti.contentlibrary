@@ -79,7 +79,7 @@ class ContentPackageImporterMixin(object):
     def validate_content_package(self, package):
         error = validate_content_package(package)
         if error is not None:
-            e, unused = error
+            e, unused_obj = error
             raise e
 
     def handle_package(self, the_object, source, context=None, **kwargs):
@@ -89,6 +89,7 @@ class ContentPackageImporterMixin(object):
             if stored is not result:  # replace
                 result = stored
                 assert IEditableContentPackage.providedBy(result)
+                # pylint: disable=no-value-for-parameter
                 # copy all new content package attributes
                 copy_attributes(the_object, result, IContentPackage.names())
                 # copy content unit attributes
@@ -123,6 +124,7 @@ class ContentPackageImporterMixin(object):
                 result.ntiid = make_content_package_ntiid(result)
             register_content_units(context, result)
             # we need events to update
+            # pylint: disable=no-member
             self.library.add(result, event=True)
 
         is_published = source.get('isPublished')
@@ -132,9 +134,9 @@ class ContentPackageImporterMixin(object):
                 result.publish()  # event trigger render job
             except ContentValidationError:
                 # Nothing we can do about this except log.
-                logger.warn('Invalid content in published package (%s)',
-                            result.ntiid,
-                            exc_info=True)
+                logger.warning('Invalid content in published package (%s)',
+                               result.ntiid,
+                               exc_info=True)
 
         locked = source.get('isLocked')
         if locked:

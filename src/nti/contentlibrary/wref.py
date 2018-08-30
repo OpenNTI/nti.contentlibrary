@@ -28,8 +28,6 @@ from nti.wref.interfaces import IWeakRef
 
 logger = __import__('logging').getLogger(__name__)
 
-# pylint:disable=I0011,W0212
-
 
 @total_ordering
 @EqHash('_ntiid')
@@ -92,5 +90,5 @@ def contentunit_wref_to_missing_ntiid(ntiid):
 
     validate_ntiid_string(ntiid)
     wref = ContentUnitWeakRef.__new__(ContentUnitWeakRef)
-    wref._ntiid = ntiid
+    wref._ntiid = ntiid  # pylint: disable=protected-access
     return wref

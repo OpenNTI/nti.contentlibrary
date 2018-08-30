@@ -10,7 +10,6 @@ from __future__ import absolute_import
 
 import os
 import re
-import six
 import time
 import zlib
 import base64
@@ -21,6 +20,8 @@ from datetime import datetime
 from collections import namedtuple
 
 from PIL import Image
+
+import six
 
 from zope import component
 
@@ -151,9 +152,9 @@ def get_package_snapshot(package, timestamp=None):
                     result = Snapshot(publish_attrs['contents'],
                                       publish_attrs.get('version'))
                 except KeyError:
-                    logger.warn('No contents found (%s) (external_value=%s)',
-                                package.ntiid,
-                                publish_attrs)
+                    logger.warning('No contents found (%s) (external_value=%s)',
+                                   package.ntiid,
+                                   publish_attrs)
     return result
 
 

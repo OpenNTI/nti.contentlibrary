@@ -12,6 +12,16 @@ import time
 import numbers
 import warnings
 
+from BTrees.OOBTree import OOBTree
+
+from persistent import Persistent
+
+from ZODB.interfaces import IBroken
+from ZODB.interfaces import IConnection
+
+from ZODB.POSException import POSError
+from ZODB.POSException import ConnectionStateError
+
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -23,16 +33,6 @@ from zope.component.hooks import getSite
 from zope.event import notify
 
 from zope.intid.interfaces import IIntIds
-
-from ZODB.interfaces import IBroken
-from ZODB.interfaces import IConnection
-
-from ZODB.POSException import POSError
-from ZODB.POSException import ConnectionStateError
-
-from persistent import Persistent
-
-from BTrees.OOBTree import OOBTree
 
 from nti.contentlibrary import DELETED_MARKER
 from nti.contentlibrary import AUTHORED_PREFIX

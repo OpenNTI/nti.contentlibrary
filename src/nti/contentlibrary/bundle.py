@@ -12,6 +12,11 @@ from __future__ import absolute_import
 
 import time
 
+from BTrees.OOBTree import OOSet
+from BTrees.OOBTree import difference as ooset_difference
+
+from ZODB.POSException import ConnectionStateError
+
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -28,11 +33,6 @@ from zope.event import notify
 from zope.location.location import locate
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
-
-from ZODB.POSException import ConnectionStateError
-
-from BTrees.OOBTree import OOSet
-from BTrees.OOBTree import difference as ooset_difference
 
 from nti.base.interfaces import ICreated
 

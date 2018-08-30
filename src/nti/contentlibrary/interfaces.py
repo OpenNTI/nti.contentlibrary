@@ -704,7 +704,7 @@ class IDisplayableContent(IZContained,
                                              required=False)
 
 
-class IDelimitedHierarchyEntry(interface.Interface, dub_interfaces.IDCTimes):
+class IDelimitedHierarchyEntry(dub_interfaces.IDCTimes):
     """
     Similar to an :class:`IFilesystemEntry`, but not tied to the local (or mounted)
     filesystem. Each entry is named by a ``/`` delimited key analogous to a filesystem
@@ -1014,6 +1014,7 @@ class ContentPackageReplacedEvent(ObjectModifiedEvent):
     original = None
     replacement = alias('object')
 
+    # pylint: disable=keyword-arg-before-vararg 
     def __init__(self, replacement, original,
                  params=None, results=None, *descriptions):
         ObjectModifiedEvent.__init__(self, replacement, *descriptions)

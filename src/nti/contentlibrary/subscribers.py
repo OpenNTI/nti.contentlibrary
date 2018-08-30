@@ -10,8 +10,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-# pylint: disable=E1101,E1121
-
 from zope import component
 
 from zope.component.hooks import site
@@ -81,6 +79,7 @@ def install_site_content_library(local_site_manager, _=None):
                        global_library)
         return
 
+    # pylint: disable=too-many-function-args
     library = site_library_factory.library_for_site_named(local_site.__name__)
     logger.info("Installing site library %s for %s",
                 library, local_site.__name__)
@@ -164,6 +163,7 @@ def sync_bundles_when_library_synched(library, _):
     enumeration = IDelimitedHierarchyContentPackageEnumeration(library)
     enumeration_root = enumeration.root
 
+    # pylint: disable=no-member
     bundle_bucket = enumeration_root.getChildNamed(bundle_library.__name__)
     if bundle_bucket is None:
         logger.info("Not synchronizing: no directory named %s in %s for library %s",
@@ -179,11 +179,12 @@ def sync_bundles_when_library_synched(library, _):
                 bundle_library, site_manager.__parent__.__name__,
                 getattr(bundle_bucket, 'absolute_path', bundle_bucket))
     syncable = ISyncableContentPackageBundleLibrary(bundle_library)
+    # pylint: disable=too-many-function-args
     syncable.syncFromBucket(bundle_bucket)
 
 
 @component.adapter(IHostPolicyFolder, IObjectCreatedEvent)
-def on_site_created(folder, unused):
+def on_site_created(folder, unused_event=None):
     if ICreated.providedBy(folder):
         site_manager = folder.getSiteManager()
         install_site_content_library(site_manager)

@@ -10,6 +10,10 @@ from __future__ import absolute_import
 
 import time
 
+from persistent.list import PersistentList
+
+from ZODB.POSException import ConnectionStateError
+
 from zope import interface
 
 from zope.cachedescriptors.property import readproperty
@@ -19,10 +23,6 @@ from zope.container.ordered import OrderedContainer
 from zope.dublincore.interfaces import IDCTimes
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
-
-from ZODB.POSException import ConnectionStateError
-
-from persistent.list import PersistentList
 
 from nti.base._compat import text_
 
@@ -69,7 +69,7 @@ class TimesMixin(PersistentCreatedModDateTrackingObject):
     created = alias('createdTime')
     modified = alias('lastModified')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # pylint: disable=useless-super-delegation
         super(TimesMixin, self).__init__(*args, **kwargs)
 
 
@@ -84,7 +84,7 @@ class PersistentHierarchyKey(TimesMixin, AbstractKey):
     def writeContents(self, data):
         if not isinstance(data, bytes):
             data = data.encode('utf-8')
-        self.data = data
+        self.data = data  # pylint: disable=attribute-defined-outside-init
     write_contents = writeContents
 
 
@@ -95,7 +95,7 @@ class PersistentHierarchyBucket(TimesMixin,
 
     _key_type = PersistentHierarchyKey
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # pylint: disable=super-init-not-called
         OrderedContainer.__init__(self)
         AbstractBucket.__init__(*args, **kwargs)
 
@@ -166,6 +166,7 @@ class PersistentContentUnit(RecordableMixin,
     getContentType = get_content_type
 
     def set_content_type(self, contentType):
+        # pylint: disable=attribute-defined-outside-init
         self.contents_key.contentType = contentType
     setContentType = set_content_type
 
@@ -224,27 +225,32 @@ class RenderableContentUnit(PersistentContentUnit):
     def read_contents(self):
         if self.has_key:
             entry = IDelimitedHierarchyEntry(self.key, None)
+            # pylint: disable=too-many-function-args
             return entry.read_contents() if entry is not None else None
         return super(RenderableContentUnit, self).read_contents()
 
     def get_parent_key(self):
         if self.has_key:
             entry = IDelimitedHierarchyEntry(self.key, None)
+            # pylint: disable=too-many-function-args
             return entry.get_parent_key() if entry is not None else None
 
     def make_sibling_key(self, sibling_name):
         if self.has_key:
             entry = IDelimitedHierarchyEntry(self.key, None)
+            # pylint: disable=too-many-function-args
             return entry is not None and entry.make_sibling_key(sibling_name)
 
     def read_contents_of_sibling_entry(self, sibling_name):
         if self.has_key:
             entry = IDelimitedHierarchyEntry(self.key, None)
+            # pylint: disable=too-many-function-args
             return entry is not None and entry.read_contents_of_sibling_entry(sibling_name)
 
     def does_sibling_entry_exist(self, sibling_name):
         if self.has_key:
             entry = IDelimitedHierarchyEntry(self.key, None)
+            # pylint: disable=too-many-function-args
             return entry is not None and entry.does_sibling_entry_exist(sibling_name)
 
 
