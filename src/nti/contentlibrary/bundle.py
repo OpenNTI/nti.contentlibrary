@@ -301,7 +301,7 @@ from nti.contentlibrary.wref import contentunit_wref_to_missing_ntiid
 
 from nti.ntiids.schema import ValidNTIID
 
-from nti.schema.field import IndexedIterable
+from nti.schema.field import ListOrTuple
 
 
 def get_package_for_bundle(package, library=None):
@@ -322,11 +322,11 @@ def get_package_for_bundle(package, library=None):
 
 class IContentBundleMetaInfo(IContentPackageBundle):
 
-    ContentPackages = IndexedIterable(
-        title=u"An iterable of NTIIDs of sub-containers embedded via reference in this content",
-        value_type=ValidNTIID(title=u"The embedded NTIID"),
-        unique=True,
-        default=())
+    ContentPackages = ListOrTuple(
+                        title=u"An iterable of NTIIDs of sub-containers embedded via reference in this content",
+                        value_type=ValidNTIID(title=u"The embedded NTIID"),
+                        unique=True,
+                        default=())
 
 
 _IContentBundleMetaInfo = IContentBundleMetaInfo  # alias

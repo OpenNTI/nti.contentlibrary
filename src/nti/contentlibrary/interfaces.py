@@ -74,8 +74,8 @@ from nti.schema.field import Number
 from nti.schema.field import Object
 from nti.schema.field import Variant
 from nti.schema.field import Iterable
+from nti.schema.field import ListOrTuple
 from nti.schema.field import UniqueIterable
-from nti.schema.field import IndexedIterable
 from nti.schema.field import DecodingValidTextLine as TextLine
 
 # pylint: disable=locally-disabled,no-self-argument,no-method-argument
@@ -336,11 +336,11 @@ class IContentPackageLibrary(ILastModified,
 
 class ISynchronizationParams(interface.Interface):
 
-    ntiids = IndexedIterable(title=u"An iterable of NTIIDs of 'things' to sync",
-                             value_type=TextLine(title=u"The NTIID"),
-                             unique=True,
-                             default=(),
-                             required=False)
+    ntiids = ListOrTuple(title=u"An iterable of NTIIDs of 'things' to sync",
+                         value_type=TextLine(title=u"The NTIID"),
+                         unique=True,
+                         default=(),
+                         required=False)
 
     allowRemoval = Bool(title=u"Allow content drops/removal",
                         default=False,
@@ -404,9 +404,9 @@ class IContentPackageSyncResults(IGenericSynchronizationResults):
 
 class ISynchronizationResults(IFiniteSequence):
 
-    Items = IndexedIterable(title=u"An iterable of sync results",
-                            value_type=Object(IGenericSynchronizationResults),
-                            required=False)
+    Items = ListOrTuple(title=u"An iterable of sync results",
+                        value_type=Object(IGenericSynchronizationResults),
+                        required=False)
 
     def add(item):
         """
@@ -815,11 +815,11 @@ class IContentUnit(IZContained,
     children = Iterable(title=u"Any :class:`IContentUnit` objects this item has.",
                         default=())
 
-    embeddedContainerNTIIDs = IndexedIterable(
-        title=u"An iterable of NTIIDs of sub-containers embedded via reference in this content",
-        value_type=ValidNTIID(title=u"The embedded NTIID"),
-        unique=True,
-        default=())
+    embeddedContainerNTIIDs = ListOrTuple(
+            title=u"An iterable of NTIIDs of sub-containers embedded via reference in this content",
+            value_type=ValidNTIID(title=u"The embedded NTIID"),
+            unique=True,
+            default=())
 
 
 class IEditableContentUnit(IContentUnit,
@@ -1440,17 +1440,17 @@ class IContentPackageLibraryModifiedOnSyncEvent(IObjectModifiedEvent):
     after events for individual content package changes.
     """
 
-    added = IndexedIterable(title=u"Content package added",
-                            value_type=Object(IContentPackage),
-                            required=False)
+    added = ListOrTuple(title=u"Content package added",
+                        value_type=Object(IContentPackage),
+                        required=False)
 
-    removed = IndexedIterable(title=u"Content package removed",
-                              value_type=Object(IContentPackage),
-                              required=False)
+    removed = ListOrTuple(title=u"Content package removed",
+                          value_type=Object(IContentPackage),
+                          required=False)
 
-    changed = IndexedIterable(title=u"Content package modified",
-                              value_type=Object(IContentPackage),
-                              required=False)
+    changed = ListOrTuple(title=u"Content package modified",
+                          value_type=Object(IContentPackage),
+                          required=False)
 
     params = Object(ISynchronizationParams,
                     title=u"Synchronization parameters",
