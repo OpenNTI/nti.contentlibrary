@@ -21,9 +21,9 @@ from nti.externalization.representation import WithRepr
 
 from nti.property.property import alias
 
-from nti.schema.field import SchemaConfigured
-
 from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.schema.schema import SchemaConfigured
 
 CONTENT_REMOVAL_ERROR_CODE = 1
 MISSING_NTIID_ERROR_CODE = 10

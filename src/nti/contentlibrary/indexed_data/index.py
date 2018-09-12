@@ -8,8 +8,13 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import six
 import time
+
+import BTrees
+
+from persistent import Persistent
+
+import six
 
 from zope import component
 
@@ -17,11 +22,7 @@ from zope.component.hooks import getSite
 
 from zope.deprecation import deprecated
 
-from zope.intid import IIntIds
-
-import BTrees
-
-from persistent import Persistent
+from zope.intid.interfaces import IIntIds
 
 from nti.base._compat import text_
 
@@ -276,6 +277,7 @@ class ContainedObjectCatalog(Persistent):
         result = None
         container_query = 'all_of' if container_all_of else 'any_of'
 
+        # pylint: disable=no-member
         # Provided is interface that maps to our type adapter
         for index, value, query in ((self._site_index, sites, 'any_of'),
                                     (self._ntiid_index, ntiid, 'any_of'),
@@ -322,7 +324,7 @@ class ContainedObjectCatalog(Persistent):
                              (self._target_index, item),
                              (self._namespace_index, namespace),
                              (self._container_index, container_ntiids)):
-            # XXX: we want to make sure we don't index None in order to
+            # We want to make sure we don't index None in order to
             # to keep the index data value(s)
             if value is not None and index is not None:
                 index.index_doc(doc_id, value)
@@ -361,6 +363,7 @@ def install_container_catalog(site_manager_container, intids=None):
     catalog = lsm.queryUtility(IContainedObjectCatalog,
                                name=CATALOG_INDEX_NAME)
     if catalog is None:
+        # pylint: disable=attribute-defined-outside-init
         catalog = ContainedObjectCatalog()
         catalog.__name__ = CATALOG_INDEX_NAME
         catalog.__parent__ = site_manager_container

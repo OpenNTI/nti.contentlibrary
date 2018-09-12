@@ -50,7 +50,7 @@ class IndexedDataContainer(PersistentCreatedAndModifiedTimeObject):
     __name__ = None
     __parent__ = None
 
-    def __init__(self, unit, sites=None):
+    def __init__(self, unit, sites=None):  # pylint: disable=super-init-not-called
         self.sites = sites or get_component_hierarchy_names()
         self.ntiid = getattr(unit, 'ntiid', None) \
                   or getattr(unit, 'NTIID', None) or u''
@@ -64,6 +64,7 @@ class IndexedDataContainer(PersistentCreatedAndModifiedTimeObject):
         return component.getUtility(IIntIds)
 
     def __getitem__(self, key):
+        # pylint: disable=no-member
         items = list(self.catalog.search_objects(container_ntiids=(self.ntiid,),
                                                  provided=self.type,
                                                  ntiid=key,
@@ -81,6 +82,7 @@ class IndexedDataContainer(PersistentCreatedAndModifiedTimeObject):
             return default
 
     def __contains__(self, key):
+        # pylint: disable=no-member
         items = self.catalog.get_references(container_ntiids=(self.ntiid,),
                                             provided=self.type,
                                             sites=self.sites,
@@ -90,12 +92,14 @@ class IndexedDataContainer(PersistentCreatedAndModifiedTimeObject):
 
     @property
     def doc_ids(self):
+        # pylint: disable=no-member
         result = self.catalog.get_references(container_ntiids=(self.ntiid,),
                                              sites=self.sites,
                                              provided=self.type)
         return result
 
     def keys(self):
+        # pylint: disable=no-member
         ntiid_index = self.catalog.ntiid_index
         for doc_id in self.doc_ids:
             value = ntiid_index.documents_to_values.get(doc_id)
