@@ -264,7 +264,7 @@ class ContentPackageBundleLibrary(CheckingLastModifiedBTreeContainer):
             self.updateLastMod()
     append = add
 
-    def getBundles(self):
+    def getBundles(self, parents=True):
         # recall that lower bundles override higher ones
         seen_ids = set()
         for k, v in self.items():
@@ -272,7 +272,7 @@ class ContentPackageBundleLibrary(CheckingLastModifiedBTreeContainer):
             yield v
 
         parent_lib = self._parent_lib
-        if parent_lib is None:
+        if parent_lib is None or not parents:
             # done
             return
 

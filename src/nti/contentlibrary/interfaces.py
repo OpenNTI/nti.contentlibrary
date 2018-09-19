@@ -1305,7 +1305,7 @@ class IContentPackageBundle(IDisplayableContent,
                             required=False)
 
     byline = TextLine(title=u"Displayable creator name",
-                           required=False)
+                      required=False)
 
 
 class IEditableContentPackageBundle(IContentPackageBundle):
