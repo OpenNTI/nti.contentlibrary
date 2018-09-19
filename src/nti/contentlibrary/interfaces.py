@@ -1360,10 +1360,12 @@ class IContentPackageBundleLibrary(IContentContainer):
         Add a bundle to this library
         """
 
-    def getBundles():
+    def getBundles(parents=True):
         """
         Return all the bundles from this library
         and the parents.
+        
+        :param parents: Flag to control if parents are parent bundles are returned
         """
 
 
