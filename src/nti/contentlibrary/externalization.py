@@ -71,7 +71,7 @@ class _ContentPackageLibraryExternal(object):
     def __init__(self, library):
         self.library = library
 
-    def toExternalObject(self):
+    def toExternalObject(self, **kwargs):
         return LocatedExternalDict({
             'title': "Library",
             'titles': [toExternalObject(x) for x in self.library.contentPackages or ()]
