@@ -1014,7 +1014,7 @@ class ContentPackageReplacedEvent(ObjectModifiedEvent):
     original = None
     replacement = alias('object')
 
-    # pylint: disable=keyword-arg-before-vararg 
+    # pylint: disable=keyword-arg-before-vararg
     def __init__(self, replacement, original,
                  params=None, results=None, *descriptions):
         ObjectModifiedEvent.__init__(self, replacement, *descriptions)
@@ -1325,8 +1325,7 @@ class IEditableContentPackageBundle(IContentPackageBundle):
 
 
 class IPublishableContentPackageBundle(IEditableContentPackageBundle,
-                                       IPublishable,
-                                       INoPublishLink):
+                                       IPublishable):
     """
     An publishable context package bundle
     """
@@ -1364,7 +1363,7 @@ class IContentPackageBundleLibrary(IContentContainer):
         """
         Return all the bundles from this library
         and the parents.
-        
+
         :param parents: Flag to control if parents are parent bundles are returned
         """
 
