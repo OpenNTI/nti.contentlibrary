@@ -52,7 +52,7 @@ class TestWref(ContentlibraryLayerTest):
         unit = lib[ntiid]
 
         wref = IWeakRef(unit)
-        assert_that(wref, 
+        assert_that(wref,
                     has_properties('ntiid', is_(ntiid),
                                    '_ntiid', is_(ntiid)))
         assert_that(wref(), is_(unit))

@@ -83,7 +83,6 @@ class TestSubscribers(ContentlibraryLayerTest):
         site_lib = subscribers.install_site_content_library(
             sm,
             NewLocalSite(sm))
-
         assert_that(sm.getUtility(interfaces.IContentUnitAnnotationUtility),
                     is_not(component.getUtility(interfaces.IContentUnitAnnotationUtility)))
 
@@ -152,7 +151,6 @@ class TestSubscribers(ContentlibraryLayerTest):
 
         site_factory.library_for_site_named(u'localsite')
         eventtesting.clearEvents()
-
         subscribers.install_site_content_library(sm, NewLocalSite(sm))
 
         events = eventtesting.getEvents(
@@ -184,7 +182,7 @@ class TestSubscribers(ContentlibraryLayerTest):
         restricted_ntiid = u'tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle'
         restricted_bundle = bundle_lib[restricted_ntiid]
         assert_that(restricted_bundle, not_none())
-        assert_that(restricted_bundle, 
+        assert_that(restricted_bundle,
                     validly_provides(interfaces.IContentPackageBundle))
         assert_that(restricted_bundle,
                     externalizes(has_entries('Class', 'ContentPackageBundle',

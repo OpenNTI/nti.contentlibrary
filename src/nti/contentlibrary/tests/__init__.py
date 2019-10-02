@@ -27,10 +27,7 @@ from nti.testing.layers import ConfiguringLayerMixin
 class ContentlibraryTestLayer(ZopeComponentLayer,
                               ConfiguringLayerMixin):
 
-    set_up_packages = ('nti.containers',
-                       'nti.contentlibrary',
-                       'nti.externalization',
-                       'nti.contenttypes.presentation')
+    set_up_packages = ('nti.contentlibrary',)
 
     @classmethod
     def setUp(cls):

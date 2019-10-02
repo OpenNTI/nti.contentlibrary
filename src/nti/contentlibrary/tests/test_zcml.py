@@ -10,7 +10,6 @@ from __future__ import absolute_import
 
 from hamcrest import is_
 from hamcrest import is_not
-from hamcrest import has_entry
 from hamcrest import assert_that
 from hamcrest import has_property
 does_not = is_not
@@ -28,15 +27,12 @@ from zope.configuration import xmlconfig
 from nti.contentlibrary.interfaces import IS3Key
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IAbsoluteContentUnitHrefMapper
-from nti.contentlibrary.interfaces import IFilesystemContentPackageLibrary
 
 from nti.contentlibrary.boto_s3 import BotoS3BucketContentLibrary
 
 from nti.contentlibrary.filesystem import EnumerateOnceFilesystemLibrary
 
-from nti.contentlibrary.tests import ContentlibraryLayerTest
-
-from nti.externalization.externalization import to_external_object
+import nti.testing.base
 
 
 HEAD_ZCML_STRING = u"""
@@ -68,14 +64,10 @@ BOTO_ZCML_STRING = HEAD_ZCML_STRING + u"""
         """
 
 
-class TestZcml(ContentlibraryLayerTest):
-
-    def setUp(self):
-        super(TestZcml, self).setUp()
+class TestZcml(nti.testing.base.ConfiguringTestBase):
 
     def test_filesystem_site_registrations(self):
         #"Can we add new registrations in a sub-site?"
-
         context = config.ConfigurationMachine()
         context.package = self.get_configuration_package()
         xmlconfig.registerCommonDirectives(context)
@@ -83,15 +75,9 @@ class TestZcml(ContentlibraryLayerTest):
         xmlconfig.string(ZCML_STRING, context)
 
         lib = component.getUtility(IContentPackageLibrary)
-        assert_that(lib, verifiably_provides(IFilesystemContentPackageLibrary))
         assert_that(lib, is_(EnumerateOnceFilesystemLibrary))
         # Did the right prefix come in?
         assert_that(lib, has_property('url_prefix', '/SomePrefix/'))
-        pack_ext = to_external_object(lib[0])
-        assert_that(pack_ext,
-                    has_entry('href',
-                              '/SomePrefix/TestFilesystem/index.html'))
-        assert_that(pack_ext, has_entry('root', '/SomePrefix/TestFilesystem/'))
 
     @fudge.patch('boto.connect_s3')
     def test_register_boto(self, fake_connect):
