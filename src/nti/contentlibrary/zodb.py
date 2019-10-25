@@ -97,7 +97,7 @@ class PersistentHierarchyBucket(TimesMixin,
 
     def __init__(self, *args, **kwargs):  # pylint: disable=super-init-not-called
         OrderedContainer.__init__(self)
-        AbstractBucket.__init__(*args, **kwargs)
+        AbstractBucket.__init__(self, *args, **kwargs)
 
     def enumerateChildren(self):
         return list(self.values())
