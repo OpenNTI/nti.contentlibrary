@@ -390,7 +390,7 @@ class _DisplayablePlatformPresentationResourcesIO(InterfaceObjectIO):
     def toExternalObject(self, *args, **kwargs):  # pylint: disable=arguments-differ
         result = InterfaceObjectIO.toExternalObject(self, *args, **kwargs)
         root_url = _root_url_of_key(self._ext_self.root)
-        root_url = _path_maybe_quote(root_url)
+        root_url = urllib_parse.quote(root_url)
         # pylint: disable=protected-access
         result._root_url = root_url
         result['href'] = root_url
