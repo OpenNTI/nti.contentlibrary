@@ -427,7 +427,7 @@ def operate_content(content, context=None, **kwargs):
 
 def operate_encode_content(content, context=None, **kwargs):
     content = operate_content(content, context, **kwargs)
-    return base64.b64encode(zlib.compress(content or b''))
+    return base64.b64encode(zlib.compress(bytes_(content) or b''))
 
 
 def export_content_package(package, backup=False, salt=None, filer=None):
