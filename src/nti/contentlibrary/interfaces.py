@@ -1296,6 +1296,8 @@ class IContentPackageBundle(IDisplayableContent,
                                      title=u"The referenced content packages",
                                      default=())
 
+    ContentPackages.setTaggedValue('_ext_excluded_out', True)
+
     RestrictedAccess = Bool(title=u"Restrict access to this bundle.",
                             description=u"""Defines whether we'll restrict access to this bundle.
                                     Historically, bundles have always been visible to all. By

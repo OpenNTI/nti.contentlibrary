@@ -11,11 +11,13 @@ from __future__ import absolute_import
 from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
+from hamcrest import has_item
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_entries
 from hamcrest import greater_than
 from hamcrest import has_property
+does_not = is_not
 
 from nti.testing.matchers import verifiably_provides
 
@@ -107,13 +109,13 @@ class TestBundle(ContentlibraryLayerTest):
         ext_obj = to_external_object(bundle)
         assert_that(ext_obj,
                     has_entries('Class', 'ContentPackageBundle',
-                                'ContentPackages', has_length(1),
                                 'MimeType', 'application/vnd.nextthought.contentpackagebundle',
                                 'NTIID', 'tag:nextthought.com,2011-10:NTI-Bundle-ABundle',
                                 'title', 'A Title',
                                 'root', '/ABundle/',
                                 'PlatformPresentationResources', has_length(3)))
 
+        assert_that(ext_obj, does_not(has_item('ContentPackages')))
         ext_obj['ContentPackages'] = [
             u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
         ]

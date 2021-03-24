@@ -186,7 +186,6 @@ class TestSubscribers(ContentlibraryLayerTest):
                     validly_provides(interfaces.IContentPackageBundle))
         assert_that(restricted_bundle,
                     externalizes(has_entries('Class', 'ContentPackageBundle',
-                                             'ContentPackages', has_length(1),
                                              'title', 'Restricted',
                                              'root', '/sites/localsite/ContentPackageBundles/RestrictedBundle/',
                                              'NTIID', restricted_ntiid,
@@ -199,7 +198,6 @@ class TestSubscribers(ContentlibraryLayerTest):
 
         assert_that(bundle,
                     externalizes(has_entries('Class', 'ContentPackageBundle',
-                                             'ContentPackages', has_length(1),
                                              'title', 'A Title',
                                              'root', '/sites/localsite/ContentPackageBundles/ABundle/',
                                              'NTIID', bundle.ntiid,
