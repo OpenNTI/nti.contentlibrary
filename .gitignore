@@ -1,0 +1,13 @@
+
+# /
+/.project
+/.pydevproject
+/.settings
+/.tox
+/.coverage
+
+# /docs/
+/docs/_build
+
+# /src/
+/src/nti.contentlibrary.egg-info
