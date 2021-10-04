@@ -1,13 +1,18 @@
+*.py[cod]
 
-# /
 /.project
 /.pydevproject
-/.settings
-/.tox
-/.coverage
+/.settings/
 
-# /docs/
-/docs/_build
+*.DS_Store
 
-# /src/
+# Distribution / packaging
+build/
+dist/
+/.tox/
+
+.coverage
+htmlcov/
+docs/_build/
+
 /src/nti.contentlibrary.egg-info
